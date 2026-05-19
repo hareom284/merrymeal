@@ -1,2 +1,4 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+deploy/ansible/roles/ansible-role-elk/files/ansible-role-elk-7.17.9.tar.gz binary
