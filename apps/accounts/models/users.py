@@ -1,30 +1,17 @@
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
-from django.utils import timezone
 
+from apps.accounts.managers import UserManager
 from apps.core.managers import AllObjectsManager
 
 
-class UserManager(BaseUserManager):
-    def get_queryset(self):
-        return super().get_queryset().filter(deleted_at__isnull=True)
-
-    def create_user(self, email, password, full_name, role, **extra):
-        if not email:
-            raise ValueError("Email is required")
-        email = self.normalize_email(email)
-        user = self.model(email=email, full_name=full_name, role=role, **extra)
-        user.set_password(password)
-        user.save(using=self._db)
-        return user
-
-    def create_superuser(self, email, password, full_name="Admin", role="admin", **extra):
-        extra.setdefault("is_staff", True)
-        extra.setdefault("is_superuser", True)
-        return self.create_user(email, password, full_name, role, **extra)
-
-
 class User(AbstractBaseUser, PermissionsMixin):
+    """Schema only — fields, choices, Meta. No business logic, no managers
+    defined inline. See:
+      - apps.accounts.managers for the UserManager
+      - apps.accounts.services  for create_user, delete_user, sign_in, ...
+    """
+
     ROLE_CHOICES = [
         ("member", "Member"),
         ("volunteer", "Volunteer"),
@@ -52,11 +39,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     REQUIRED_FIELDS = ["full_name", "role"]
 
     class Meta:
+        app_label = "accounts"
         db_table = "users"
 
     def __str__(self) -> str:
         return f"{self.full_name} <{self.email}>"
-
-    def delete(self, using=None, keep_parents=False):
-        self.deleted_at = timezone.now()
-        self.save(update_fields=["deleted_at", "updated_at"])

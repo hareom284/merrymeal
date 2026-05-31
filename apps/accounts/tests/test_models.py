@@ -2,14 +2,15 @@ import pytest
 from django.contrib.auth import get_user_model
 from django.db import IntegrityError
 
+from apps.accounts.services import create_user, delete_user
+
 User = get_user_model()
 
 
 @pytest.mark.django_db
-def test_user_requires_email_and_role():
-    user = User.objects.create_user(
-        email="a@example.com", password="pw", full_name="Alice", role="member"
-    )
+def test_user_schema_basics():
+    """Model is schema-only; we exercise it via the service."""
+    user = create_user(email="a@example.com", password="pw", full_name="Alice", role="member")
     assert user.email == "a@example.com"
     assert user.full_name == "Alice"
     assert user.role == "member"
@@ -20,21 +21,16 @@ def test_user_requires_email_and_role():
 
 @pytest.mark.django_db
 def test_email_is_unique():
-    User.objects.create_user(
-        email="a@example.com", password="pw", full_name="A", role="member"
-    )
+    create_user(email="a@example.com", password="pw", full_name="A", role="member")
     with pytest.raises(IntegrityError):
-        User.objects.create_user(
-            email="a@example.com", password="pw", full_name="A2", role="donor"
-        )
+        create_user(email="a@example.com", password="pw", full_name="A2", role="donor")
 
 
 @pytest.mark.django_db
-def test_soft_delete_hides_user_from_default_manager():
-    user = User.objects.create_user(
-        email="a@example.com", password="pw", full_name="A", role="member"
-    )
+def test_delete_user_soft_deletes_and_hides_from_default_manager():
+    user = create_user(email="a@example.com", password="pw", full_name="A", role="member")
     pk = user.pk
-    user.delete()
+    delete_user(user)
+    assert user.deleted_at is not None
     assert User.objects.filter(pk=pk).count() == 0
     assert User.all_objects.filter(pk=pk).count() == 1

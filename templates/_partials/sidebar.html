@@ -1,0 +1,88 @@
+{% comment %}
+  Sidebar app navigation. Pass `active` via {% include %} `with` syntax.
+{% endcomment %}
+<aside class="hidden md:flex w-64 shrink-0 flex-col bg-white border-r border-warm-200">
+  <!-- Brand -->
+  <div class="px-5 py-5 flex items-center gap-3">
+    <span class="w-9 h-9 rounded-xl bg-brand-green text-white flex items-center justify-center font-bold">M</span>
+    <span class="text-xl font-semibold tracking-tight">
+      <span class="text-warm-900">Merry</span><span class="text-brand-green">Meal</span>
+    </span>
+  </div>
+
+  <!-- Nav -->
+  <nav class="flex-1 px-3 py-2">
+    <p class="px-3 pt-2 pb-1 text-xs font-medium uppercase tracking-wider text-warm-500">Menu</p>
+    <ul class="flex flex-col gap-0.5">
+      {% with active=active|default:"dashboard" %}
+      <li>
+        <a href="{% url 'dashboards:member' %}"
+           class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm
+                  {% if active == 'dashboard' %}bg-warm-100 text-warm-900 font-semibold shadow-sm{% else %}text-warm-700 hover:bg-warm-50{% endif %}">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12 12 4l9 8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 10v10h14V10" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span>Dashboard</span>
+        </a>
+      </li>
+      <li>
+        <a href="#" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-warm-700 hover:bg-warm-50">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 2v9M5 2v6a3 3 0 0 0 3 3M11 2v9M16 2v20M19 2c1.1 0 2 .9 2 2v8c0 1.1-.9 2-2 2v6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span>This week's menu</span>
+        </a>
+      </li>
+      <li>
+        <a href="#" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-warm-700 hover:bg-warm-50">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0" stroke-linecap="round"/></svg>
+          <span>Dietary profile</span>
+        </a>
+      </li>
+      <li>
+        <a href="#" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-warm-700 hover:bg-warm-50">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15 9 22 9 17 14 18 21 12 17 6 21 7 14 2 9 9 9 12 2" stroke-linejoin="round"/></svg>
+          <span>Feedback</span>
+        </a>
+      </li>
+      <li>
+        <a href="#" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-warm-700 hover:bg-warm-50">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span>Help &amp; contact</span>
+        </a>
+      </li>
+      {% endwith %}
+    </ul>
+  </nav>
+
+  <!-- User profile footer with Alpine dropdown -->
+  <div x-data="{ open: false }" class="relative border-t border-warm-200 px-4 py-4">
+    <button @click="open = !open"
+            @click.outside="open = false"
+            class="w-full flex items-center gap-3 rounded-xl hover:bg-warm-50 -mx-2 px-2 py-1.5">
+      <span class="w-10 h-10 rounded-full bg-warm-200 text-warm-700 flex items-center justify-center text-sm font-semibold">
+        {{ request.user.full_name|slice:":2"|upper }}
+      </span>
+      <div class="flex-1 min-w-0 text-left">
+        <p class="text-sm font-semibold text-warm-900 truncate">{{ request.user.full_name }}</p>
+        <p class="text-xs text-warm-500 capitalize">{{ request.user.role }}</p>
+      </div>
+      <span class="w-8 h-8 rounded-lg flex items-center justify-center text-warm-500" aria-label="More">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+      </span>
+    </button>
+
+    <!-- Dropdown -->
+    <div x-show="open" x-cloak x-transition
+         class="absolute bottom-full left-4 right-4 mb-2 rounded-2xl bg-white border border-warm-200 shadow-card overflow-hidden">
+      <a href="#" class="flex items-center gap-3 px-4 py-3 text-sm text-warm-800 hover:bg-warm-50">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0" stroke-linecap="round"/></svg>
+        Account settings
+      </a>
+      <form method="post" action="{% url 'accounts:logout' %}" class="border-t border-warm-200">
+        {% csrf_token %}
+        <button type="submit"
+                class="w-full flex items-center gap-3 px-4 py-3 text-sm text-warm-800 hover:bg-warm-50 text-left">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Sign out
+        </button>
+      </form>
+    </div>
+  </div>
+</aside>

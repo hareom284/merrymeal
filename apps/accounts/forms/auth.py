@@ -1,15 +1,18 @@
 from django import forms
-from django.contrib.auth import authenticate
 
 
 class EmailLoginForm(forms.Form):
+    """HTML form for the login screen. Format validation only —
+    credential check lives in apps.accounts.services.auth.sign_in.
+    """
+
     email = forms.EmailField(
         widget=forms.EmailInput(
             attrs={
                 "autofocus": True,
                 "autocomplete": "email",
                 "inputmode": "email",
-                "class": "w-full rounded-xl border-2 border-stone-300 px-4 py-4 text-lg",
+                "class": "input",
                 "placeholder": "you@example.com",
             }
         )
@@ -18,16 +21,8 @@ class EmailLoginForm(forms.Form):
         widget=forms.PasswordInput(
             attrs={
                 "autocomplete": "current-password",
-                "class": "w-full rounded-xl border-2 border-stone-300 px-4 py-4 text-lg",
+                "class": "input",
                 "placeholder": "Password",
             }
         )
     )
-
-    def clean(self):
-        cleaned = super().clean()
-        user = authenticate(email=cleaned.get("email"), password=cleaned.get("password"))
-        if user is None:
-            raise forms.ValidationError("Invalid email or password")
-        cleaned["user"] = user
-        return cleaned

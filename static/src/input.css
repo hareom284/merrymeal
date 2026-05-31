@@ -2,7 +2,58 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Alpine: hide x-cloak until ready */
+[x-cloak] { display: none !important; }
+
 @layer base {
-  html { font-size: 18px; }
-  button, [role="button"] { min-height: 44px; }
+  html {
+    font-size: 17px;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    @apply bg-warm-50 text-warm-800;
+  }
+  h1, h2, h3 {
+    @apply font-display text-warm-900;
+  }
+  button, [role="button"] {
+    min-height: 44px;
+  }
+  /* Focus rings — soft, brand-aligned */
+  *:focus-visible {
+    outline: 2px solid #16a34a;
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+}
+
+@layer components {
+  /* Primary CTA */
+  .btn-primary {
+    @apply inline-flex items-center justify-center min-h-[48px] px-5 py-3
+           rounded-2xl bg-brand-green text-white text-base font-semibold
+           hover:bg-brand-green-hover active:bg-brand-green-hover
+           transition-colors;
+  }
+  /* Secondary / ghost */
+  .btn-secondary {
+    @apply inline-flex items-center justify-center min-h-[48px] px-5 py-3
+           rounded-2xl bg-warm-100 text-warm-800 text-base font-medium
+           border border-warm-200 hover:bg-warm-200 transition-colors;
+  }
+  /* Text input */
+  .input {
+    @apply w-full rounded-2xl border-2 border-warm-200 bg-white
+           px-4 py-4 text-lg text-warm-900 placeholder:text-warm-500
+           focus:border-brand-green focus:outline-none transition-colors;
+  }
+  /* Card surface */
+  .card {
+    @apply bg-white rounded-3xl border border-warm-200 shadow-card p-6 sm:p-8;
+  }
+  /* Label */
+  .label {
+    @apply text-sm font-medium text-warm-700;
+  }
 }

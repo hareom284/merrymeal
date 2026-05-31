@@ -1,36 +1,36 @@
 {% extends "base.html" %}
 {% block title %}Sign in · MerryMeal{% endblock %}
+
 {% block content %}
-<section class="mt-8 flex flex-col gap-6">
+<section class="flex flex-col gap-10">
   <header class="text-center">
-    <h1 class="text-3xl font-semibold tracking-tight">Sign in</h1>
-    <p class="mt-2 text-stone-600">Welcome back to MerryMeal.</p>
+    <h1 class="font-display text-5xl font-semibold tracking-tight text-warm-900">Sign in</h1>
+    <p class="mt-3 text-warm-600">Welcome back to MerryMeal.</p>
   </header>
 
-  <form method="post" class="flex flex-col gap-4" novalidate>
+  <form method="post" class="flex flex-col gap-5" novalidate>
     {% csrf_token %}
+
     {% if form.non_field_errors %}
-      <div class="rounded-xl bg-red-50 px-4 py-3 text-red-800" role="alert">
+      <div class="rounded-2xl bg-red-50 border border-red-200 px-4 py-3 text-red-800" role="alert">
         {{ form.non_field_errors.0 }}
       </div>
     {% endif %}
 
-    <label class="flex flex-col gap-1 text-sm font-medium">
-      Email
+    <label class="flex flex-col gap-2">
+      <span class="label">Email</span>
       {{ form.email }}
     </label>
 
-    <label class="flex flex-col gap-1 text-sm font-medium">
-      Password
+    <label class="flex flex-col gap-2">
+      <span class="label">Password</span>
       {{ form.password }}
     </label>
 
-    <button type="submit"
-            class="mt-2 min-h-[48px] rounded-xl bg-teal-700 px-4 py-3 text-lg font-semibold text-white active:bg-teal-800">
-      Sign in
-    </button>
+    <button type="submit" class="btn-primary mt-2">Sign in</button>
 
-    <a href="{% url 'accounts:password_reset' %}" class="mt-2 text-center text-sm text-teal-700 underline">
+    <a href="{% url 'accounts:password_reset' %}"
+       class="mt-1 text-center text-sm text-brand-green underline hover:text-brand-green-hover">
       Forgot password?
     </a>
   </form>
