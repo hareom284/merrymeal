@@ -1,0 +1,21 @@
+import factory
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
+
+class UserFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = User
+        django_get_or_create = ("email",)
+        skip_postgeneration_save = True
+
+    email = factory.Sequence(lambda n: f"user{n}@example.com")
+    full_name = factory.Faker("name")
+    role = "member"
+    is_active = True
+
+    @classmethod
+    def _create(cls, model_class, *args, **kwargs):
+        password = kwargs.pop("password", "pw12345!")
+        return model_class.objects.create_user(password=password, **kwargs)

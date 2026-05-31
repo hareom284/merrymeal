@@ -1,0 +1,38 @@
+# Planning / working docs (local only)
+docs/
+
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.venv/
+.python-version
+
+# Django
+*.sqlite3
+media/
+staticfiles/
+*.log
+
+# Tailwind / Node
+node_modules/
+static/dist/
+
+# Env
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+
+# Tests
+.pytest_cache/
+.coverage
+htmlcov/
+playwright-report/
+test-results/
