@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     "apps.meals",
     "apps.planning",
     "apps.food_safety",
+    "apps.volunteers",
 ]
 
 MIDDLEWARE = [
