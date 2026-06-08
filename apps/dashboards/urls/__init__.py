@@ -4,6 +4,7 @@ from apps.dashboards.views import landing_view
 
 from .admin import urlpatterns as admin_urls
 from .caregiver import urlpatterns as caregiver_urls
+from .donor import urlpatterns as donor_urls
 from .member import urlpatterns as member_urls
 from .partner import urlpatterns as partner_urls
 
@@ -19,10 +20,14 @@ app_name = "dashboards"
 # Story 6.2 adds the partner outcomes route at `/partner/outcomes/`;
 # it sits in the same `dashboards` namespace so templates and tests can
 # `reverse("dashboards:partner_outcomes")`.
+#
+# Story 6.3 mounts the donor history page under `/donor/`; same
+# namespace so `reverse("dashboards:donor_history")` resolves.
 urlpatterns = [
     path("", landing_view, name="landing"),
     *member_urls,
     *caregiver_urls,
     path("admin/", include(admin_urls)),
     path("partner/", include(partner_urls)),
+    path("donor/", include(donor_urls)),
 ]
