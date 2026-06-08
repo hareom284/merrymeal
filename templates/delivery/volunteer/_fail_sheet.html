@@ -1,0 +1,56 @@
+{% comment %}
+  Story 4.10 — "Couldn't deliver" bottom-sheet body.
+
+  Included from ``_stop_card.html`` inside a sheet container that owns
+  the ``open`` Alpine state. This partial only renders the form itself
+  so the sheet markup stays out of the form-submit DOM tree (HTMX swap
+  replaces ``#route-fragment``, which sits above the sheet container —
+  if the sheet wrapper lived inside ``#route-fragment``, the swap would
+  unmount Alpine state mid-transition and the close animation would
+  jank).
+
+  Submit: HTMX POST. The view returns the re-rendered route fragment
+  with the next pending stop slotted into the "current" position; HTMX
+  swaps ``#route-fragment`` outerHTML, which also unmounts this sheet
+  along with the failed stop card. No explicit ``open = false`` needed.
+{% endcomment %}
+<form method="post"
+      action="{% url 'delivery:mark_failed' stop.delivery.id %}"
+      hx-post="{% url 'delivery:mark_failed' stop.delivery.id %}"
+      hx-target="#route-fragment"
+      hx-swap="outerHTML"
+      data-testid="fail-form">
+  {% csrf_token %}
+  <div class="flex justify-between items-center mb-3">
+    <h2 class="font-display text-lg">Why couldn't you deliver?</h2>
+    <button type="button"
+            class="text-warm-500 underline min-h-[44px] px-2"
+            @click="open = false"
+            data-testid="fail-cancel">Cancel</button>
+  </div>
+
+  <fieldset class="grid grid-cols-2 gap-2 mb-3">
+    {% for value, label in reason_choices %}
+      <label class="block">
+        <input type="radio" name="reason" value="{{ value }}"
+               class="peer sr-only" required>
+        <span class="block text-center min-h-[44px] py-3 rounded border border-warm-200
+                     peer-checked:bg-brand-green peer-checked:text-white text-[18px]"
+              data-testid="reason-chip">
+          {{ label }}
+        </span>
+      </label>
+    {% endfor %}
+  </fieldset>
+
+  <textarea name="notes" maxlength="500" rows="3"
+            class="input w-full mb-3 text-[18px]"
+            placeholder="Any extra detail (optional)"
+            data-testid="fail-notes"></textarea>
+
+  <button type="submit"
+          class="btn-primary w-full min-h-[44px] py-3 text-[18px]"
+          data-testid="fail-submit">
+    Submit
+  </button>
+</form>

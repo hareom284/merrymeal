@@ -14,6 +14,11 @@ whitenoise>=6,<7
 # without it the HEIC code path raises a clear RuntimeError at upload.
 Pillow>=10.2,<13
 pyheif>=0.7,<1; platform_system != "Windows"
+# Story 4.13 — Twilio REST client used by the prod SMS backend
+# (apps.core.services.sms_backends.TwilioBackend). Import is deferred to
+# send-time so dev / CI machines without the wheel can still run the
+# console backend.
+twilio>=8
 
 # Dev / test
 pytest>=8,<9

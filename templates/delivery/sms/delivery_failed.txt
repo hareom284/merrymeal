@@ -1,0 +1,1 @@
+MerryMeal: today's meal for {{ member.full_name }} couldn't be delivered ({{ reason }}). Call {{ office_phone }} if urgent.

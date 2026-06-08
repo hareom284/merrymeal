@@ -75,6 +75,12 @@ class Delivery(models.Model):
         max_digits=10, decimal_places=7, null=True, blank=True
     )
     photo = models.URLField(max_length=512, null=True, blank=True)
+    # Story 4.10 — when a stop transitions to ``failed``, the volunteer
+    # picks one of four UI reason slugs and may add a free-text note. We
+    # store the combined string here as ``slug`` or ``slug: notes`` so
+    # Epic 06 reporting can group by slug while still surfacing the
+    # original note to the admin follow-up screen.
+    failure_reason = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

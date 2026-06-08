@@ -22,3 +22,8 @@ CSRF_COOKIE_SECURE = env.bool("DJANGO_CSRF_COOKIE_SECURE", default=True)
 # Nginx terminates TLS and sets X-Forwarded-Proto; Django needs this to
 # trust the proxy when evaluating request.is_secure() and the SSL redirect.
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+# Story 4.13 — switch to the real Twilio transport in production. The
+# console backend stays the default in dev / CI; flipping the value here
+# (rather than in base.py) keeps secrets out of the test path.
+SMS_BACKEND = "twilio"

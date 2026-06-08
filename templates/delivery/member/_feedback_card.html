@@ -1,0 +1,80 @@
+{% comment %}
+  Story 4.11 — 2-tap meal feedback prompt.
+
+  Mobile-first card rendered into the member home today section the
+  moment ``Delivery.status == 'delivered'`` AND no ``DeliveryFeedback``
+  row exists for the delivery yet (the parent partial decides).
+
+  Interaction model:
+    * 5 radio buttons share ``name="rating"`` — single value 1..5.
+    * 5 checkboxes share ``name="tags"`` — multi-select, 0..N.
+    * Submit button is always rendered; the ``required`` attribute on
+      the radios is what the browser enforces (no JS needed to
+      "enable" the button — clicking it without a star fires the
+      browser's native validation tooltip).
+    * On POST, the parent ``<form>`` flips into the thanks partial via
+      ``hx-target="#feedback-card-{{ delivery.id }}"`` +
+      ``hx-swap="outerHTML"``.
+
+  Accessibility:
+    * Each star/chip label is at least 44 × 44 px (hit-area, not glyph
+      size — the visible ``★`` can be 36 px while the wrapping
+      ``<label>`` is the full tap target).
+    * Radios + checkboxes use ``sr-only`` so the visual chip styles
+      stay clean while keyboard/screen-reader users still get the
+      native form controls.
+
+  Render contract:
+    * ``delivery``      — ``apps.delivery.models.Delivery``. Used
+                          ONLY for the ``delivery.id`` URL + DOM ID.
+    * ``tag_choices``   — iterable of ``(value, label)`` pairs from
+                          ``apps.delivery.forms.feedback.TAG_CHOICES``.
+                          Required; rendered as the chip set.
+{% endcomment %}
+<div id="feedback-card-{{ delivery.id }}"
+     class="card p-4 text-[18px]"
+     data-testid="feedback-card">
+  <h3 class="font-display text-lg mb-2">How was today's meal?</h3>
+  <form method="post"
+        action="{% url 'delivery:feedback' delivery.id %}"
+        hx-post="{% url 'delivery:feedback' delivery.id %}"
+        hx-target="#feedback-card-{{ delivery.id }}"
+        hx-swap="outerHTML">
+    {% csrf_token %}
+
+    <fieldset class="flex justify-between mb-3" aria-label="Rate 1 to 5 stars">
+      <legend class="sr-only">Star rating</legend>
+      {% for n in "12345" %}
+        <label class="min-h-[44px] min-w-[44px] flex items-center justify-center cursor-pointer">
+          <span class="sr-only">{{ n }} star{{ n|pluralize }}</span>
+          <input type="radio" name="rating" value="{{ n }}"
+                 class="peer sr-only" required>
+          <span class="text-[36px] text-warm-300 peer-checked:text-brand-orange leading-none"
+                aria-hidden="true"
+                data-testid="star">★</span>
+        </label>
+      {% endfor %}
+    </fieldset>
+
+    <fieldset class="flex flex-wrap gap-2 mb-3">
+      <legend class="sr-only">Quick tags</legend>
+      {% for value, label in tag_choices %}
+        <label class="block cursor-pointer">
+          <input type="checkbox" name="tags" value="{{ value }}"
+                 class="peer sr-only">
+          <span class="block px-4 py-3 min-h-[44px] border border-warm-200 rounded-full
+                       peer-checked:bg-brand-green peer-checked:text-white"
+                data-testid="tag-chip">
+            {{ label }}
+          </span>
+        </label>
+      {% endfor %}
+    </fieldset>
+
+    <button type="submit"
+            class="btn-primary w-full min-h-[44px] py-3"
+            data-testid="feedback-submit">
+      Submit
+    </button>
+  </form>
+</div>

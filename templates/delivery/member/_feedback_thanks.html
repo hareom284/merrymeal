@@ -1,0 +1,28 @@
+{% comment %}
+  Story 4.11 — thanks card.
+
+  Two flavours, decided by the boolean ``already`` in context:
+
+    already=False — first successful submit. "Thanks for letting us
+                    know."
+    already=True  — duplicate submit (a second POST after the row
+                    already exists, OR the page is re-rendered after
+                    the feedback was submitted in a previous session).
+                    "Thanks — feedback already recorded."
+
+  The view returns this partial with 200 in BOTH cases so HTMX swaps
+  it into ``#feedback-card-<id>`` cleanly — no error toast, no card
+  duplication.
+
+  Render contract:
+    * ``already`` — bool. Default-rendered as False (the friendlier
+                    first-submit copy) if the caller forgets to pass
+                    it.
+{% endcomment %}
+<div class="card p-4 text-center text-[18px]" data-testid="feedback-thanks">
+  {% if already %}
+    <p>Thanks — feedback already recorded.</p>
+  {% else %}
+    <p>Thanks for letting us know.</p>
+  {% endif %}
+</div>

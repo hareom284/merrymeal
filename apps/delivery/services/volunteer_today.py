@@ -28,6 +28,7 @@ from datetime import time
 
 from django.utils import timezone
 
+from apps.delivery.forms.mark_failed import REASON_CHOICES
 from apps.delivery.models import Delivery
 from apps.planning.services.allergen import meal_allergens_for_member
 
@@ -148,4 +149,9 @@ def get_today_route(user) -> dict:
         },
         "route": route,
         "stops": stops,
+        # Story 4.10 — the bottom-sheet partial iterates these to render
+        # the four reason chips. Surfacing them here (rather than via a
+        # context processor) keeps the route fragment self-contained for
+        # HTMX swaps.
+        "reason_choices": REASON_CHOICES,
     }
