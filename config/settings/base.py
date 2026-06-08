@@ -143,3 +143,22 @@ AWS_SECRET_ACCESS_KEY = env("AWS_SECRET_ACCESS_KEY", default="")
 AWS_DEFAULT_ACL = None
 AWS_QUERYSTRING_AUTH = False
 AWS_S3_FILE_OVERWRITE = False
+
+# SMS — Story 4.13. The ``console`` backend (apps.core.services.sms_backends.
+# ConsoleBackend) appends messages to ``apps.core.testing.sms_outbox`` and
+# echoes them to stdout. ``twilio`` makes a real REST call and is only
+# enabled in prod (see config/settings/prod.py).
+SMS_BACKEND = env("SMS_BACKEND", default="console")
+# Email address that receives the failure alert when a member has no
+# linked caregiver — Story 4.13 fallback.
+OFFICE_ALERT_EMAIL = env("OFFICE_ALERT_EMAIL", default="office@merrymeal.org")
+# Phone number rendered in the failure alert templates ("Call the office
+# on …"). Kept as a setting so the prod ops line can rotate without a
+# template change.
+OFFICE_PHONE = env("OFFICE_PHONE", default="03 9000 0000")
+# Twilio credentials (prod only). Defaults keep dev / CI bootable
+# without secrets; the TwilioBackend will fail loudly at send time if
+# they remain blank in a prod environment.
+TWILIO_ACCOUNT_SID = env("TWILIO_ACCOUNT_SID", default="")
+TWILIO_AUTH_TOKEN = env("TWILIO_AUTH_TOKEN", default="")
+TWILIO_FROM = env("TWILIO_FROM", default="")

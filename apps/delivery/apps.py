@@ -24,6 +24,13 @@ class DeliveryConfig(AppConfig):
         # ready() time (no DB writes) so we do it outside the django_q
         # try-block — wrapping it in OperationalError would mask import
         # bugs in the registry module itself.
+        # Story 4.13 — register the post_save signal that fires the
+        # caregiver alert when a delivery flips to ``failed``. Import is
+        # side-effect-only (the @receiver decorator wires the handler)
+        # so it cannot fail at startup short of an import error in the
+        # signals module itself.
+        from apps.delivery import signals  # noqa: F401
+
         try:
             from auditlog.registry import auditlog
 
@@ -38,6 +45,10 @@ class DeliveryConfig(AppConfig):
                         "photo",
                         "latitude",
                         "longitude",
+                        # Story 4.10 — record the failure reason so the
+                        # admin follow-up screen can reconstruct the
+                        # sequence of events for a contested drop-off.
+                        "failure_reason",
                     ],
                 )
         except Exception:  # noqa: BLE001
