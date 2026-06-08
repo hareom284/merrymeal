@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{# Story 5.7 — "check your inbox" confirmation page.
+
+   Rendered after a successful POST to ``/donate/manage/``. The copy
+   below is intentionally vague about whether the email was actually
+   sent — the request flow must not leak which addresses are on file.
+#}
+
+{% block title %}Check your inbox · MerryMeal{% endblock %}
+
+{% block content %}
+<section class="mx-auto max-w-md px-4 py-10 text-center">
+  <h1 class="font-display text-3xl text-warm-900">Check your inbox</h1>
+  <p class="mt-4 text-warm-700">
+    If that email address has an active MerryMeal subscription, we just
+    sent a one-time link you can use to manage or cancel it.
+  </p>
+  <p class="mt-2 text-sm text-warm-500">
+    The link expires in 30 minutes. Didn't see it? Check your spam folder
+    or
+    <a href="{% url 'donations:manage_request' %}" class="underline">
+      request another link
+    </a>.
+  </p>
+</section>
+{% endblock %}
