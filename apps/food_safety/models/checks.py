@@ -22,7 +22,7 @@ class FoodSafetyCheck(models.Model):
         related_name="safety_checks",
     )
     meal_plan = models.ForeignKey(
-        "meals.MealPlan",
+        "planning.MealPlan",
         on_delete=models.PROTECT,
         db_column="meal_plan_id",
         related_name="safety_checks",
