@@ -38,7 +38,7 @@ within seconds of a failed delivery.
 ## Stories
 
 ### Story 4.1 — `volunteers` app: `Availability` model
-**STATUS: backlog**
+**STATUS: done (sprint-07)**
 
 **As a** volunteer
 **I want** to declare which days and times of the week I am available
@@ -62,7 +62,7 @@ within seconds of a failed delivery.
 ---
 
 ### Story 4.2 — Volunteer availability editor (mobile)
-**STATUS: backlog**
+**STATUS: done (sprint-07)**
 
 **As a** volunteer
 **I want** a simple grid (days × morning/afternoon/evening) on my phone
@@ -89,7 +89,7 @@ within seconds of a failed delivery.
 ---
 
 ### Story 4.3 — `delivery` app: `Route` model
-**STATUS: backlog**
+**STATUS: done (sprint-07)**
 
 **As a** developer
 **I want** a `Route` model representing "one volunteer's deliveries on one day"
@@ -112,7 +112,7 @@ within seconds of a failed delivery.
 ---
 
 ### Story 4.4 — `Delivery` model
-**STATUS: backlog**
+**STATUS: done (sprint-07)**
 
 **As a** developer
 **I want** a `Delivery` row per (member, meal_plan, scheduled_date)
@@ -141,7 +141,7 @@ within seconds of a failed delivery.
 ---
 
 ### Story 4.5 — `DeliveryFeedback` model
-**STATUS: backlog**
+**STATUS: done (sprint-07)**
 
 **As a** member
 **I want** to rate the meal I received and add an optional note
@@ -164,7 +164,7 @@ within seconds of a failed delivery.
 ---
 
 ### Story 4.6 — Auto-assign service: generate today's deliveries
-**STATUS: backlog**
+**STATUS: done (sprint-07)**
 
 **As an** admin
 **I want** a job that turns "today's `MealPlan` × every active member" into one `Delivery` row per member
@@ -196,7 +196,7 @@ within seconds of a failed delivery.
 ---
 
 ### Story 4.7 — Auto-assign service: pack today's deliveries into routes
-**STATUS: backlog**
+**STATUS: done (sprint-07)**
 
 **As an** admin
 **I want** today's `pending` deliveries grouped into `Route`s assigned to available volunteers, balanced by proximity
@@ -232,7 +232,7 @@ within seconds of a failed delivery.
 ---
 
 ### Story 4.8 — Volunteer "today" route screen (mobile)
-**STATUS: backlog**
+**STATUS: done (sprint-08)**
 
 **As a** volunteer
 **I want** one screen with my route for today: pickup info at the top, then a list of stops in order, with a "Mark delivered" button anchored at the bottom of the screen for the current stop
@@ -264,7 +264,7 @@ within seconds of a failed delivery.
 ---
 
 ### Story 4.9 — Mark-delivered with proof-of-delivery photo
-**STATUS: backlog**
+**STATUS: done (sprint-08)**
 
 **As a** volunteer
 **I want** to tap "Mark delivered", take a photo (via the phone camera), and move to the next stop
@@ -301,7 +301,7 @@ within seconds of a failed delivery.
 ---
 
 ### Story 4.10 — Mark-failed with reason
-**STATUS: backlog**
+**STATUS: done (sprint-08)**
 
 **As a** volunteer
 **I want** to mark a delivery as failed with a reason (not home / no answer / refused / address wrong)
@@ -327,7 +327,7 @@ within seconds of a failed delivery.
 ---
 
 ### Story 4.11 — 2-tap meal feedback (member)
-**STATUS: backlog**
+**STATUS: done (sprint-08)**
 
 **As a** member
 **I want** to rate the meal I just received with two taps — stars + one of a few tag chips
@@ -356,7 +356,7 @@ within seconds of a failed delivery.
 ---
 
 ### Story 4.12 — Member tracking page ("is it on the way?")
-**STATUS: backlog**
+**STATUS: done (sprint-08)**
 
 **As a** member or caregiver
 **I want** to refresh a page and see whether today's meal is pending, on the way, or delivered
@@ -381,7 +381,7 @@ within seconds of a failed delivery.
 ---
 
 ### Story 4.13 — Caregiver alert on failed delivery (email + SMS)
-**STATUS: backlog**
+**STATUS: done (sprint-08)**
 
 **As a** caregiver
 **I want** an email AND text within 60 seconds of a member's delivery failing
@@ -412,7 +412,7 @@ within seconds of a failed delivery.
 ---
 
 ### Story 4.14 — Admin reassignment widget
-**STATUS: backlog**
+**STATUS: done (sprint-08)**
 
 **As an** admin
 **I want** to reassign a delivery to a different volunteer at any time

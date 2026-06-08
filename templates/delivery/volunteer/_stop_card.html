@@ -1,0 +1,124 @@
+{% comment %}
+  One stop on today's route. Re-used by Story 4.10+ HTMX swaps, so it
+  is a standalone partial that takes a single ``stop`` dict (the shape
+  ``get_today_route`` returns).
+
+  Tap target: the whole header is a ``<button>`` (>= 44px tall) that
+  toggles the expanded body via Alpine's ``x-show``. The brand-green
+  left border + warm-100 background marks the current stop.
+{% endcomment %}
+<article x-data="{open: false}"
+         class="card p-0 overflow-hidden{% if stop.is_current %} bg-warm-100 border-l-4 border-brand-green{% endif %}"
+         data-testid="stop-card"
+         {% if stop.is_current %}data-current="true"{% endif %}>
+  <button type="button"
+          class="flex w-full min-h-[44px] items-start justify-between gap-3 p-4 text-left"
+          @click="open = !open"
+          :aria-expanded="open"
+          data-testid="stop-toggle">
+    <div class="flex-1">
+      <p class="font-semibold text-warm-900">{{ stop.member_display }}</p>
+      {% if stop.address_line %}
+        <p class="mt-1 text-[16px] text-warm-500">{{ stop.address_line }}</p>
+      {% endif %}
+    </div>
+    {% if stop.allergens %}
+      <span class="rounded-full bg-brand-orange px-3 py-2 text-[14px] font-medium text-white"
+            data-testid="allergen-badge">
+        &#9888; Contains
+        {% for allergen in stop.allergens %}{{ allergen.name }}{% if not forloop.last %}, {% endif %}{% endfor %}
+      </span>
+    {% endif %}
+  </button>
+
+  <div x-show="open" x-cloak class="space-y-3 px-4 pb-4 text-[16px] text-warm-700">
+    {% if stop.special_instructions %}
+      <p data-testid="stop-instructions">{{ stop.special_instructions }}</p>
+    {% endif %}
+    {% if stop.phone %}
+      <a href="tel:{{ stop.phone }}"
+         class="inline-flex min-h-[44px] items-center text-brand-green underline"
+         data-testid="stop-call">
+        Call {{ stop.phone }}
+      </a>
+    {% endif %}
+  </div>
+
+  {% comment %}
+    Story 4.9 — POD upload form for the current stop only. The hidden
+    ``<input type=file>`` is triggered by the visible label that doubles
+    as the primary CTA; iOS Safari treats ``capture="environment"`` as
+    "open the back camera". ``onchange`` auto-submits so the volunteer
+    never sees an extra "upload" tap. The two ``data-geo`` inputs are
+    populated client-side by ``static/src/volunteer-offline.js``.
+
+    The sticky-bottom positioning + green button colour comes from the
+    parent ``_route_fragment.html`` wrapper — keep this card markup
+    layout-neutral so HTMX swaps don't fight the scroll container.
+  {% endcomment %}
+  {% if stop.is_current %}
+    <form method="post"
+          action="{% url 'delivery:mark_delivered' stop.delivery.id %}"
+          enctype="multipart/form-data"
+          hx-post="{% url 'delivery:mark_delivered' stop.delivery.id %}"
+          hx-encoding="multipart/form-data"
+          hx-target="#route-fragment"
+          hx-swap="outerHTML"
+          data-pod-form="1"
+          data-delivery-id="{{ stop.delivery.id }}"
+          class="px-4 pb-4">
+      {% csrf_token %}
+      <label class="btn-primary w-full min-h-[44px] py-3 text-[18px] text-center block cursor-pointer"
+             data-testid="mark-delivered-cta">
+        Mark {{ stop.member_display }} delivered
+        <input type="file" name="photo" accept="image/*"
+               capture="environment" class="sr-only"
+               data-testid="pod-photo-input"
+               onchange="this.form.requestSubmit()">
+      </label>
+      <input type="hidden" name="latitude" data-geo="lat">
+      <input type="hidden" name="longitude" data-geo="lng">
+    </form>
+  {% endif %}
+
+  {% comment %}
+    Story 4.10 — "Couldn't deliver" secondary link + Alpine bottom
+    sheet. Renders only on the current stop so the volunteer cannot
+    accidentally fail a future stop card. The link is deliberately a
+    plain text link (warm-500 underline, body-size font) so the primary
+    delivered CTA above stays the obvious tap target; the visual
+    hierarchy is the safety net.
+
+    The Alpine ``x-data`` lives OUTSIDE ``#route-fragment`` for HTMX
+    safety: when the swap replaces the fragment, this whole wrapper
+    unmounts with it and the new fragment ships its own fresh
+    ``open: false`` state. ``@click.stop`` on the sheet body prevents
+    the backdrop click from bubbling up and closing the sheet while
+    the volunteer is picking a chip.
+  {% endcomment %}
+  {% if stop.is_current %}
+    <div x-data="{open: false}" class="mt-3 text-center">
+      <button type="button"
+              class="text-warm-500 underline text-[16px] min-h-[32px] px-4 pb-4"
+              @click="open = true"
+              data-testid="couldnt-deliver-link">
+        Couldn't deliver
+      </button>
+
+      <div x-show="open"
+           x-cloak
+           x-transition.opacity
+           class="fixed inset-0 bg-black/40 z-40"
+           @click="open = false"></div>
+
+      <div x-show="open"
+           x-cloak
+           x-transition.translate.y.full
+           class="fixed inset-x-0 bottom-0 z-50 bg-warm-50 rounded-t-2xl p-4 max-h-[80vh] overflow-y-auto text-left"
+           @click.stop
+           data-testid="fail-sheet">
+        {% include "delivery/volunteer/_fail_sheet.html" %}
+      </div>
+    </div>
+  {% endif %}
+</article>

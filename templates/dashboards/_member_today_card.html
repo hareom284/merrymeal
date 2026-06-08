@@ -1,0 +1,61 @@
+{% comment %}
+  Member home today-card extension point (Sprint 06 Story 3.4, extended
+  through Sprint 08).
+
+  This partial is intentionally a thin shell of `{% include %}` slots so
+  multiple sprint-08 stories can drop in their own fragments WITHOUT
+  conflicting in the same file:
+
+    Story 4.12 — tracking status pill (section below).
+    Story 4.11 — 2-tap feedback prompt (wraps the tracking section so
+                 a *delivered* stop with no feedback yet shows the
+                 prompt INSTEAD of the live-tracking pill; a delivered
+                 stop with feedback already recorded shows the thanks
+                 card).
+
+  Render contract:
+    * `card`        — the dict from
+                      `apps.dashboards.services.member_today
+                      .get_today_card(member)`. Optional; absent on
+                      tracking-only re-renders.
+    * `delivery`    — `apps.delivery.models.Delivery` for today, when
+                      the tracking context is included. Optional.
+    * `tag_choices` — iterable of ``(value, label)`` pairs from
+                      `apps.delivery.forms.feedback.TAG_CHOICES`.
+                      Required only when ``delivery.status ==
+                      'delivered'`` and no feedback row exists yet
+                      (i.e. when ``_feedback_card.html`` is rendered).
+
+  All keys are optional so callers can render any subset (e.g. the
+  member home includes everything; an HTMX tracking-poll only injects
+  the tracking sub-partial directly via its dedicated URL).
+{% endcomment %}
+
+{# === 4.11 feedback prompt — wraps 4.12's tracking partial so a
+       delivered stop swaps its live tracking for the feedback CTA. === #}
+{% if delivery %}
+  {% if delivery.status == "delivered" %}
+    <section class="mb-4" data-testid="feedback-section">
+      {# ``delivery.feedback`` is a reverse ``OneToOneField`` — Django's
+         template engine treats a missing related object as falsy
+         (``DoesNotExist`` is swallowed by the variable resolver). So
+         this conditional renders the thanks card if a row already
+         exists and the prompt if it doesn't. #}
+      {% if delivery.feedback %}
+        {% include "delivery/member/_feedback_thanks.html" with already=True %}
+      {% else %}
+        {% include "delivery/member/_feedback_card.html" %}
+      {% endif %}
+    </section>
+  {% else %}
+    {# === 4.12 tracking status (member-facing "is it on the way?") === #}
+    <section class="mb-4" data-testid="tracking-section">
+      {% include "delivery/member/_tracking_card.html" %}
+    </section>
+  {% endif %}
+{% endif %}
+
+{# === Existing meal/ingredient card (Story 3.4). === #}
+{% if card %}
+  {% include "dashboards/_partials/today_card.html" with card=card %}
+{% endif %}

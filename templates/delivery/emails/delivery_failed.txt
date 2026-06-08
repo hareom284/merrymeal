@@ -1,0 +1,5 @@
+{{ member.full_name }} did not receive today's MerryMeal ({{ delivery.scheduled_date|date:"D j M" }}).
+
+Reason: {{ reason }}
+
+We'll attempt redelivery tomorrow. If urgent, call the office on {{ office_phone }}.

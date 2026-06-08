@@ -1,0 +1,15 @@
+{# Per-delivery table row. HTMX swap target for the reassign POST. #}
+<tr id="delivery-row-{{ delivery.id }}" data-testid="delivery-row">
+  <td class="py-2">{{ delivery.member.full_name }}</td>
+  <td>{{ delivery.volunteer.full_name }}</td>
+  <td>{{ delivery.get_status_display }}</td>
+  <td>#{{ delivery.route_id|default:"—" }}</td>
+  <td class="text-right">
+    <button hx-get="{% url 'delivery:admin_reassign' delivery.id %}"
+            hx-target="#modal-slot"
+            class="btn-secondary"
+            data-testid="reassign-btn">
+      Reassign
+    </button>
+  </td>
+</tr>
