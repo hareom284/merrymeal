@@ -36,18 +36,16 @@ def run_nightly_validation() -> int:
             "validate_radius_assignments exited non-zero with no captured "
             "output. Check the Django-Q task log for details."
         )
-        admin_to = getattr(settings, "ADMIN_EMAIL", None)
-        if admin_to:
+        # Send to / from the same operator inbox — for a solo-admin setup
+        # the two are the same address, so we read DEFAULT_FROM_EMAIL.
+        operator_email = getattr(settings, "DEFAULT_FROM_EMAIL", "") or ""
+        if operator_email and "@" in operator_email:
             try:
                 mail.send_mail(
                     subject="[MerryMeal] validate_radius_assignments FAILED",
                     message=body,
-                    from_email=getattr(
-                        settings,
-                        "DEFAULT_FROM_EMAIL",
-                        "no-reply@merrymeal.local",
-                    ),
-                    recipient_list=[admin_to],
+                    from_email=operator_email,
+                    recipient_list=[operator_email],
                     fail_silently=True,
                 )
             except Exception:
@@ -58,7 +56,7 @@ def run_nightly_validation() -> int:
                 )
         else:
             log.warning(
-                "validate_radius_assignments failed but ADMIN_EMAIL is "
-                "unset; skipping notification email."
+                "validate_radius_assignments failed but DEFAULT_FROM_EMAIL "
+                "is unset; skipping notification email."
             )
     return code
