@@ -33,6 +33,17 @@ class DeliveryConfig(AppConfig):
                     "repeats": -1,
                 },
             )
+            Schedule.objects.update_or_create(
+                name="assign_routes_for_today",
+                defaults={
+                    "func": "apps.delivery.tasks.assign_routes.run_for_today",
+                    "schedule_type": Schedule.DAILY,
+                    # 04:30 Australia/Melbourne — 30 minutes after the
+                    # generator. The gap absorbs retries on small datasets.
+                    "cron": "30 4 * * *",
+                    "repeats": -1,
+                },
+            )
         except (OperationalError, ProgrammingError, ImportError):
             # django_q tables don't exist yet (initial migrate / test
             # bootstrap) or the package isn't importable. Safe to skip.

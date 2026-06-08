@@ -39,13 +39,17 @@ from django.db import transaction
 
 from apps.accounts.models import Address
 from apps.core.geo import haversine_km
-from apps.delivery.models import Delivery
+from apps.delivery.models import Delivery, Route
 from apps.delivery.services.deliveries import create_delivery
 from apps.kitchens.models import Kitchen
 from apps.planning.models import MealPlan
+from apps.volunteers.models import Availability
 
 logger = logging.getLogger("merrymeal.dispatch")
 User = get_user_model()
+
+ROUTE_CAPACITY = 12
+_WEEKDAY_TO_ENUM = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
 
 
 @dataclasses.dataclass
@@ -185,3 +189,148 @@ def generate_deliveries_for_date(date) -> DispatchReport:
         date, len(created), len(skipped),
     )
     return DispatchReport(created=created, skipped=skipped)
+
+
+# ---------------------------------------------------------------------------
+# Story 4.7 — assign_routes_for_date (greedy route packer)
+# ---------------------------------------------------------------------------
+#
+# v1 algorithm: greedy nearest-from-kitchen pack. Real vehicle-routing
+# optimisation (load balancing, two-opt, time windows) lands in Epic 07
+# backlog.
+
+
+@dataclasses.dataclass
+class PackReport:
+    """Result of a single `assign_routes_for_date(date)` run."""
+
+    routes_created: list[Route]
+    unassigned: list[Delivery]
+
+
+def _pack_chunk_into_route(volunteer, route_date, chunk):
+    """Create a planned Route for `volunteer` and attach the chunk's deliveries."""
+    route = Route.objects.create(
+        volunteer=volunteer,
+        route_date=route_date,
+        status=Route.STATUS_PLANNED,
+    )
+    Delivery.objects.filter(pk__in=[d.pk for d in chunk]).update(
+        route=route, volunteer=volunteer,
+    )
+    return route
+
+
+def _available_volunteers(date) -> list:
+    """Volunteers with `morning` availability on the weekday of `date`.
+
+    v1 hard-codes `day_phrase="morning"`. Afternoon/evening routing is
+    deferred until we have evening volunteers (Epic 07).
+    """
+    day_enum = _WEEKDAY_TO_ENUM[date.weekday()]
+    vol_ids = (
+        Availability.objects
+        .filter(day_of_week=day_enum, day_phrase="morning")
+        .values_list("volunteer_id", flat=True)
+        .distinct()
+    )
+    return list(
+        User.objects.filter(pk__in=vol_ids, is_active=True, role="volunteer")
+        .order_by("id")
+    )
+
+
+def _clear_planned_routes_for_date(date) -> None:
+    """Wipe `planned` routes for `date`, returning their deliveries to the
+    unassigned pool. Leaves `in_progress` / `completed` / `cancelled`
+    routes untouched.
+    """
+    planned = Route.objects.filter(
+        route_date=date, status=Route.STATUS_PLANNED,
+    )
+    Delivery.objects.filter(route__in=planned).update(route=None)
+    planned.delete()
+
+
+def assign_routes_for_date(date) -> PackReport:
+    """Greedy-pack today's pending deliveries into `Route`s.
+
+    Algorithm:
+      1. Wipe planned routes for `date` (clean-slate idempotency).
+      2. For each `(kitchen, date)` pair with unrouted pending deliveries:
+         a. Sort deliveries by Haversine distance from the kitchen.
+         b. Chunk into groups of `ROUTE_CAPACITY` (12).
+         c. Match chunks to volunteers available on `day_of_week+morning`.
+         d. Overflow (chunks > volunteers) → log warning, leave unassigned.
+    """
+    _clear_planned_routes_for_date(date)
+
+    routes_created: list[Route] = []
+    unassigned_all: list[Delivery] = []
+
+    pending = (
+        Delivery.objects
+        .filter(
+            scheduled_date=date,
+            status=Delivery.STATUS_PENDING,
+            route__isnull=True,
+        )
+        .select_related("meal_plan__kitchen", "member_address")
+    )
+    by_kitchen: dict[int, list[Delivery]] = {}
+    kitchens: dict[int, object] = {}
+    for d in pending:
+        k = d.meal_plan.kitchen
+        by_kitchen.setdefault(k.id, []).append(d)
+        kitchens[k.id] = k
+
+    volunteers = _available_volunteers(date)
+
+    for kitchen_id, deliveries in by_kitchen.items():
+        kitchen = kitchens[kitchen_id]
+        deliveries.sort(key=lambda d: haversine_km(
+            float(kitchen.latitude), float(kitchen.longitude),
+            float(d.member_address.latitude), float(d.member_address.longitude),
+        ))
+
+        # Spread deliveries across available volunteers, capped at
+        # ROUTE_CAPACITY per route. With V volunteers and N deliveries,
+        # each volunteer carries ceil(N / V) — but never more than 12.
+        # Anything beyond V * ROUTE_CAPACITY overflows to unassigned.
+        n = len(deliveries)
+        v = len(volunteers)
+        if v == 0 or n == 0:
+            chunk_size = 0
+            num_routes = 0
+        else:
+            chunk_size = min(ROUTE_CAPACITY, -(-n // v))  # ceil division
+            num_routes = min(v, -(-n // chunk_size))
+
+        chunks: list[list[Delivery]] = []
+        cursor = 0
+        for _ in range(num_routes):
+            chunk = deliveries[cursor:cursor + chunk_size]
+            if not chunk:
+                break
+            chunks.append(chunk)
+            cursor += chunk_size
+
+        with transaction.atomic():
+            for chunk, vol in zip(chunks, volunteers[:len(chunks)], strict=True):
+                routes_created.append(
+                    _pack_chunk_into_route(vol, date, chunk)
+                )
+
+        overflow = deliveries[cursor:]
+        if overflow:
+            logger.warning(
+                "overflow: kitchen=%s date=%s unassigned=%d",
+                kitchen_id, date, len(overflow),
+            )
+        unassigned_all.extend(overflow)
+
+    logger.info(
+        "assign_routes_for_date date=%s routes=%d unassigned=%d",
+        date, len(routes_created), len(unassigned_all),
+    )
+    return PackReport(routes_created=routes_created, unassigned=unassigned_all)
