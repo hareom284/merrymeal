@@ -12,6 +12,10 @@ echo "MySQL is up."
 # Apply migrations. Safe to run repeatedly.
 python manage.py migrate --noinput
 
+# Seed lookup tables + the super-admin user. All commands are idempotent;
+# the admin command also updates the password when DJANGO_ADMIN_PASSWORD changes.
+python manage.py seed_all
+
 # Collect static files so whitenoise can serve them. Cheap when nothing changed.
 python manage.py collectstatic --noinput
 

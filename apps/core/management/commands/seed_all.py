@@ -6,6 +6,7 @@ class Command(BaseCommand):
     help = "Run every project seed command in order. Idempotent — safe to re-run."
 
     SEED_COMMANDS = [
+        "seed_admin",
         "seed_cities",
         "seed_dietary",
         "seed_ingredients",
