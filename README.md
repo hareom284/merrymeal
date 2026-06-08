@@ -12,6 +12,34 @@ No virtualenv. Deps install globally to Python 3.12.
 
 ---
 
+## Setup — Docker (quickstart)
+
+This path needs only Docker Desktop installed. No Python, MySQL, Node setup.
+
+```bash
+git clone <repo-url> merrymeal
+cd merrymeal
+cp .env.example .env
+docker compose up
+```
+
+Open <http://localhost:8000/accounts/login/>. On first start, MySQL takes
+~30 s to initialise; migrations then run automatically.
+
+To create a superuser:
+
+```bash
+docker compose run --rm web python manage.py createsuperuser
+```
+
+To stop everything (and wipe the DB volume):
+
+```bash
+docker compose down -v
+```
+
+---
+
 ## Setup — macOS (Homebrew)
 
 ### 1. Install tools
@@ -144,6 +172,25 @@ python manage.py runserver
 Open:
 - App: <http://localhost:8000/accounts/login/>
 - Admin: <http://localhost:8000/admin/>
+
+For production deploy, see [`docs/deploy.md`](docs/deploy.md).
+
+---
+
+## After setup — verify your environment
+
+A teammate should be able to tick all of these after their first
+`docker compose up` (or after the macOS / Windows native path):
+
+- [ ] `http://localhost:8000/accounts/login/` returns the login screen.
+- [ ] `http://localhost:8000/admin/` returns the Django admin login.
+- [ ] `python3 -m pytest` (or `docker compose run --rm web pytest`) is green.
+- [ ] `npm run watch:css` rebuilds Tailwind on file save.
+- [ ] `python3 scripts/check_env_example.py` exits 0.
+- [ ] (Optional) `npm run test:e2e` is green when the stack is up.
+
+If any item fails, fix it **and** open a PR updating this checklist with
+the missing step. The checklist is the contract.
 
 ---
 

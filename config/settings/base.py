@@ -60,7 +60,17 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
-DATABASES = {"default": env.db("DATABASE_URL", default="sqlite:///db.sqlite3")}
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": env("MYSQL_DATABASE", default="merrymeal"),
+        "USER": env("MYSQL_USER", default="merrymeal"),
+        "PASSWORD": env("MYSQL_PASSWORD", default="merrymeal"),
+        "HOST": env("MYSQL_HOST", default="localhost"),
+        "PORT": env("MYSQL_PORT", default="3306"),
+        "OPTIONS": {"charset": "utf8mb4"},
+    }
+}
 
 AUTH_USER_MODEL = "accounts.User"
 
