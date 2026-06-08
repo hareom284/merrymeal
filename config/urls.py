@@ -18,4 +18,7 @@ urlpatterns = [
     # volunteer-facing screens (Stories 4.8 / 4.12) and the admin
     # reassign widget (Story 4.14) share one ``delivery`` namespace.
     path("", include("apps.delivery.urls")),
+    # Story 6.7 — public ``/partners/refer/`` form for charity
+    # social workers to submit referrals on behalf of a member.
+    path("partners/", include("apps.accounts.urls.partner_referral")),
 ]
