@@ -1,0 +1,102 @@
+{% comment %}
+Story 6.1 — partial for the admin "what needs attention now" grid.
+
+Stays a fragment (no {% extends %}) so the 5-minute HTMX refresh swaps
+the grid without re-injecting the page chrome.
+
+Severity drives the whole visual treatment, not just a border colour:
+
+  green  → 0 items. Cream-white surface, muted number, calm "All clear"
+           pill. The card recedes — eye skips it.
+  yellow → below threshold. Soft amber tint, amber pill, count in warm
+           ink, "Review queue" CTA.
+  red    → at/over threshold. Red wash, pulsing red dot, count in red
+           ink, "Review now" CTA. Demands attention.
+
+Each card also draws a progress bar of ``count / threshold``. Over-
+threshold values overflow the bar and get clipped by ``overflow-hidden``
+on the track — visually reads as "maxed out".
+{% endcomment %}
+{% for card in cards %}
+  {% widthratio card.count card.threshold 100 as pct %}
+  <a href="{{ card.link }}"
+     class="group relative flex flex-col gap-5 rounded-3xl border p-6 transition
+            shadow-card hover:-translate-y-0.5 hover:shadow-md
+            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2
+            {% if card.severity == 'green' %}
+              border-warm-200 bg-white focus-visible:ring-emerald-500
+            {% elif card.severity == 'yellow' %}
+              border-amber-200 bg-amber-50/60 focus-visible:ring-amber-500
+            {% else %}
+              border-red-200 bg-red-50/70 focus-visible:ring-red-500
+            {% endif %}">
+
+    <!-- Status pill + threshold note -->
+    <div class="flex items-center justify-between">
+      <span class="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em]
+                   {% if card.severity == 'green' %}text-emerald-700
+                   {% elif card.severity == 'yellow' %}text-amber-800
+                   {% else %}text-red-700{% endif %}">
+        <span class="relative flex h-2 w-2 items-center justify-center">
+          {% if card.severity == 'red' %}
+            <span aria-hidden="true"
+                  class="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-500/60"></span>
+          {% endif %}
+          <span aria-hidden="true"
+                class="relative inline-flex h-2 w-2 rounded-full
+                       {% if card.severity == 'green' %}bg-emerald-500
+                       {% elif card.severity == 'yellow' %}bg-amber-500
+                       {% else %}bg-red-500{% endif %}"></span>
+        </span>
+        {% if card.severity == 'green' %}All clear
+        {% elif card.severity == 'yellow' %}Active
+        {% else %}Needs action{% endif %}
+      </span>
+      <span class="text-[11px] font-medium text-warm-500 tabular-nums">
+        Threshold {{ card.threshold }}
+      </span>
+    </div>
+
+    <!-- Title + headline count -->
+    <div class="flex flex-col gap-1.5">
+      <p class="text-sm font-medium text-warm-600">{{ card.title }}</p>
+      <p class="font-sans text-5xl font-bold tabular-nums tracking-tight leading-none
+                {% if card.severity == 'green' %}text-warm-400
+                {% elif card.severity == 'yellow' %}text-warm-900
+                {% else %}text-red-700{% endif %}">
+        {{ card.count }}
+      </p>
+    </div>
+
+    <!-- Progress track + footer row -->
+    <div class="space-y-2">
+      <div class="h-1.5 w-full overflow-hidden rounded-full
+                  {% if card.severity == 'green' %}bg-warm-100
+                  {% elif card.severity == 'yellow' %}bg-amber-100
+                  {% else %}bg-red-100{% endif %}">
+        <span aria-hidden="true"
+              class="block h-full rounded-full transition-all
+                     {% if card.severity == 'green' %}bg-emerald-400/50
+                     {% elif card.severity == 'yellow' %}bg-amber-500
+                     {% else %}bg-red-500{% endif %}"
+              style="width: {{ pct }}%; max-width: 100%;"></span>
+      </div>
+
+      <div class="flex items-center justify-between text-[11px]">
+        <span class="font-medium text-warm-500 tabular-nums">
+          {{ card.count }} of {{ card.threshold }}
+        </span>
+        <span class="inline-flex items-center gap-1 font-semibold transition-transform group-hover:translate-x-0.5
+                     {% if card.severity == 'green' %}text-warm-400
+                     {% elif card.severity == 'yellow' %}text-amber-800
+                     {% else %}text-red-700{% endif %}">
+          {% if card.severity == 'green' %}View queue{% else %}Review now{% endif %}
+          <svg aria-hidden="true" class="h-3 w-3" viewBox="0 0 20 20" fill="none"
+               stroke="currentColor" stroke-width="2">
+            <path d="M5 10h10M11 5l5 5-5 5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+      </div>
+    </div>
+  </a>
+{% endfor %}

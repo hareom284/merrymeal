@@ -20,7 +20,11 @@ def test_member_dashboard_renders_for_authenticated_user(client):
     assert b"Hello, Margaret" in response.content
     assert b"Today's delivery" in response.content
     assert b"This week's menu" in response.content
-    assert b"Herb-roasted chicken" in response.content
+    # Story 3.4 — the "today's meal" card is fed by ``get_today_card``.
+    # A factory member with no address / no MealPlan resolves to the
+    # empty-state copy; the previous hardcoded "Herb-roasted chicken"
+    # mock is gone.
+    assert b"No meal scheduled today" in response.content
     assert b"Rate yesterday's meal" in response.content
 
 

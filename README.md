@@ -177,6 +177,31 @@ For production deploy, see [`docs/deploy.md`](docs/deploy.md).
 
 ---
 
+## Seeded test users
+
+`python3 manage.py seed_test_users` (also bundled into
+`python3 manage.py seed_all`) creates one user per role with a shared
+hard-coded password so any teammate can sign in and walk every
+role-specific surface end-to-end. Re-running is safe — the seeder
+upserts every user, the partner row, and the caregiver→member link.
+
+| Email | Role | Password | Lands on |
+|---|---|---|---|
+| `member@test.merrymeal.local` | member | `testpass123` | `/dashboard/` |
+| `caregiver@test.merrymeal.local` | caregiver | `testpass123` | `/dashboard/` (caregiver list, Story 3.8) |
+| `volunteer@test.merrymeal.local` | volunteer | `testpass123` | `/volunteer/today/` |
+| `donor@test.merrymeal.local` | donor | `testpass123` | `/donor/history/` |
+| `kitchen_staff@test.merrymeal.local` | kitchen_staff | `testpass123` | `/kitchen/stock/receive/` |
+| `partner@test.merrymeal.local` | partner-affiliated member | `testpass123` | `/partner/outcomes/` |
+
+The platform super-admin is owned by a separate seeder, `seed_admin`,
+and reads its email + password from `DJANGO_ADMIN_EMAIL` /
+`DJANGO_ADMIN_PASSWORD`. If `DJANGO_ADMIN_PASSWORD` is empty, the
+seeder generates a random password on first run and prints it once —
+copy it from the terminal output.
+
+---
+
 ## After setup — verify your environment
 
 A teammate should be able to tick all of these after their first

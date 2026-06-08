@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{# Story 5.7 — 410 Gone page for expired / used / tampered tokens.
+
+   Rendered when ``verify_token`` raises ``BadSignature`` or
+   ``SignatureExpired``. The HTTP status is 410 (not 404) because the
+   resource genuinely existed and was intentionally retired — that's
+   the semantically correct code for a burned magic link.
+#}
+
+{% block title %}Link expired · MerryMeal{% endblock %}
+
+{% block content %}
+<section class="mx-auto max-w-md px-4 py-10 text-center">
+  <h1 class="font-display text-3xl text-warm-900">This link has expired</h1>
+  <p class="mt-4 text-warm-700">
+    Magic links are single-use and only valid for 30 minutes. If you still
+    need to manage your subscription, request a fresh link below.
+  </p>
+  <a
+    href="{% url 'donations:manage_request' %}"
+    class="btn-primary mt-6 inline-flex min-h-[48px] w-full items-center justify-center"
+  >
+    Request a new link
+  </a>
+</section>
+{% endblock %}

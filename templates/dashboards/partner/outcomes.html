@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}Partner outcomes — MerryMeal{% endblock %}
+
+{% block content %}
+<section class="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-8">
+  <header class="flex flex-col gap-2">
+    <h1 class="font-display text-3xl font-semibold text-warm-900">Members you referred</h1>
+    <p class="text-warm-600">
+      Outcomes for members your organisation referred to MerryMeal.
+      Counts and ratings update as deliveries complete.
+    </p>
+  </header>
+
+  <!-- Aggregate header -->
+  <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+    <div class="rounded-2xl border border-warm-200 bg-white p-4 shadow-sm">
+      <p class="text-xs uppercase tracking-wide text-warm-500">Total referred</p>
+      <p class="font-display text-3xl text-warm-900">{{ aggregate.total_referred }}</p>
+    </div>
+    <div class="rounded-2xl border border-warm-200 bg-white p-4 shadow-sm">
+      <p class="text-xs uppercase tracking-wide text-warm-500">Currently active</p>
+      <p class="font-display text-3xl text-warm-900">{{ aggregate.currently_active }}</p>
+    </div>
+    <div class="rounded-2xl border border-warm-200 bg-white p-4 shadow-sm">
+      <p class="text-xs uppercase tracking-wide text-warm-500">90-day retention</p>
+      <p class="font-display text-3xl text-warm-900">
+        {% if aggregate.retention_pct_90d is None %}—{% else %}{{ aggregate.retention_pct_90d }}%{% endif %}
+      </p>
+    </div>
+  </div>
+
+  <div class="flex justify-end">
+    <a href="?format=csv"
+       class="rounded-xl border border-warm-300 bg-warm-50 px-4 py-2 text-sm font-medium text-warm-800 hover:bg-warm-100">
+      Download CSV
+    </a>
+  </div>
+
+  <!-- Table -->
+  <div class="overflow-x-auto rounded-2xl border border-warm-200 bg-white shadow-sm">
+    <table class="min-w-full text-sm">
+      <thead class="bg-warm-100 text-left text-xs uppercase tracking-wide text-warm-700">
+        <tr>
+          <th class="p-3">Member</th>
+          <th class="p-3">Suburb</th>
+          <th class="p-3">Status</th>
+          <th class="p-3">Enrolled</th>
+          <th class="p-3">Last delivery</th>
+          <th class="p-3">Avg rating</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+        <tr class="border-t border-warm-200">
+          <td class="p-3 text-warm-900">{{ row.full_name }}</td>
+          <td class="p-3 text-warm-700">{{ row.suburb|default:"—" }}</td>
+          <td class="p-3">
+            {% if row.status == "active" %}
+              <span class="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-800">active</span>
+            {% else %}
+              <span class="rounded-full bg-warm-200 px-2 py-0.5 text-xs font-medium text-warm-700">inactive</span>
+            {% endif %}
+          </td>
+          <td class="p-3 text-warm-700">{{ row.enrolment_date }}</td>
+          <td class="p-3 text-warm-700">{{ row.last_delivery|default:"—" }}</td>
+          <td class="p-3 text-warm-700">
+            {% if row.avg_rating %}{{ row.avg_rating|floatformat:1 }}{% else %}—{% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="6" class="p-6 text-center text-warm-500">
+            No referred members yet.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

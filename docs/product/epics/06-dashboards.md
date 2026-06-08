@@ -38,7 +38,7 @@ requirement-doc story *"who changed Margaret's diet?"*.
 ## Stories
 
 ### Story 6.1 — Admin home: "what needs attention now"
-**STATUS: backlog**
+**STATUS: done (sprint-10)**
 
 **As an** admin
 **I want** one screen that surfaces every actionable thing
@@ -69,7 +69,7 @@ requirement-doc story *"who changed Margaret's diet?"*.
 ---
 
 ### Story 6.2 — Partner outcomes view
-**STATUS: backlog**
+**STATUS: done (sprint-10)**
 
 **As a** partner staff member
 **I want** to see the members our organisation has referred to MerryMeal,
@@ -104,7 +104,7 @@ their current status, average rating, and retention
 ---
 
 ### Story 6.3 — Donor history page (signed-in donor)
-**STATUS: backlog**
+**STATUS: done (sprint-10)**
 
 **As a** logged-in donor
 **I want** to see my donation history with downloadable receipts
@@ -129,7 +129,7 @@ their current status, average rating, and retention
 ---
 
 ### Story 6.4 — Tax receipt printer-friendly page
-**STATUS: backlog**
+**STATUS: done (sprint-10)**
 
 **As a** donor at tax time
 **I want** a printable summary of every donation I made in a financial year
@@ -155,7 +155,7 @@ their current status, average rating, and retention
 ---
 
 ### Story 6.5 — Board report: CSV + PDF (one-click monthly export)
-**STATUS: backlog**
+**STATUS: done (sprint-10)**
 
 **As an** admin
 **I want** to click one button and download a monthly board pack
@@ -185,7 +185,7 @@ generated PDF parses and contains the expected headings.
 ---
 
 ### Story 6.6 — Audit log viewer
-**STATUS: backlog**
+**STATUS: done (sprint-10)**
 
 **As an** admin
 **I want** to search the audit log by user, by table, and by date range
@@ -210,7 +210,7 @@ generated PDF parses and contains the expected headings.
 ---
 
 ### Story 6.7 — Partner referral form (public)
-**STATUS: backlog (promoted from Epic 01 backlog 1.15)**
+**STATUS: done (sprint-10)**
 
 **As a** social worker at a referring agency
 **I want** a public form to submit a member on behalf of my client, attributed to my organisation

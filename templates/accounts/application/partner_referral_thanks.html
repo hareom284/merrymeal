@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Referral received — MerryMeal{% endblock %}
+
+{% block content %}
+<section class="mx-auto flex w-full max-w-md flex-col gap-6 px-4 py-12 text-center">
+  <h1 class="font-display text-4xl font-semibold text-warm-900">Thank you</h1>
+  <p class="text-warm-700">
+    We've received your referral.
+    {% if ref %}
+      Your reference is <strong>#{{ ref }}</strong>.
+    {% endif %}
+  </p>
+  <p class="text-warm-500 text-sm">
+    A MerryMeal admin will be in touch within 3 business days.
+  </p>
+  <a href="/" class="btn-secondary mt-4 min-h-[44px]">Back to home</a>
+</section>
+{% endblock %}

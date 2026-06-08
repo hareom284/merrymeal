@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Admin home · MerryMeal{% endblock %}
+
+{% block content %}
+<section class="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-8">
+  <header class="flex flex-col gap-1">
+    <h1 class="font-display text-3xl font-semibold text-warm-900">
+      What needs attention now
+    </h1>
+    <p class="text-warm-600">
+      Every queue across the charity at a glance. Cards refresh every
+      five minutes.
+    </p>
+  </header>
+
+  <div id="attention-cards"
+       class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3"
+       hx-get="{% url 'dashboards:admin_home_cards' %}"
+       hx-trigger="every 300s"
+       hx-swap="innerHTML">
+    {% include "dashboards/admin/_attention_card.html" %}
+  </div>
+</section>
+{% endblock %}

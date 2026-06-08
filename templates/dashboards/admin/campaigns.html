@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load donation_extras %}
+{% block title %}Campaigns — admin · MerryMeal{% endblock %}
+
+{% block content %}
+<section class="mx-auto flex w-full max-w-5xl flex-col gap-4 px-4 py-8">
+  <header class="flex flex-col gap-2 lg:flex-row lg:items-end lg:justify-between">
+    <div>
+      <h1 class="font-display text-3xl font-semibold text-warm-900">Active campaigns</h1>
+      <p class="text-warm-600">Live progress across every open fundraising appeal.</p>
+    </div>
+    <p class="text-sm text-warm-500">{{ campaigns|length }} active</p>
+  </header>
+
+  {% for s in campaigns %}
+    <a href="{% url 'dashboards_admin_campaigns:detail' s.campaign.slug %}"
+       class="block rounded-2xl border border-warm-200 bg-warm-50 p-5 hover:bg-warm-100">
+      <div class="flex items-baseline justify-between gap-4">
+        <h2 class="font-display text-xl text-warm-900">{{ s.campaign.name }}</h2>
+        <span class="text-sm text-warm-500">
+          {% if s.days_remaining is None %}—{% else %}{{ s.days_remaining }} days left{% endif %}
+        </span>
+      </div>
+      <p class="mt-1 text-xs text-warm-500 font-mono">{{ s.campaign.slug }}</p>
+      <div class="mt-3 h-2 w-full overflow-hidden rounded bg-warm-200">
+        <div class="h-2 rounded bg-brand-green" style="width: {{ s.pct }}%"></div>
+      </div>
+      <p class="mt-2 text-sm text-warm-600">
+        {{ s.raised_cents|dollars }} of {{ s.goal_cents|dollars }} ({{ s.pct }}%)
+      </p>
+    </a>
+  {% empty %}
+    <p class="rounded-2xl border border-warm-200 bg-warm-50 p-6 text-center text-warm-500">
+      No active campaigns.
+    </p>
+  {% endfor %}
+</section>
+{% endblock %}

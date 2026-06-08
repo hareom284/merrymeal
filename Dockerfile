@@ -4,14 +4,25 @@ WORKDIR /build
 COPY package.json package-lock.json tailwind.config.js ./
 COPY static/src ./static/src
 COPY templates ./templates
+# tailwind.config.js scans both ./templates/**/*.html and
+# ./apps/**/templates/**/*.html, so the css-builder stage needs the
+# apps tree as well — otherwise any Tailwind class used only in an
+# app-level template would be silently stripped from the production
+# bundle. No app-level templates exist today (find apps -name '*.html'
+# -path '*/templates/*' returns 0 results) but copying apps/ keeps the
+# build forward-safe for the first time someone adds one.
+COPY apps ./apps
 RUN npm ci && npm run build:css
 
 # Stage 2 — Python runtime
 FROM python:3.12-slim-bookworm AS runtime
 
+# The image is what we deploy, so default to the prod settings module.
+# docker-compose / the smoke test can still override via the env_file or
+# `environment:` block when they want to run against config.settings.dev.
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    DJANGO_SETTINGS_MODULE=config.settings.dev
+    DJANGO_SETTINGS_MODULE=config.settings.prod
 
 # System deps: mysqlclient build chain + curl for healthchecks
 RUN apt-get update && apt-get install -y --no-install-recommends \

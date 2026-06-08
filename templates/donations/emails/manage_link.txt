@@ -1,0 +1,16 @@
+Hi,
+
+You requested a link to manage your recurring MerryMeal donation.
+
+Open this link to view or cancel your subscription:
+
+    {{ link }}
+
+The link can only be used once, and expires 30 minutes after we sent it.
+
+If you didn't request this, please ignore this email — your subscription
+is unchanged.
+
+Thank you for supporting MerryMeal.
+
+— The MerryMeal team

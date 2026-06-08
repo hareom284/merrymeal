@@ -14,7 +14,8 @@
     <p class="mt-2 text-warm-600">So the kitchen never sends you food you can't eat.</p>
   </header>
 
-  <form method="post" class="flex flex-col gap-6" novalidate>
+  <form method="post" class="flex flex-col gap-6" novalidate
+        x-data="{ submitting: false }" @submit="submitting = true">
     {% csrf_token %}
 
     <!-- DIET PREFERENCES -->
@@ -66,7 +67,18 @@
     <div class="flex items-center justify-between mt-2">
       <a href="{% url 'accounts:application_step_2' %}"
          class="text-brand-green underline min-h-[44px] flex items-center">Back</a>
-      <button type="submit" class="btn-primary min-h-[44px]">Submit</button>
+      <button type="submit" class="btn-primary min-h-[44px]"
+              :disabled="submitting"
+              :class="{ 'opacity-70 cursor-not-allowed': submitting }">
+        <span x-show="!submitting">Submit</span>
+        <span x-show="submitting" x-cloak class="inline-flex items-center gap-2">
+          <svg class="animate-spin h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+          </svg>
+          Submitting&hellip;
+        </span>
+      </button>
     </div>
   </form>
 </section>

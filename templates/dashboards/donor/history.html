@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% load donation_extras %}
+
+{% block title %}My donations — MerryMeal{% endblock %}
+
+{# Story 6.3 — Donor history page.
+
+   Mobile-first: the outer ``main`` in base.html already constrains
+   width to ``max-w-md`` on small screens, so this template lays out as
+   a stacked card list and lets the parent handle the gutter. Tap
+   targets (the "Tax receipt" link in particular) are sized at >=44px
+   per the accessibility checklist in Story 1.6.
+
+   Status badge colours
+   --------------------
+   * ``completed`` / ``refunded`` — neutral; the office has reconciled.
+   * ``pending`` — amber; transient, expected to resolve.
+   * ``failed`` / ``cancelled`` — red; donor may need to retry. We
+     surface these (rather than hide them per the original spec) so
+     donors are never left wondering why a charge "disappeared".
+#}
+{% block content %}
+<section class="flex w-full flex-col gap-6">
+  <header class="flex flex-col gap-2">
+    <h1 class="font-display text-3xl font-semibold text-warm-900">My donations</h1>
+    <p class="text-warm-600">
+      Every donation linked to {{ request.user.email }}. Newest first.
+    </p>
+  </header>
+
+  {% if donations %}
+    <ul class="flex flex-col gap-3">
+      {% for d in donations %}
+        <li class="rounded-2xl border border-warm-200 bg-white p-4 shadow-sm">
+          <div class="flex items-start justify-between gap-3">
+            <div>
+              <p class="font-display text-2xl text-warm-900">{{ d.amount_cents|dollars }}</p>
+              <p class="text-sm text-warm-600">{{ d.campaign.name }}</p>
+            </div>
+            <time class="text-sm text-warm-500" datetime="{{ d.created_at|date:'c' }}">
+              {{ d.created_at|date:"d M Y" }}
+            </time>
+          </div>
+
+          <div class="mt-3 flex items-center justify-between gap-3">
+            <span
+              class="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium uppercase tracking-wide
+                {% if d.status == 'completed' %}bg-green-50 text-green-700
+                {% elif d.status == 'refunded' %}bg-warm-100 text-warm-700
+                {% elif d.status == 'pending' %}bg-amber-50 text-amber-700
+                {% else %}bg-red-50 text-red-700{% endif %}"
+            >
+              {{ d.get_status_display }}
+            </span>
+
+            {# TODO(story 6.4): point at ``dashboards:donor_receipt`` once
+               the receipt-detail view exists. Until then, ``#`` keeps
+               the link visible (so the design is correct) without a
+               NoReverseMatch crash. Only completed/refunded donations
+               can be receipted; the rest hide the link entirely. #}
+            {% if d.status == 'completed' or d.status == 'refunded' %}
+              <a href="#"
+                 class="inline-flex min-h-[44px] items-center text-sm font-medium text-brand-green underline">
+                Tax receipt &rarr;
+              </a>
+            {% endif %}
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <div class="rounded-2xl border border-dashed border-warm-300 bg-warm-50 p-8 text-center">
+      <p class="font-display text-xl text-warm-900">No donations yet.</p>
+      <p class="mt-2 text-sm text-warm-600">
+        Donations you make will appear here, along with a tax receipt
+        for your records.
+      </p>
+    </div>
+  {% endif %}
+</section>
+{% endblock %}

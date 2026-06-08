@@ -19,6 +19,27 @@ pyheif>=0.7,<1; platform_system != "Windows"
 # send-time so dev / CI machines without the wheel can still run the
 # console backend.
 twilio>=8
+# Story 5.4 — Stripe Python SDK used by the donations Checkout service
+# (apps.donations.services.stripe_checkout) and webhook signature
+# verification (apps.donations.views.checkout). Imports are deferred to
+# call-time so dev / CI environments without the wheel can still import
+# the module graph and run the test suite (tests patch the SDK via a
+# sys.modules stub installed in apps/donations/tests/conftest.py).
+stripe>=8
+# Story 6.5 — server-side PDF rendering for the board report. WeasyPrint
+# needs system libs (``libpango``, ``libpangoft2``, ``libharfbuzz``,
+# ``libcairo2``, ``libgdk-pixbuf-2.0``, ``shared-mime-info``,
+# ``fonts-liberation``) installed in the Debian-slim runtime stage. On
+# developer machines without those libs the import fails at module
+# load; ``apps.dashboards.services.board_report_pdf`` catches that and
+# falls back to a print-friendly HTML response with a banner.
+weasyprint>=62,<63
+# WeasyPrint 62 declares ``tinycss2>=1.3.0`` (unbounded) but its render
+# path breaks against tinycss2 1.5.x (released Nov 2025) with
+# ``'super' object has no attribute 'transform'``. WeasyPrint 69 is the
+# first release that supports tinycss2 1.5+; until we bump WeasyPrint
+# we must keep tinycss2 on the 1.3/1.4 line.
+tinycss2>=1.3,<1.5
 
 # Dev / test
 pytest>=8,<9
