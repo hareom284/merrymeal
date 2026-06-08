@@ -18,4 +18,9 @@ urlpatterns = [
     # volunteer-facing screens (Stories 4.8 / 4.12) and the admin
     # reassign widget (Story 4.14) share one ``delivery`` namespace.
     path("", include("apps.delivery.urls")),
+    # Story 5.4 — donations app routes (Stripe webhook). Mounted at the
+    # project root so ``/stripe/webhook/`` matches the URL we configure
+    # in the Stripe dashboard. Future stories (5.3 donate page, 5.5
+    # thanks page) append to ``apps/donations/urls.py``.
+    path("", include("apps.donations.urls")),
 ]

@@ -19,6 +19,13 @@ pyheif>=0.7,<1; platform_system != "Windows"
 # send-time so dev / CI machines without the wheel can still run the
 # console backend.
 twilio>=8
+# Story 5.4 — Stripe Python SDK used by the donations Checkout service
+# (apps.donations.services.stripe_checkout) and webhook signature
+# verification (apps.donations.views.checkout). Imports are deferred to
+# call-time so dev / CI environments without the wheel can still import
+# the module graph and run the test suite (tests patch the SDK via a
+# sys.modules stub installed in apps/donations/tests/conftest.py).
+stripe>=8
 
 # Dev / test
 pytest>=8,<9
