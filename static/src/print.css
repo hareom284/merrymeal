@@ -1,0 +1,52 @@
+/* Story 6.4 — print stylesheet for the FY tax receipt page.
+ *
+ * Linked at media="print" from templates/base.html, so the browser
+ * only pulls these rules when the user opens print preview / saves to
+ * PDF. Keeping the screen view untouched is deliberate: we do not want
+ * Tailwind's screen styles to be repainted at print time, just hidden.
+ *
+ * Class-based selectors (`.no-print`) let other templates opt buttons
+ * and dev affordances out of the print output without dragging the
+ * whole site into a print-specific stylesheet.
+ */
+
+@media print {
+  /* Hide site chrome and any element explicitly opted out of print. */
+  nav,
+  header.site-header,
+  footer.site-footer,
+  .no-print {
+    display: none !important;
+  }
+
+  /* Pure black text on white — toner-friendly and ATO-friendly. */
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  /* A4 page with comfortable margins; the table fills the rest. */
+  @page {
+    size: A4;
+    margin: 18mm;
+  }
+
+  /* Tighter typography and clean table breaks across pages. */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  thead {
+    display: table-header-group;
+  }
+  tr {
+    page-break-inside: avoid;
+  }
+
+  /* Reset Tailwind's padding utilities on the receipt section so the
+   * @page margin is the only whitespace around the receipt. */
+  .receipt-page {
+    padding: 0 !important;
+    max-width: none !important;
+  }
+}
