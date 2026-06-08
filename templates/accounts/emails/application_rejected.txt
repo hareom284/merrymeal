@@ -1,0 +1,10 @@
+Hi {{ first_name }},
+
+Thank you for applying to MerryMeal. After reviewing your application we are
+unable to enrol you at this time.
+
+Reason: {{ reason }}
+
+If you believe this is a mistake, reply to this email and we will look again.
+
+— The MerryMeal team

@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Application received · MerryMeal{% endblock %}
+
+{% block content %}
+<section class="mx-auto flex w-full max-w-md flex-col gap-6 px-4 py-12 text-center">
+  <h1 class="font-display text-4xl font-semibold text-warm-900">Thank you</h1>
+  <p class="text-warm-700">We've received your application. We'll be in touch in 3–5 business days.</p>
+  <p class="text-warm-500 text-sm">A confirmation email is on its way.</p>
+  {% include "accounts/application/_existing_caregiver_banner.html" %}
+  <a href="/" class="btn-secondary mt-4 min-h-[44px]">Back to home</a>
+</section>
+{% endblock %}

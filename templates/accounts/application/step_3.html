@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}Apply — dietary · MerryMeal{% endblock %}
+
+{% block content %}
+<section class="mx-auto flex w-full max-w-md flex-col gap-6 px-4 py-8"
+         x-data="dietaryForm({
+           initialDiet: {{ form.initial.dietary_ids|default:'[]'|safe }},
+           initialAllergy: {{ form.initial.allergy_ids|default:'[]'|safe }}
+         })">
+  {% include "accounts/application/_progress.html" with step=3 %}
+
+  <header>
+    <h1 class="font-display text-3xl font-semibold text-warm-900">Diet &amp; allergies</h1>
+    <p class="mt-2 text-warm-600">So the kitchen never sends you food you can't eat.</p>
+  </header>
+
+  <form method="post" class="flex flex-col gap-6" novalidate>
+    {% csrf_token %}
+
+    <!-- DIET PREFERENCES -->
+    <fieldset class="flex flex-col gap-3">
+      <legend class="label">Diet preferences</legend>
+      <label class="flex items-center gap-2 min-h-[44px]">
+        <input type="checkbox" x-model="noDiet" class="h-5 w-5">
+        <span>I don't have any</span>
+      </label>
+      <div class="flex flex-wrap gap-2" :aria-disabled="noDiet">
+        {% for p in diet_choices %}
+        <button type="button"
+                @click="toggleDiet({{ p.id }})"
+                :disabled="noDiet"
+                :class="diet.includes({{ p.id }}) ? 'bg-brand-green text-white' : 'bg-warm-100 text-warm-800'"
+                class="min-h-[44px] min-w-[44px] rounded-full border border-warm-200 px-4 py-2 text-sm">
+          {{ p.name }}
+        </button>
+        {% endfor %}
+      </div>
+      <template x-for="id in diet" :key="id">
+        <input type="hidden" name="dietary_ids" :value="id">
+      </template>
+    </fieldset>
+
+    <!-- ALLERGIES -->
+    <fieldset class="flex flex-col gap-3">
+      <legend class="label">Allergies</legend>
+      <label class="flex items-center gap-2 min-h-[44px]">
+        <input type="checkbox" x-model="noAllergy" class="h-5 w-5">
+        <span>I don't have any</span>
+      </label>
+      <div class="flex flex-wrap gap-2" :aria-disabled="noAllergy">
+        {% for a in allergy_choices %}
+        <button type="button"
+                @click="toggleAllergy({{ a.id }})"
+                :disabled="noAllergy"
+                :class="allergy.includes({{ a.id }}) ? 'bg-brand-orange text-white' : 'bg-warm-100 text-warm-800'"
+                class="min-h-[44px] min-w-[44px] rounded-full border border-warm-200 px-4 py-2 text-sm">
+          {{ a.name }}
+        </button>
+        {% endfor %}
+      </div>
+      <template x-for="id in allergy" :key="id">
+        <input type="hidden" name="allergy_ids" :value="id">
+      </template>
+    </fieldset>
+
+    <div class="flex items-center justify-between mt-2">
+      <a href="{% url 'accounts:application_step_2' %}"
+         class="text-brand-green underline min-h-[44px] flex items-center">Back</a>
+      <button type="submit" class="btn-primary min-h-[44px]">Submit</button>
+    </div>
+  </form>
+</section>
+
+<script>
+function dietaryForm({ initialDiet, initialAllergy }) {
+  return {
+    diet: initialDiet || [],
+    allergy: initialAllergy || [],
+    noDiet: false,
+    noAllergy: false,
+    toggleDiet(id) {
+      this.diet = this.diet.includes(id)
+        ? this.diet.filter(x => x !== id)
+        : [...this.diet, id];
+    },
+    toggleAllergy(id) {
+      this.allergy = this.allergy.includes(id)
+        ? this.allergy.filter(x => x !== id)
+        : [...this.allergy, id];
+    },
+    init() {
+      this.$watch('noDiet', v => { if (v) this.diet = []; });
+      this.$watch('noAllergy', v => { if (v) this.allergy = []; });
+    }
+  };
+}
+</script>
+{% endblock %}

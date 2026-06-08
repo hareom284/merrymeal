@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}Application — {{ application.full_name }} · MerryMeal{% endblock %}
+
+{% block content %}
+<section class="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-8">
+  <nav class="text-sm text-warm-500">
+    <a href="{% url 'dashboards:admin_applications' %}" class="hover:underline">← Back to queue</a>
+  </nav>
+
+  <header class="flex flex-col gap-1">
+    <h1 class="font-display text-3xl font-semibold text-warm-900">{{ application.full_name }}</h1>
+    <p class="text-warm-600">{{ application.email }} · submitted {{ application.created_at|date:"D j M Y H:i" }}</p>
+    {% if application.applying_for_other %}
+      <p class="mt-1 inline-block self-start rounded-full bg-amber-100 px-3 py-1 text-xs text-amber-900">
+        Applying for someone else
+      </p>
+    {% endif %}
+  </header>
+
+  <dl class="grid grid-cols-1 gap-4 rounded-2xl border border-warm-200 bg-warm-50 p-4 md:grid-cols-2">
+    <div>
+      <dt class="label">Date of birth</dt>
+      <dd>{{ application.dob|date:"j M Y" }}</dd>
+    </div>
+    <div>
+      <dt class="label">Phone</dt>
+      <dd>{{ application.phone|default:"—" }}</dd>
+    </div>
+    <div class="md:col-span-2">
+      <dt class="label">Address</dt>
+      <dd>
+        {{ application.address_label|default:"Home" }} —
+        {{ application.street|default:"—" }},
+        {{ application.postal_code|default:"" }}
+        {% if suburb %} · {{ suburb }}{% endif %}
+      </dd>
+    </div>
+    <div>
+      <dt class="label">Diet preferences</dt>
+      <dd>
+        {% for chip in diet_chips %}
+          <span class="mr-1 inline-block rounded-full bg-brand-green/10 px-2 py-0.5 text-xs text-brand-green">{{ chip }}</span>
+        {% empty %}<span class="text-warm-400">none</span>{% endfor %}
+      </dd>
+    </div>
+    <div>
+      <dt class="label">Allergies</dt>
+      <dd>
+        {% for chip in allergy_chips %}
+          <span class="mr-1 inline-block rounded-full bg-brand-orange/10 px-2 py-0.5 text-xs text-brand-orange">{{ chip }}</span>
+        {% empty %}<span class="text-warm-400">none</span>{% endfor %}
+      </dd>
+    </div>
+
+    {% if application.applying_for_other %}
+    <div class="md:col-span-2 mt-2 border-t border-warm-200 pt-4">
+      <h2 class="font-display text-lg text-warm-900">Caregiver</h2>
+      <p>{{ application.caregiver_full_name }} — {{ application.caregiver_email }}
+        {% if application.caregiver_phone %} · {{ application.caregiver_phone }}{% endif %}
+      </p>
+      <p class="text-warm-500 text-sm">Relationship: {{ application.get_relationship_display }}</p>
+    </div>
+    {% endif %}
+  </dl>
+
+  {% if reject_error %}
+    <div class="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-red-800" role="alert">
+      {{ reject_error }}
+    </div>
+  {% endif %}
+
+  <div class="flex flex-col gap-4 md:flex-row">
+    <form method="post"
+          action="{% url 'dashboards:admin_application_approve' application.id %}"
+          class="flex-1">
+      {% csrf_token %}
+      <button type="submit" class="btn-primary w-full min-h-[44px]">Approve</button>
+    </form>
+
+    <form method="post"
+          action="{% url 'dashboards:admin_application_reject' application.id %}"
+          class="flex-1 flex flex-col gap-2">
+      {% csrf_token %}
+      <label class="label" for="reason">Reason (required for rejection)</label>
+      <textarea id="reason" name="reason" rows="3" class="input" placeholder="e.g. Outside our delivery area."></textarea>
+      <button type="submit" class="btn-secondary min-h-[44px]">Reject</button>
+    </form>
+  </div>
+</section>
+{% endblock %}

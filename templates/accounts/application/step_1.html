@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}Apply — your details · MerryMeal{% endblock %}
+
+{% block content %}
+<section class="mx-auto flex w-full max-w-md flex-col gap-6 px-4 py-8"
+         x-data="{ forOther: {{ form.applying_for_other.value|yesno:'true,false,false' }} }"
+         x-cloak>
+  {% include "accounts/application/_progress.html" with step=1 %}
+
+  <header>
+    <h1 class="font-display text-3xl font-semibold text-warm-900">Tell us about you</h1>
+    <p class="mt-2 text-warm-600">We use this to reach you and confirm your application.</p>
+  </header>
+
+  <form method="post" class="flex flex-col gap-5" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+      <div class="rounded-2xl bg-red-50 border border-red-200 px-4 py-3 text-red-800" role="alert">
+        {{ form.non_field_errors.0 }}
+      </div>
+    {% endif %}
+
+    <!-- Toggle -->
+    <label class="flex items-start gap-3 rounded-2xl border border-warm-200 bg-warm-50 px-4 py-3 min-h-[44px]">
+      <input type="checkbox"
+             name="applying_for_other"
+             x-model="forOther"
+             class="mt-1 h-5 w-5"
+             {% if form.applying_for_other.value %}checked{% endif %}>
+      <span>
+        <span class="font-medium">I'm applying for someone else</span>
+        <span class="block text-sm text-warm-600">e.g. a relative or someone in your care.</span>
+      </span>
+    </label>
+
+    <!-- Member contact (re-labelled when applying for someone else) -->
+    <fieldset class="flex flex-col gap-5">
+      <legend class="label" x-text="forOther ? 'Their details' : 'Your details'"></legend>
+
+      <label class="flex flex-col gap-2">
+        <span class="label" x-text="forOther ? 'Their full name' : 'Full name'"></span>
+        {{ form.full_name }}
+        {% if form.full_name.errors %}<span class="text-sm text-red-700">{{ form.full_name.errors.0 }}</span>{% endif %}
+      </label>
+
+      <label class="flex flex-col gap-2">
+        <span class="label" x-text="forOther ? 'Their email' : 'Email'"></span>
+        {{ form.email }}
+        {% if form.email.errors %}<span class="text-sm text-red-700">{{ form.email.errors.0 }}</span>{% endif %}
+      </label>
+
+      <label class="flex flex-col gap-2">
+        <span class="label">Date of birth</span>
+        {{ form.dob }}
+        {% if form.dob.errors %}<span class="text-sm text-red-700">{{ form.dob.errors.0 }}</span>{% endif %}
+      </label>
+
+      <label class="flex flex-col gap-2">
+        <span class="label">Phone <span class="text-warm-500">(optional)</span></span>
+        {{ form.phone }}
+        {% if form.phone.errors %}<span class="text-sm text-red-700">{{ form.phone.errors.0 }}</span>{% endif %}
+      </label>
+    </fieldset>
+
+    <!-- Caregiver fieldset, visible only when toggle is on -->
+    <fieldset class="flex flex-col gap-5" x-show="forOther" x-cloak>
+      <legend class="label">Your details (as the caregiver)</legend>
+
+      <label class="flex flex-col gap-2">
+        <span class="label">Your full name</span>
+        {{ form.caregiver_full_name }}
+        {% if form.caregiver_full_name.errors %}<span class="text-sm text-red-700">{{ form.caregiver_full_name.errors.0 }}</span>{% endif %}
+      </label>
+
+      <label class="flex flex-col gap-2">
+        <span class="label">Your email</span>
+        {{ form.caregiver_email }}
+        {% if form.caregiver_email.errors %}<span class="text-sm text-red-700">{{ form.caregiver_email.errors.0 }}</span>{% endif %}
+      </label>
+
+      <label class="flex flex-col gap-2">
+        <span class="label">Your phone <span class="text-warm-500">(optional)</span></span>
+        {{ form.caregiver_phone }}
+        {% if form.caregiver_phone.errors %}<span class="text-sm text-red-700">{{ form.caregiver_phone.errors.0 }}</span>{% endif %}
+      </label>
+
+      <label class="flex flex-col gap-2">
+        <span class="label">Relationship</span>
+        {{ form.relationship }}
+        {% if form.relationship.errors %}<span class="text-sm text-red-700">{{ form.relationship.errors.0 }}</span>{% endif %}
+      </label>
+    </fieldset>
+
+    <button type="submit" class="btn-primary mt-2 min-h-[44px]">Continue</button>
+  </form>
+</section>
+{% endblock %}

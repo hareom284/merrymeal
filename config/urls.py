@@ -7,6 +7,6 @@ from django.urls import include, path
 # custom management commands.
 
 urlpatterns = [
-    path("accounts/", include("apps.accounts.urls")),
+    path("", include("apps.accounts.urls")),
     path("", include("apps.dashboards.urls")),
 ]

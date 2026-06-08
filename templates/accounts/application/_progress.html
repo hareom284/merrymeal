@@ -1,0 +1,20 @@
+{% comment %}Progress dots for the 3-step application wizard.{% endcomment %}
+<ol class="flex items-center gap-3 text-sm" aria-label="Progress">
+  {% for n in "123" %}
+    {% with i=forloop.counter %}
+    <li class="flex items-center gap-2">
+      <span class="flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold
+                   {% if i == step %}bg-brand-green text-white
+                   {% elif i < step %}bg-warm-200 text-warm-700
+                   {% else %}bg-warm-100 text-warm-500{% endif %}">
+        {{ i }}
+      </span>
+      <span class="hidden sm:inline {% if i == step %}text-warm-900{% else %}text-warm-500{% endif %}">
+        {% if i == 1 %}Contact{% elif i == 2 %}Address{% else %}Diet{% endif %}
+      </span>
+      {% if not forloop.last %}<span class="h-px w-6 bg-warm-200"></span>{% endif %}
+    </li>
+    {% endwith %}
+  {% endfor %}
+</ol>
+<p class="mt-2 text-xs text-warm-500">Step {{ step }} of 3</p>

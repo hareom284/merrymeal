@@ -1,0 +1,12 @@
+{% if request.session.existing_caregiver %}
+<aside class="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900"
+       role="status">
+  <strong class="block font-medium">Caregiver account already exists</strong>
+  <p class="mt-1">
+    We found an existing MerryMeal account for the caregiver email you provided.
+    After we approve this application, the caregiver will be asked to
+    <a href="{% url 'accounts:login' %}" class="underline">log in</a>
+    to confirm the link.
+  </p>
+</aside>
+{% endif %}
