@@ -36,6 +36,9 @@ def _load_draft_from_session(request):
 
 @require_http_methods(["GET", "POST"])
 def application_step_1(request):
+    if request.method == "GET" and "application_id" not in request.session:
+        request.session.pop("existing_caregiver", None)
+
     if request.method == "POST":
         form = ApplicationContactForm(request.POST)
         if form.is_valid():

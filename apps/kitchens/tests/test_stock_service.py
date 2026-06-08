@@ -8,7 +8,6 @@ from apps.kitchens.models import IngredientBatch
 from apps.kitchens.services.stock import receive_batch
 from apps.kitchens.tests.factories import IngredientFactory, KitchenFactory
 
-
 pytestmark = pytest.mark.django_db
 
 

@@ -5,7 +5,6 @@ from django.core.management import call_command
 from apps.kitchens.models import Ingredient
 from apps.kitchens.tests.factories import IngredientFactory
 
-
 pytestmark = pytest.mark.django_db
 
 

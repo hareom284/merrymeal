@@ -47,6 +47,10 @@ class IngredientBatch(models.Model):
             models.Index(fields=["expiration_date"], name="idx_batch_expiry"),
         ]
 
+    def __str__(self) -> str:
+        lot = self.lot_number or "?"
+        return f"{self.ingredient.name} [{lot}] exp {self.expiration_date}"
+
     def clean(self):
         super().clean()
         if (
@@ -57,7 +61,3 @@ class IngredientBatch(models.Model):
             raise ValidationError(
                 {"expiration_date": "Expiration date must be on or after the received date."}
             )
-
-    def __str__(self) -> str:
-        lot = self.lot_number or "?"
-        return f"{self.ingredient.name} [{lot}] exp {self.expiration_date}"

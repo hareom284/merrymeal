@@ -1,5 +1,4 @@
 from datetime import date, timedelta
-from decimal import Decimal
 
 import pytest
 from django.urls import reverse
@@ -7,7 +6,6 @@ from django.urls import reverse
 from apps.accounts.services.users import create_user
 from apps.kitchens.models import IngredientBatch
 from apps.kitchens.tests.factories import IngredientFactory, KitchenFactory
-
 
 pytestmark = pytest.mark.django_db
 

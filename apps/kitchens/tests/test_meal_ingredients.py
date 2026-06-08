@@ -10,7 +10,6 @@ from apps.kitchens.tests.factories import IngredientFactory, MealIngredientFacto
 from apps.meals.models import Meal
 from apps.meals.tests.factories import MealFactory
 
-
 pytestmark = pytest.mark.django_db
 
 

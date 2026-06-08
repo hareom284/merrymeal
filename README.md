@@ -257,23 +257,61 @@ apps/
 │   ├── managers.py       Query layer (e.g. soft-delete filter)
 │   ├── geo.py            Haversine helper (10 km rule)
 │   └── decorators.py     @role_required
-└── accounts/             Identity
-    ├── models/           Data — schema only (fields, Meta, choices)
-    │   └── users.py      User (zero methods other than __str__)
-    ├── managers/         Query-layer plumbing (Django contract)
-    │   └── users.py      UserManager (create_user etc — Django-required)
-    ├── services/         Business logic — state changes & side effects
-    │   ├── auth.py       sign_in(), sign_out()
-    │   └── users.py      create_user(), delete_user()
-    ├── forms/            HTML rendering + validation (Django's natural fit)
-    │   └── auth.py       EmailLoginForm
-    ├── views/            HTTP layer — thin: form.cleaned_data → service
-    │   └── auth.py       login_view, logout_view
-    ├── urls/             Routing
-    │   ├── auth.py       /login/, /logout/
-    │   └── password_reset.py
-    ├── backends.py       EmailBackend
-    └── admin.py
+├── accounts/             Identity + applications + addresses + caregivers + cities
+│   ├── models/           Data — schema only (fields, Meta, choices)
+│   │   ├── users.py      User (zero methods other than __str__)
+│   │   ├── cities.py     City (lookup for address suburb dropdown)
+│   │   ├── addresses.py  Address (lat/lng + FK to City)
+│   │   ├── caregiver_links.py  CaregiverLink (member ↔ caregiver relationship)
+│   │   ├── applications.py     Application (3-step intake wizard rows)
+│   │   └── password_setup_tokens.py  Single-use welcome-link tokens
+│   ├── managers/         Query-layer plumbing (Django contract)
+│   │   └── users.py      UserManager (create_user etc — Django-required)
+│   ├── services/         Business logic — state changes & side effects
+│   │   ├── auth.py       sign_in(), sign_out()
+│   │   ├── users.py      create_user(), delete_user()
+│   │   ├── caregiver_links.py     link_caregiver()
+│   │   ├── application.py         create_draft_application(), update_application_address(), submit_application()
+│   │   └── password_setup_tokens.py  issue/consume welcome tokens
+│   ├── forms/            HTML rendering + validation
+│   │   ├── auth.py       EmailLoginForm
+│   │   └── application.py  ApplicationContact/Address/DietaryForm (3 wizard steps)
+│   ├── views/            HTTP layer — thin: form.cleaned_data → service
+│   │   ├── auth.py       login_view, logout_view
+│   │   └── application.py  application_step_1/2/3, application_done
+│   ├── urls/             Routing
+│   │   ├── auth.py       /login/, /logout/
+│   │   ├── application.py  /apply/, /apply/address/, /apply/dietary/, /apply/done/
+│   │   └── password_reset.py
+│   ├── backends.py       EmailBackend
+│   └── admin.py
+├── partners/             Partner orgs (charities, restaurants, suppliers, corporates)
+│   ├── models/           Partner — schema only
+│   ├── admin.py
+│   └── tests/
+├── dietary/              Diet preferences + allergies + user join tables
+│   ├── models/           DietPreference, Allergy, UserDietPreference, UserAllergy
+│   ├── management/       seed_dietary command (8 prefs + 7 allergies, idempotent)
+│   ├── admin.py
+│   └── tests/
+├── dashboards/           Landing page + member dashboard + admin approval queue
+│   ├── views/            landing, member, admin_applications_list/detail/approve/reject
+│   ├── services/         approve_application(), reject_application()
+│   ├── urls/             /, /dashboard/, /admin/applications/...
+│   └── tests/
+├── meals/                Meal catalogue
+│   ├── models/           Meal (soft-delete enabled)
+│   ├── admin.py
+│   └── tests/
+└── kitchens/             Kitchens + ingredients + stock batches + meal recipes
+    ├── models/           Kitchen, Ingredient, MealIngredient, IngredientBatch
+    ├── services/         receive_batch() — atomic stock receipt
+    ├── forms/            StockReceiveForm
+    ├── views/            stock_receive_view (kitchen_staff/admin only)
+    ├── urls/             /kitchen/stock/receive/
+    ├── management/       seed_ingredients (30 staples, idempotent)
+    ├── admin.py          + ExpiringSoonFilter
+    └── tests/
 templates/                Mobile-first templates (HTMX + Alpine via CDN)
 static/                   Tailwind input + compiled output
 ```

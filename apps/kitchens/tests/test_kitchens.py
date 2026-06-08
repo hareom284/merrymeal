@@ -7,7 +7,6 @@ from django.core.exceptions import ValidationError
 from apps.kitchens.models import Kitchen
 from apps.kitchens.tests.factories import KitchenFactory
 
-
 pytestmark = pytest.mark.django_db
 
 
