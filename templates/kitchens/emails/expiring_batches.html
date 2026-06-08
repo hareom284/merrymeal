@@ -1,0 +1,28 @@
+<!doctype html>
+<html><body style="font-family: Arial, sans-serif; color:#1a1917;">
+  <p>Hi team,</p>
+  <p>The following batches at <strong>{{ kitchen.name }}</strong>
+     expire on or before <strong>{{ cutoff|date:"D j M Y" }}</strong>
+     (cutoff: 3 days from {{ today|date:"D j M Y" }}).</p>
+
+  {% for ingredient, batches in ingredient_groups %}
+    <h3 style="margin:16px 0 4px;">{{ ingredient.name }} ({{ ingredient.unit }})</h3>
+    <table cellpadding="6" cellspacing="0" border="1"
+           style="border-collapse:collapse; border-color:#e8e6e1;">
+      <thead style="background:#faf9f8;">
+        <tr><th>Lot</th><th>Quantity</th><th>Expires</th></tr>
+      </thead>
+      <tbody>
+        {% for b in batches %}
+          <tr>
+            <td>{{ b.lot_number|default:"—" }}</td>
+            <td>{{ b.quantity }} {{ ingredient.unit }}</td>
+            <td>{{ b.expiration_date|date:"D j M Y" }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% endfor %}
+
+  <p style="margin-top:24px; color:#827b6f; font-size:12px;">— MerryMeal automation</p>
+</body></html>

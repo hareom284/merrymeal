@@ -19,6 +19,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # Third-party
     "auditlog",
+    "django_q",
     # Local
     "apps.core",
     "apps.accounts",
@@ -27,6 +28,7 @@ INSTALLED_APPS = [
     "apps.dashboards",
     "apps.kitchens",
     "apps.meals",
+    "apps.food_safety",
 ]
 
 MIDDLEWARE = [

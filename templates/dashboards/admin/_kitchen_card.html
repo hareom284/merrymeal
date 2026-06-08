@@ -1,0 +1,55 @@
+<article class="flex flex-col gap-3 rounded-2xl border border-warm-200 bg-white p-4">
+  <header class="flex items-baseline justify-between">
+    <h2 class="font-display text-xl text-warm-900">{{ card.kitchen.name }}</h2>
+    <span class="text-xs text-warm-500">#{{ card.kitchen.id }}</span>
+  </header>
+
+  <!-- Expiring batches -->
+  <a href="{{ card.expiring_href }}"
+     class="flex items-center justify-between rounded-xl border px-3 py-2
+            {% if card.expiring_status == 'green' %}bg-emerald-50 border-emerald-200 text-emerald-800
+            {% elif card.expiring_status == 'yellow' %}bg-amber-50 border-amber-200 text-amber-800
+            {% elif card.expiring_status == 'red' %}bg-red-50 border-red-200 text-red-800
+            {% else %}bg-warm-50 border-warm-200 text-warm-700{% endif %}">
+    <span class="text-sm">Expiring ≤ 3 days</span>
+    <span class="font-semibold">{{ card.expiring_count }}</span>
+  </a>
+
+  <!-- Pass rate -->
+  <a href="{{ card.pass_rate_href }}"
+     class="flex items-center justify-between rounded-xl border px-3 py-2
+            {% if card.pass_rate_status == 'green' %}bg-emerald-50 border-emerald-200 text-emerald-800
+            {% elif card.pass_rate_status == 'yellow' %}bg-amber-50 border-amber-200 text-amber-800
+            {% elif card.pass_rate_status == 'red' %}bg-red-50 border-red-200 text-red-800
+            {% else %}bg-warm-50 border-warm-200 text-warm-600{% endif %}">
+    <span class="text-sm">Pass-rate (24 h)</span>
+    <span class="font-semibold">
+      {% if card.pass_rate is None %}no data{% else %}{{ card.pass_rate }}%{% endif %}
+    </span>
+  </a>
+
+  <!-- Last failure -->
+  {% if card.last_failure %}
+  <a href="{{ card.last_failure_href }}"
+     class="flex items-center justify-between rounded-xl border px-3 py-2
+            {% if card.last_failure_status == 'green' %}bg-emerald-50 border-emerald-200 text-emerald-800
+            {% elif card.last_failure_status == 'yellow' %}bg-amber-50 border-amber-200 text-amber-800
+            {% elif card.last_failure_status == 'red' %}bg-red-50 border-red-200 text-red-800
+            {% else %}bg-warm-50 border-warm-200 text-warm-700{% endif %}">
+    <span class="text-sm">
+      Last failure
+      <span class="block text-xs opacity-75">
+        {{ card.last_failure.get_check_type_display }} ·
+        {{ card.last_failure.checked_at|date:"D j M H:i" }}
+      </span>
+    </span>
+    <span class="font-semibold">→</span>
+  </a>
+  {% else %}
+  <div class="flex items-center justify-between rounded-xl border px-3 py-2
+              bg-emerald-50 border-emerald-200 text-emerald-800">
+    <span class="text-sm">Last failure</span>
+    <span class="font-semibold">No recent failures</span>
+  </div>
+  {% endif %}
+</article>

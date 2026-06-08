@@ -6,6 +6,7 @@ from apps.dashboards.views.admin_applications import (
     admin_application_reject,
     admin_applications_list,
 )
+from apps.dashboards.views.admin_kitchens import admin_kitchens
 
 urlpatterns = [
     path("applications/", admin_applications_list, name="admin_applications"),
@@ -24,4 +25,5 @@ urlpatterns = [
         admin_application_reject,
         name="admin_application_reject",
     ),
+    path("kitchens/", admin_kitchens, name="admin_kitchens"),
 ]
