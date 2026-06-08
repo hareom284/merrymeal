@@ -1,11 +1,9 @@
 from datetime import date, timedelta
-from decimal import Decimal
 
 import pytest
 
 from apps.kitchens.forms.stock import StockReceiveForm
 from apps.kitchens.tests.factories import IngredientFactory, KitchenFactory
-
 
 pytestmark = pytest.mark.django_db
 

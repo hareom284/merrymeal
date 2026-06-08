@@ -1,6 +1,5 @@
 from datetime import date
 from decimal import Decimal
-from typing import Optional
 
 from django.db import transaction
 
@@ -15,8 +14,8 @@ def receive_batch(
     ingredient: Ingredient,
     quantity: Decimal,
     expiration_date: date,
-    received_at: Optional[date] = None,
-    lot_number: Optional[str] = None,
+    received_at: date | None = None,
+    lot_number: str | None = None,
 ) -> IngredientBatch:
     """Record an incoming stock batch.
 
