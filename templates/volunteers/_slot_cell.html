@@ -1,0 +1,15 @@
+{% load static %}
+<button
+    id="slot-{{ day }}-{{ phrase }}"
+    data-cell="slot"
+    type="button"
+    hx-post="{% url 'volunteers:availability_toggle' %}"
+    hx-vals='{"day": "{{ day }}", "phrase": "{{ phrase }}"}'
+    hx-swap="outerHTML"
+    hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+    aria-pressed="{% if active %}true{% else %}false{% endif %}"
+    class="min-h-[44px] min-w-[44px] w-full rounded-md text-sm font-medium transition
+           {% if active %}bg-brand-green text-white shadow-sm
+           {% else %}bg-warm-100 text-warm-800 border border-warm-200 hover:bg-warm-200{% endif %}">
+    {{ phrase|title }}
+</button>

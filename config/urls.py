@@ -12,4 +12,5 @@ urlpatterns = [
     path("admin/planner/", include("apps.planning.urls")),
     path("kitchen/", include("apps.kitchens.urls")),
     path("kitchen/safety/", include("apps.food_safety.urls")),
+    path("volunteer/", include("apps.volunteers.urls")),
 ]

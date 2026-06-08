@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}My availability{% endblock %}
+
+{% block content %}
+<main class="mx-auto w-full max-w-md px-4 py-6">
+    <header class="mb-6">
+        <h1 class="font-display text-2xl text-warm-900">My availability</h1>
+        <p class="mt-1 text-sm text-warm-500">
+            Tap a slot to switch it on or off. Saves as you tap.
+        </p>
+    </header>
+
+    <div class="grid grid-cols-[auto_1fr_1fr_1fr] gap-2" role="grid" aria-label="Availability grid">
+        <div></div>
+        <div class="px-2 text-center text-xs font-semibold uppercase text-warm-500">AM</div>
+        <div class="px-2 text-center text-xs font-semibold uppercase text-warm-500">PM</div>
+        <div class="px-2 text-center text-xs font-semibold uppercase text-warm-500">Eve</div>
+
+        {% for row in grid %}
+            <div class="flex items-center pr-2 text-sm font-medium text-warm-800">
+                {{ row.day_label|slice:":3" }}
+            </div>
+            {% for cell in row.cells %}
+                {% include "volunteers/_slot_cell.html" with day=cell.day phrase=cell.phrase active=cell.active %}
+            {% endfor %}
+        {% endfor %}
+    </div>
+</main>
+{% endblock %}
