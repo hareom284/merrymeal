@@ -6,7 +6,9 @@ from apps.dashboards.views.admin_applications import (
     admin_application_reject,
     admin_applications_list,
 )
+from apps.dashboards.views.admin_home import admin_home, admin_home_cards
 from apps.dashboards.views.admin_kitchens import admin_kitchens
+from apps.dashboards.views.audit import audit_viewer
 
 urlpatterns = [
     path("applications/", admin_applications_list, name="admin_applications"),
@@ -26,4 +28,13 @@ urlpatterns = [
         name="admin_application_reject",
     ),
     path("kitchens/", admin_kitchens, name="admin_kitchens"),
+    # Story 6.6 — read-only audit log viewer.
+    # Deliberately NO ``audit/<id>/edit/`` or ``audit/<id>/delete/`` routes.
+    # The viewer is GET-only; mutations go through the underlying audited
+    # models, not through this URL space.
+    path("audit/", audit_viewer, name="audit_viewer"),
+    # Story 6.1 — admin home "what needs attention now". The chrome page
+    # renders five cards; the HTMX partial re-fetches every 5 minutes.
+    path("home/", admin_home, name="admin_home"),
+    path("home/cards/", admin_home_cards, name="admin_home_cards"),
 ]
