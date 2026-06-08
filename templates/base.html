@@ -24,7 +24,7 @@
     <script src="{% static 'src/volunteer-offline.js' %}" defer></script>
   </head>
   <body class="h-full">
-    <main class="mx-auto flex min-h-full max-w-md flex-col px-4 py-8 sm:py-12">
+    <main class="mx-auto flex min-h-full {% block main_max_width %}max-w-md{% endblock %} flex-col px-4 py-8 sm:py-12">
       {% block content %}{% endblock %}
     </main>
   </body>
