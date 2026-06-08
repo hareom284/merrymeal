@@ -1,0 +1,10 @@
+Hi {{ applicant_first_name }},
+
+We've received your MerryMeal application. Thank you.
+
+A volunteer will review it within 3-5 business days. We'll email you again
+as soon as we've approved your application.
+
+If anything urgent comes up, reply to this email.
+
+— The MerryMeal team

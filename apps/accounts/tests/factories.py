@@ -1,6 +1,8 @@
 import factory
 from django.contrib.auth import get_user_model
 
+from apps.accounts.models import Address, City
+
 User = get_user_model()
 
 
@@ -19,3 +21,21 @@ class UserFactory(factory.django.DjangoModelFactory):
     def _create(cls, model_class, *args, **kwargs):
         password = kwargs.pop("password", "pw12345!")
         return model_class.objects.create_user(password=password, **kwargs)
+
+
+class CityFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = City
+        django_get_or_create = ("name",)
+
+    name = factory.Sequence(lambda n: f"City {n}")
+
+
+class AddressFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Address
+
+    user = factory.SubFactory(UserFactory)
+    city = factory.SubFactory(CityFactory)
+    label = "Home"
+    postal_code = factory.Sequence(lambda n: f"3{n:03d}")

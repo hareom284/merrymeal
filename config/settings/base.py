@@ -17,9 +17,13 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    # Third-party
+    "auditlog",
     # Local
     "apps.core",
     "apps.accounts",
+    "apps.partners",
+    "apps.dietary",
     "apps.dashboards",
 ]
 
@@ -87,6 +91,8 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [BASE_DIR / "static" / "dist"]
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+SITE_URL = env("SITE_URL", default="http://localhost:8000")
 
 # LOGIN_URL = "accounts:login"
 LOGIN_REDIRECT_URL = "/"

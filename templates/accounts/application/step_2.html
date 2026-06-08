@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Apply — address · MerryMeal{% endblock %}
+
+{% block content %}
+<section class="mx-auto flex w-full max-w-md flex-col gap-6 px-4 py-8">
+  {% include "accounts/application/_progress.html" with step=2 %}
+
+  <header>
+    <h1 class="font-display text-3xl font-semibold text-warm-900">Where should we deliver?</h1>
+    <p class="mt-2 text-warm-600">We'll use this address for your meals. You can add more later.</p>
+  </header>
+
+  <form method="post" class="flex flex-col gap-5" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+      <div class="rounded-2xl bg-red-50 border border-red-200 px-4 py-3 text-red-800" role="alert">
+        {{ form.non_field_errors.0 }}
+      </div>
+    {% endif %}
+
+    <label class="flex flex-col gap-2">
+      <span class="label">Address label</span>
+      {{ form.label }}
+      {% if form.label.errors %}<span class="text-sm text-red-700">{{ form.label.errors.0 }}</span>{% endif %}
+    </label>
+
+    <label class="flex flex-col gap-2">
+      <span class="label">Street</span>
+      {{ form.street }}
+      {% if form.street.errors %}<span class="text-sm text-red-700">{{ form.street.errors.0 }}</span>{% endif %}
+    </label>
+
+    <div class="grid grid-cols-2 gap-4">
+      <label class="flex flex-col gap-2">
+        <span class="label">Postcode</span>
+        {{ form.postal_code }}
+        {% if form.postal_code.errors %}<span class="text-sm text-red-700">{{ form.postal_code.errors.0 }}</span>{% endif %}
+      </label>
+      <label class="flex flex-col gap-2">
+        <span class="label">City</span>
+        {{ form.city }}
+        {% if form.city.errors %}<span class="text-sm text-red-700">{{ form.city.errors.0 }}</span>{% endif %}
+      </label>
+    </div>
+
+    <div class="flex items-center justify-between mt-2">
+      <a href="{% url 'accounts:application_step_1' %}"
+         class="text-brand-green underline min-h-[44px] flex items-center">Back</a>
+      <button type="submit" class="btn-primary min-h-[44px]">Continue</button>
+    </div>
+  </form>
+</section>
+{% endblock %}
