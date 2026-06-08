@@ -9,4 +9,5 @@ from django.urls import include, path
 urlpatterns = [
     path("", include("apps.accounts.urls")),
     path("", include("apps.dashboards.urls")),
+    path("kitchen/", include("apps.kitchens.urls")),
 ]

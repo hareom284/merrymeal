@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}Receive stock — MerryMeal{% endblock %}
+
+{% block content %}
+<main class="mx-auto w-full max-w-3xl px-4 py-6">
+
+  <h1 class="font-display text-2xl text-warm-900 mb-4">Receive stock</h1>
+
+  {% if just_created_id %}
+  <div class="card mb-4 border-l-4 border-brand-green bg-warm-100 p-4"
+       role="status" aria-live="polite">
+    <p class="text-warm-900 font-medium">Batch #{{ just_created_id }} recorded.</p>
+    <a href="{% url 'kitchens:stock_receive' %}"
+       class="btn-primary mt-3 inline-flex min-h-[44px] items-center px-4">
+      Receive another?
+    </a>
+  </div>
+  {% endif %}
+
+  <form method="post" class="card p-4 md:p-6 md:grid md:grid-cols-2 md:gap-6">
+    {% csrf_token %}
+
+    <div class="space-y-4">
+      <div>
+        <label class="label" for="id_kitchen">Kitchen</label>
+        {% if single_kitchen %}
+          <p class="text-warm-900 py-2">{{ single_kitchen.name }}</p>
+          <input type="hidden" name="kitchen" value="{{ single_kitchen.pk }}">
+        {% else %}
+          {{ form.kitchen }}
+        {% endif %}
+        {{ form.kitchen.errors }}
+      </div>
+
+      <div>
+        <label class="label" for="id_ingredient">Ingredient</label>
+        {{ form.ingredient }}
+        {{ form.ingredient.errors }}
+      </div>
+
+      <div>
+        <label class="label" for="id_quantity">Quantity</label>
+        {{ form.quantity }}
+        {{ form.quantity.errors }}
+      </div>
+
+      <div>
+        <label class="label" for="id_expiration_date">Expiration date</label>
+        {{ form.expiration_date }}
+        {{ form.expiration_date.errors }}
+      </div>
+    </div>
+
+    <div class="space-y-4 mt-4 md:mt-0">
+      <div>
+        <label class="label" for="id_received_at">Received on</label>
+        {{ form.received_at }}
+        {{ form.received_at.errors }}
+      </div>
+
+      <div>
+        <label class="label" for="id_lot_number">Lot number (optional)</label>
+        {{ form.lot_number }}
+        {{ form.lot_number.errors }}
+      </div>
+
+      <button type="submit"
+              class="btn-primary mt-2 w-full min-h-[44px]">
+        Record batch
+      </button>
+    </div>
+
+  </form>
+</main>
+{% endblock %}

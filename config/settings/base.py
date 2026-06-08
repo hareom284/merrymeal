@@ -25,6 +25,8 @@ INSTALLED_APPS = [
     "apps.partners",
     "apps.dietary",
     "apps.dashboards",
+    "apps.kitchens",
+    "apps.meals",
 ]
 
 MIDDLEWARE = [

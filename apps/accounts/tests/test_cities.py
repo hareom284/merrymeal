@@ -56,7 +56,7 @@ def test_cities_table_columns_match_schema():
 def test_seed_cities_creates_the_five_starter_cities():
     call_command("seed_cities")
     names = set(City.objects.values_list("name", flat=True))
-    assert names == {"Melbourne", "Geelong", "Ballarat", "Bendigo", "Frankston"}
+    assert names == {"Hlaing", "Insein", "Bahan", "Kamayut", "Yankin"}
 
 
 @pytest.mark.django_db
