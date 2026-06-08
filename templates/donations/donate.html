@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+{% load donation_extras %}
+
+{# Story 5.3 — public donate page (mobile-first, 375 x 667 px iPhone SE).
+   Extends ``base.html`` (the public/anonymous template) rather than
+   ``app_base.html`` so we don't drag in the auth-only sidebar — strangers
+   should not see member navigation while donating.
+
+   Alpine state:
+   * ``amount`` — integer cents reflected on the chips (5000 default = $50)
+   * ``custom`` — the free-form custom-input string
+   * ``recurring`` — checkbox state, bound to the hidden recurring input
+#}
+
+{% block title %}Donate · MerryMeal{% endblock %}
+
+{% block content %}
+<section
+  class="w-full"
+  x-data="{ amount: 5000, custom: '', recurring: false }"
+>
+  {% if cancelled %}
+    {# Story 5.4's Stripe cancel return URL appends ``?cancelled=1``. Soft
+       toast above the form so the user can re-try without confusion. #}
+    <div
+      role="status"
+      class="mb-4 rounded-md bg-amber-50 p-3 text-sm text-amber-900 ring-1 ring-amber-200"
+    >
+      Cancelled &mdash; your card wasn't charged.
+    </div>
+  {% endif %}
+
+  <header class="mb-6">
+    <h1 class="font-display text-3xl text-warm-900">
+      {{ campaign.name|default:"General fund" }}
+    </h1>
+    {% if campaign and campaign.goal_cents %}
+      <div class="mt-3 h-2 w-full overflow-hidden rounded bg-warm-100">
+        {# ``widthratio`` returns an integer 0..100; CSS clamps to 100% if
+           pledges overshoot the goal. ``raised_cents_for`` only sums
+           ``status=completed`` donations so a fresh pending row does NOT
+           bump the bar — by design. #}
+        <div
+          class="h-2 rounded bg-brand-green"
+          style="width: {% widthratio raised_cents campaign.goal_cents 100 %}%; max-width: 100%;"
+        ></div>
+      </div>
+      <p class="mt-1 text-sm text-warm-500">
+        {{ raised_cents|dollars }} of {{ campaign.goal_cents|dollars }} raised
+      </p>
+    {% endif %}
+  </header>
+
+  <form
+    method="post"
+    action="{% url 'donations:donate_start' %}"
+    class="space-y-5"
+    novalidate
+  >
+    {% csrf_token %}
+    {# ``campaign_slug`` is hidden; set by the GET-side view from
+       ``?campaign=`` and round-tripped through the form so the slug
+       survives a validation-error re-render. #}
+    <input
+      type="hidden"
+      name="campaign_slug"
+      value="{{ form.campaign_slug.value|default_if_none:'' }}"
+    >
+
+    {# Amount chips + custom input.
+       Three preset chips ($20 / $50 / $100) plus a free-form input. The
+       chips push integer cents into Alpine's ``amount`` AND write the
+       dollar value into ``id_amount_dollars`` (the actual form field)
+       so server-side validation receives the same value the user picked.
+       The ``split`` template filter doesn't exist by default and isn't
+       worth a custom filter for three values — chips are hand-unrolled. #}
+    <div>
+      <p class="mb-2 text-sm text-warm-700">Choose an amount</p>
+      <div class="grid grid-cols-4 gap-2">
+        <button
+          type="button"
+          class="min-h-[44px] rounded border border-warm-200 px-2 py-2 text-sm font-medium"
+          :class="amount === 2000 ? 'bg-brand-green text-white border-brand-green' : 'bg-warm-50 text-warm-900'"
+          @click="amount = 2000; custom = ''; document.getElementById('id_amount_dollars').value = '20'"
+        >
+          $20
+        </button>
+        <button
+          type="button"
+          class="min-h-[44px] rounded border border-warm-200 px-2 py-2 text-sm font-medium"
+          :class="amount === 5000 ? 'bg-brand-green text-white border-brand-green' : 'bg-warm-50 text-warm-900'"
+          @click="amount = 5000; custom = ''; document.getElementById('id_amount_dollars').value = '50'"
+        >
+          $50
+        </button>
+        <button
+          type="button"
+          class="min-h-[44px] rounded border border-warm-200 px-2 py-2 text-sm font-medium"
+          :class="amount === 10000 ? 'bg-brand-green text-white border-brand-green' : 'bg-warm-50 text-warm-900'"
+          @click="amount = 10000; custom = ''; document.getElementById('id_amount_dollars').value = '100'"
+        >
+          $100
+        </button>
+        <input
+          type="text"
+          inputmode="decimal"
+          placeholder="Custom"
+          id="id_amount_dollars"
+          name="amount_dollars"
+          value="{{ form.amount_dollars.value|default_if_none:'' }}"
+          x-model="custom"
+          @input="amount = Math.round(parseFloat(custom || '0') * 100)"
+          class="input min-h-[44px]"
+          aria-label="Custom amount in dollars"
+        >
+      </div>
+      {# Placeholder copy — Story 5.6 fills the chip captions with the
+         real "≈ N meals" derived from the per-meal cost setting. Showing
+         a single line below the grid keeps the chips themselves uncluttered
+         on a 375 px viewport. #}
+      <p class="mt-2 text-xs text-warm-500">
+        Every donation funds meals for people in need.
+      </p>
+      {% if form.amount_dollars.errors %}
+        <p class="mt-1 text-sm text-red-600">{{ form.amount_dollars.errors.0 }}</p>
+      {% endif %}
+    </div>
+
+    <label class="flex items-center gap-2 text-sm text-warm-800">
+      <input
+        type="checkbox"
+        name="is_recurring"
+        x-model="recurring"
+        class="h-4 w-4 rounded border-warm-300"
+      >
+      Make this monthly
+    </label>
+
+    <div>
+      <label class="mb-1 block text-sm font-medium text-warm-800" for="id_donor_email">
+        Email (for your receipt)
+      </label>
+      <input
+        type="email"
+        required
+        name="donor_email"
+        id="id_donor_email"
+        value="{{ form.donor_email.value|default_if_none:'' }}"
+        autocomplete="email"
+        class="input min-h-[44px] w-full"
+      >
+      {% if form.donor_email.errors %}
+        <p class="mt-1 text-sm text-red-600">{{ form.donor_email.errors.0 }}</p>
+      {% endif %}
+    </div>
+
+    {# CTA — full-width on mobile, minimum 48 px tall (touch target).
+       Playwright asserts ``boundingBox.height >= 48`` at 375 px. #}
+    <button
+      type="submit"
+      class="btn-primary min-h-[48px] w-full"
+    >
+      Donate
+    </button>
+
+    <p class="text-center text-xs text-warm-500">
+      You'll be taken to our secure payment provider to finish your gift.
+    </p>
+  </form>
+</section>
+{% endblock %}

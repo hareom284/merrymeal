@@ -29,8 +29,8 @@ urlpatterns = [
     path("", include("apps.delivery.urls")),
     # Sprint 09 — donations app routes. Mounted at the project root so
     # ``/stripe/webhook/`` (Story 5.4) matches the URL we configure in
-    # the Stripe dashboard; the impact / donate / thanks / manage routes
-    # carry their own ``donations/`` and ``donate/`` prefixes inside the
+    # the Stripe dashboard; the donate / impact / thanks / manage routes
+    # carry their own ``donate/`` and ``donations/`` prefixes inside the
     # module so the namespace stays single-rooted under ``donations:``.
     path("", include("apps.donations.urls")),
 ]
