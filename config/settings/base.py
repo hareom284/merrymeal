@@ -163,3 +163,10 @@ OFFICE_PHONE = env("OFFICE_PHONE", default="03 9000 0000")
 TWILIO_ACCOUNT_SID = env("TWILIO_ACCOUNT_SID", default="")
 TWILIO_AUTH_TOKEN = env("TWILIO_AUTH_TOKEN", default="")
 TWILIO_FROM = env("TWILIO_FROM", default="")
+
+# Donor-impact conversion (Story 5.6). The donate-page chips, thanks
+# page and receipt email render "your $X = N meals" using this knob.
+# Default 300c ($3) matches the charity's per-portion cost (cooked-meal
+# CoGS / portion served — see Sprint 09 brief). Overridable in ops
+# without a deploy.
+MEAL_COST_CENTS = env.int("MEAL_COST_CENTS", default=300)

@@ -18,4 +18,8 @@ urlpatterns = [
     # volunteer-facing screens (Stories 4.8 / 4.12) and the admin
     # reassign widget (Story 4.14) share one ``delivery`` namespace.
     path("", include("apps.delivery.urls")),
+    # Sprint 09 — donor-impact preview (Story 5.6). Other Sprint 09
+    # stories (5.3 donate, 5.4 webhook, 5.5 thanks, 5.7 manage) append
+    # to ``apps.donations.urls`` under the same prefix.
+    path("donations/", include("apps.donations.urls")),
 ]

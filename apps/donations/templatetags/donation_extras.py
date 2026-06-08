@@ -9,6 +9,8 @@ enforced (floats raise ``TypeError`` at the boundary).
 
 from django import template
 
+from apps.donations.services.impact import meals_for_amount
+
 register = template.Library()
 
 
@@ -39,3 +41,27 @@ def dollars(amount_cents):
     cents = abs(amount_cents)
     whole, remainder = divmod(cents, 100)
     return f"{sign}${whole:,}.{remainder:02d}"
+
+
+@register.filter
+def meals_for(amount_cents):
+    """Return how many meals ``amount_cents`` buys at $3 per meal.
+
+    Forgiving variant of ``apps.donations.services.impact.meals_for_amount``
+    — templates should never crash on a missing or stringly-typed value.
+    ``None`` / empty string / non-numeric input all return ``0`` so the
+    donate-page chip captions render cleanly even when the upstream
+    context is partly populated.
+
+    The service stays strict (raising on floats and negatives) because
+    the receipt + thanks page need that protection; the template tag is
+    the relaxed boundary.
+    """
+    if amount_cents in (None, ""):
+        return 0
+    try:
+        # ``int(...)`` coerces ``"5000"`` -> 5000 (string filter args)
+        # and rejects ``"12.5"`` with ``ValueError`` — which we catch.
+        return meals_for_amount(int(amount_cents))
+    except (TypeError, ValueError):
+        return 0
