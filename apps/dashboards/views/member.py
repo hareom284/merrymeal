@@ -1,6 +1,8 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 
+from apps.dashboards.views.caregiver import caregiver_list_view
+
 
 @login_required
 def member_dashboard_view(request):
@@ -8,7 +10,13 @@ def member_dashboard_view(request):
 
     Phase 0: all data is mocked. Phase 3 (planning) wires `today_meal` +
     `week_menu` to MealPlan; Phase 4 (delivery) wires `delivery`.
+
+    Role router: when a caregiver hits `/dashboard/`, defer to the
+    caregiver multi-member view (Story 3.8) instead of rendering a
+    member-specific template they have no use for.
     """
+    if getattr(request.user, "role", None) == "caregiver":
+        return caregiver_list_view(request)
     context = {
         "page_title": "Dashboard",
         "today_date_label": "Tuesday, 14 October",

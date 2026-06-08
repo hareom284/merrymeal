@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Food safety check · MerryMeal{% endblock %}
+
+{% block content %}
+<main class="mx-auto w-full max-w-3xl px-4 py-6 md:py-10">
+  <h1 class="font-display text-2xl md:text-3xl text-warm-900">Food safety check</h1>
+  <p class="mt-1 text-sm text-warm-500">Logged as {{ request.user.email }} · {% now "l j M Y" %}</p>
+
+  {% if today_rows %}
+    <section class="mt-6 card p-4">
+      <h2 class="text-sm font-semibold text-warm-800">Already done today</h2>
+      <ul class="mt-2 divide-y divide-warm-200">
+        {% for row in today_rows %}
+          <li class="flex items-center justify-between py-2 text-sm">
+            <span class="text-warm-800">{{ row.get_check_type_display }}</span>
+            <span class="rounded-full px-2 py-0.5 text-xs font-medium
+                         {% if row.result == 'pass' %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
+              {{ row.get_result_display }}{% if row.temperature_celsius %} · {{ row.temperature_celsius }} °C{% endif %}
+            </span>
+          </li>
+        {% endfor %}
+      </ul>
+    </section>
+  {% endif %}
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="mt-4 rounded-md bg-green-100 px-4 py-3 text-sm text-green-900" role="status">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <form method="post" class="mt-6 card p-4 md:p-6"
+        x-data="{ type: '{{ form.check_type.value|default:'storage_temp' }}' }">
+    {% csrf_token %}
+
+    <div>
+      <label class="label" for="id_kitchen">Kitchen</label>
+      {{ kitchen_form.kitchen }}
+    </div>
+
+    <fieldset class="mt-4">
+      <legend class="label">Check type</legend>
+      <div class="grid grid-cols-2 gap-2 md:grid-cols-3">
+        {% for value, label in form.fields.check_type.choices %}
+          <label class="flex h-11 cursor-pointer items-center gap-2 rounded-md border border-warm-200 px-3 text-sm
+                        has-[:checked]:border-brand-green has-[:checked]:bg-brand-green/5">
+            <input type="radio" name="check_type" value="{{ value }}"
+                   class="h-5 w-5"
+                   x-model="type"
+                   {% if form.check_type.value == value %}checked{% endif %}>
+            <span>{{ label }}</span>
+          </label>
+        {% endfor %}
+      </div>
+    </fieldset>
+
+    <div class="mt-4" x-show="['storage_temp','cooking_temp','cold_chain'].includes(type)" x-cloak>
+      <label class="label" for="id_temperature_celsius">Temperature (°C)</label>
+      {{ form.temperature_celsius }}
+      {% if form.temperature_celsius.errors %}
+        <p class="mt-1 text-sm text-red-700">{{ form.temperature_celsius.errors.0 }}</p>
+      {% endif %}
+    </div>
+
+    <fieldset class="mt-4" x-show="['hygiene','cleaning','pest_control'].includes(type)" x-cloak>
+      <legend class="label">Result</legend>
+      <div class="grid grid-cols-2 gap-2">
+        <label class="flex h-11 items-center justify-center gap-2 rounded-md border border-warm-200 has-[:checked]:border-green-600 has-[:checked]:bg-green-50">
+          <input type="radio" name="result" value="pass" class="h-5 w-5"> Pass
+        </label>
+        <label class="flex h-11 items-center justify-center gap-2 rounded-md border border-warm-200 has-[:checked]:border-red-600 has-[:checked]:bg-red-50">
+          <input type="radio" name="result" value="fail" class="h-5 w-5"> Fail
+        </label>
+      </div>
+      {% if form.result.errors %}
+        <p class="mt-1 text-sm text-red-700">{{ form.result.errors.0 }}</p>
+      {% endif %}
+    </fieldset>
+
+    <div class="mt-4">
+      <label class="label" for="id_notes">Notes (optional)</label>
+      {{ form.notes }}
+    </div>
+
+    <button type="submit" class="btn-primary mt-6 h-11 w-full md:w-auto">Save check</button>
+  </form>
+</main>
+{% endblock %}

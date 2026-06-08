@@ -35,6 +35,20 @@ class User(AbstractBaseUser, PermissionsMixin):
     )
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
+    allergies = models.ManyToManyField(
+        "dietary.Allergy",
+        through="dietary.UserAllergy",
+        through_fields=("user", "allergy"),
+        related_name="users",
+        blank=True,
+    )
+    diet_preferences = models.ManyToManyField(
+        "dietary.DietPreference",
+        through="dietary.UserDietPreference",
+        through_fields=("user", "diet_preference"),
+        related_name="users",
+        blank=True,
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(null=True, blank=True)

@@ -1,0 +1,63 @@
+{% comment %}
+  Shared "today's meal" card partial.
+
+  Story 3.8 (caregiver multi-member view) introduces this fragment so
+  both the member dashboard (Story 3.4) and the caregiver member-detail
+  page can share one source of truth. The template assumes `card` is the
+  dict returned by `apps.dashboards.services.member_today.get_today_card`.
+
+  Required keys on `card`:
+    has_meal             bool
+    meal_name            str (when has_meal)
+    meal_description     str (optional)
+    ingredient_names     list[str]
+    allergens            list[Allergy]
+    delivery_status_label str
+    next_plan_date       date | None
+{% endcomment %}
+<article class="card space-y-3">
+  <header class="flex items-center justify-between gap-3">
+    <h2 class="font-display text-2xl text-warm-900">
+      {% if card.has_meal %}{{ card.meal_name }}{% else %}No meal today{% endif %}
+    </h2>
+    <span class="text-xs uppercase tracking-widest text-warm-500">
+      {{ card.delivery_status_label }}
+    </span>
+  </header>
+
+  {% if card.has_meal %}
+    {% if card.meal_description %}
+      <p class="text-warm-700 leading-relaxed">{{ card.meal_description }}</p>
+    {% endif %}
+
+    <section>
+      <h3 class="text-sm font-semibold text-warm-800 mb-1">Key ingredients</h3>
+      {% if card.ingredient_names %}
+        <ul class="text-warm-700 leading-relaxed list-disc list-inside">
+          {% for name in card.ingredient_names %}
+            <li>{{ name }}</li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="text-warm-500">Ingredient list pending.</p>
+      {% endif %}
+    </section>
+
+    {% if card.allergens %}
+      <p class="text-red-700 font-semibold">
+        ⚠ Contains
+        {% for a in card.allergens %}{{ a.name }}{% if not forloop.last %}, {% endif %}{% endfor %}
+      </p>
+    {% endif %}
+  {% else %}
+    <p class="text-warm-700">
+      {% if card.next_plan_date %}
+        Next meal scheduled for {{ card.next_plan_date|date:"l j F" }}.
+      {% else %}
+        No meals are scheduled yet.
+      {% endif %}
+    </p>
+    <h3 class="text-sm font-semibold text-warm-800">Key ingredients</h3>
+    <p class="text-warm-500">—</p>
+  {% endif %}
+</article>

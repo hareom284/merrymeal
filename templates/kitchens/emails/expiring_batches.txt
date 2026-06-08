@@ -1,0 +1,9 @@
+Hi team,
+
+The following batches at {{ kitchen.name }} expire on or before
+{{ cutoff|date:"D j M Y" }} (cutoff: 3 days from {{ today|date:"D j M Y" }}).
+
+{% for ingredient, batches in ingredient_groups %}{{ ingredient.name }} ({{ ingredient.unit }})
+{% for b in batches %}  - Lot {{ b.lot_number|default:"—" }}: {{ b.quantity }} {{ ingredient.unit }} expires {{ b.expiration_date|date:"D j M Y" }}
+{% endfor %}{% endfor %}
+— MerryMeal automation
