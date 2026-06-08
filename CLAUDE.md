@@ -30,8 +30,8 @@ the relevant sprint story first.
 | 01–06 | 00–03 | done | foundations, accounts, kitchens, planning |
 | 07 | 04 | done | volunteer Availability + delivery models + dispatch |
 | 08 | 04 | done | volunteer today screen, mark-delivered, feedback, caregiver alert |
-| 09 | 05 | in progress | donations + Stripe checkout |
-| 10 | 06 | partial | 6.1/6.2/6.6/6.7 done; 6.3/6.4/6.5 blocked on sprint 09 |
+| 09 | 05 | done | donations + Stripe checkout |
+| 10 | 06 | done | admin home, partner outcomes, donor history, FY receipt, board report, audit viewer, partner referral form |
 | 11 | 07 | not started | hardening (PWA, encryption, WCAG, perf budget) |
 
 Branch convention: each sprint's work merges into `implement-sprint-02`

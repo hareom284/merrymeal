@@ -104,7 +104,7 @@ their current status, average rating, and retention
 ---
 
 ### Story 6.3 — Donor history page (signed-in donor)
-**STATUS: backlog**
+**STATUS: done (sprint-10)**
 
 **As a** logged-in donor
 **I want** to see my donation history with downloadable receipts
@@ -129,7 +129,7 @@ their current status, average rating, and retention
 ---
 
 ### Story 6.4 — Tax receipt printer-friendly page
-**STATUS: backlog**
+**STATUS: done (sprint-10)**
 
 **As a** donor at tax time
 **I want** a printable summary of every donation I made in a financial year
@@ -155,7 +155,7 @@ their current status, average rating, and retention
 ---
 
 ### Story 6.5 — Board report: CSV + PDF (one-click monthly export)
-**STATUS: backlog**
+**STATUS: done (sprint-10)**
 
 **As an** admin
 **I want** to click one button and download a monthly board pack
