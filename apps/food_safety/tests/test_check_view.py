@@ -1,11 +1,9 @@
 import pytest
-from django.urls import reverse
 
 from apps.accounts.tests.factories import UserFactory
 from apps.food_safety.models import FoodSafetyCheck
 from apps.food_safety.services.checks import record_check
 from apps.kitchens.tests.factories import KitchenFactory
-
 
 pytestmark = pytest.mark.django_db
 URL = "/kitchen/safety/check/"

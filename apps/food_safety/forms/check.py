@@ -3,7 +3,6 @@ from django import forms
 from apps.food_safety.models import FoodSafetyCheck
 from apps.food_safety.services.checks import THRESHOLDS
 
-
 _TEMP_TYPES = set(THRESHOLDS.keys())
 
 

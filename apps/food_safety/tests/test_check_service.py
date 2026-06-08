@@ -12,7 +12,6 @@ from apps.food_safety.services.checks import (
 )
 from apps.kitchens.tests.factories import KitchenFactory
 
-
 pytestmark = pytest.mark.django_db
 
 

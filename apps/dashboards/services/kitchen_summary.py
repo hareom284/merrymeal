@@ -7,7 +7,6 @@ from apps.food_safety.models import FoodSafetyCheck
 from apps.kitchens.models import Kitchen
 from apps.kitchens.services.expiry import find_expiring_batches
 
-
 # ---------- thresholds ----------
 
 EXPIRING_WITHIN_DAYS = 3

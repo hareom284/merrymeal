@@ -1,7 +1,6 @@
 import pytest
 from django_q.models import Schedule
 
-
 pytestmark = pytest.mark.django_db
 
 

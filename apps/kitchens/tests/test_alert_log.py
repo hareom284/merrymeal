@@ -1,11 +1,9 @@
-from django.utils import timezone
-
 import pytest
 from django.db import IntegrityError
+from django.utils import timezone
 
 from apps.kitchens.models import ExpiryAlertLog
 from apps.kitchens.tests.factories import KitchenFactory
-
 
 pytestmark = pytest.mark.django_db(transaction=True)
 

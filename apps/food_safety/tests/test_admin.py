@@ -1,9 +1,7 @@
 import pytest
 from django.contrib.admin.sites import site
 
-from apps.food_safety.admin import FoodSafetyCheckAdmin
 from apps.food_safety.models import FoodSafetyCheck
-
 
 pytestmark = pytest.mark.django_db
 

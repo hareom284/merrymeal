@@ -1,6 +1,5 @@
 from django.db import migrations
 
-
 TASK_FUNC = "apps.kitchens.tasks.expiry_alerts.send_expiry_alerts"
 
 

@@ -11,7 +11,6 @@ from apps.accounts.models import User
 from apps.kitchens.models import ExpiryAlertLog, Kitchen
 from apps.kitchens.services.expiry import find_expiring_batches
 
-
 logger = logging.getLogger(__name__)
 
 

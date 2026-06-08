@@ -7,7 +7,6 @@ from django.utils import timezone
 
 from apps.accounts.tests.factories import UserFactory
 
-
 pytestmark = pytest.mark.django_db
 
 

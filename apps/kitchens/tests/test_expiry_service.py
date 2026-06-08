@@ -10,7 +10,6 @@ from apps.kitchens.tests.factories import (
     KitchenFactory,
 )
 
-
 pytestmark = pytest.mark.django_db
 
 
@@ -58,14 +57,14 @@ def test_orders_by_ingredient_then_expiry():
     rice = IngredientFactory(name="Rice")
     onion = IngredientFactory(name="Onion")
     today = date.today()
-    older_rice = IngredientBatchFactory(kitchen=kitchen, ingredient=rice,
-                                        expiration_date=today + timedelta(days=1),
-                                        quantity=Decimal("1.00"))
-    newer_rice = IngredientBatchFactory(kitchen=kitchen, ingredient=rice,
-                                        expiration_date=today + timedelta(days=2),
-                                        quantity=Decimal("1.00"))
-    onion_batch = IngredientBatchFactory(kitchen=kitchen, ingredient=onion,
-                                         expiration_date=today + timedelta(days=2),
-                                         quantity=Decimal("1.00"))
+    IngredientBatchFactory(kitchen=kitchen, ingredient=rice,
+                           expiration_date=today + timedelta(days=1),
+                           quantity=Decimal("1.00"))
+    IngredientBatchFactory(kitchen=kitchen, ingredient=rice,
+                           expiration_date=today + timedelta(days=2),
+                           quantity=Decimal("1.00"))
+    IngredientBatchFactory(kitchen=kitchen, ingredient=onion,
+                           expiration_date=today + timedelta(days=2),
+                           quantity=Decimal("1.00"))
     rows = list(find_expiring_batches(kitchen, within_days=3))
     assert rows == sorted(rows, key=lambda b: (b.ingredient_id, b.expiration_date))

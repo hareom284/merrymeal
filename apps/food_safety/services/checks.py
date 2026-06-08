@@ -1,15 +1,13 @@
 from decimal import Decimal
-from typing import Optional
 
 from django.db.models import QuerySet
 from django.utils import timezone
 
 from apps.food_safety.models import FoodSafetyCheck
 
-
 # Result thresholds for temperature-typed checks.
 # (low_inclusive, high_inclusive) — PASS if any inclusive band matches.
-THRESHOLDS: dict[str, list[tuple[Optional[Decimal], Optional[Decimal]]]] = {
+THRESHOLDS: dict[str, list[tuple[Decimal | None, Decimal | None]]] = {
     "storage_temp": [(None, Decimal("5.0")), (Decimal("60.0"), None)],
     "cooking_temp": [(Decimal("75.0"), None)],
     "cold_chain":   [(None, Decimal("5.0"))],
@@ -28,8 +26,8 @@ def derive_result(check_type: str, temperature_celsius: Decimal) -> str:
 
 
 def record_check(*, kitchen, user, check_type: str,
-                 temperature_celsius: Optional[Decimal],
-                 result: Optional[str],
+                 temperature_celsius: Decimal | None,
+                 result: str | None,
                  notes: str) -> FoodSafetyCheck:
     """Write one food-safety check. Server owns checked_at and derives result
     for temperature types."""

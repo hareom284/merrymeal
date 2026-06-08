@@ -3,7 +3,6 @@ import pytest
 from apps.food_safety.forms.check import CheckForm
 from apps.food_safety.models import FoodSafetyCheck
 
-
 pytestmark = pytest.mark.django_db
 
 
