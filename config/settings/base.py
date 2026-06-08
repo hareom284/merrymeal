@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     "apps.food_safety",
     "apps.volunteers",
     "apps.delivery",
+    "apps.donations",
 ]
 
 MIDDLEWARE = [
@@ -162,3 +163,53 @@ OFFICE_PHONE = env("OFFICE_PHONE", default="03 9000 0000")
 TWILIO_ACCOUNT_SID = env("TWILIO_ACCOUNT_SID", default="")
 TWILIO_AUTH_TOKEN = env("TWILIO_AUTH_TOKEN", default="")
 TWILIO_FROM = env("TWILIO_FROM", default="")
+
+# Stripe (Story 5.4 — Checkout integration).
+#
+# The publishable key is fine to expose to the browser; the secret key
+# and the webhook secret are server-side only and must never leak. The
+# defaults are deliberately obvious placeholder values so a missing
+# ``.env`` in prod fails the first Stripe call instead of silently
+# charging the wrong account.
+#
+# ``stripe`` is **not** pip-installed on dev / CI. The donations service
+# (apps.donations.services.stripe_checkout) and webhook view defer the
+# ``import stripe`` to call-time, mirroring the Twilio pattern above so
+# the module graph still imports cleanly without the wheel.
+STRIPE_PUBLISHABLE_KEY = env("STRIPE_PUBLISHABLE_KEY", default="pk_test_replace_me")
+STRIPE_SECRET_KEY = env("STRIPE_SECRET_KEY", default="sk_test_replace_me")
+STRIPE_WEBHOOK_SECRET = env("STRIPE_WEBHOOK_SECRET", default="whsec_test_only")
+STRIPE_LIVE_MODE = False
+
+# Donations — currency + redirect targets pulled from settings so a
+# future market switch (NZD, GBP…) is a one-line change.
+DONATIONS_CURRENCY = "aud"
+DONATIONS_SUCCESS_URL = "/donate/thanks/?session_id={CHECKOUT_SESSION_ID}"
+DONATIONS_CANCEL_URL = "/donate/?cancelled=1"
+
+# Donor-impact conversion (Story 5.6). The donate-page chips, thanks
+# page and receipt email render "your $X = N meals" using this knob.
+# Default 300c ($3) matches the charity's per-portion cost (cooked-meal
+# CoGS / portion served — see Sprint 09 brief). Overridable in ops
+# without a deploy.
+MEAL_COST_CENTS = env.int("MEAL_COST_CENTS", default=300)
+
+# Receipt email (Story 5.5). ``DONATIONS_FROM_EMAIL`` is the From address
+# stamped on the transactional receipt sent when a Donation flips to
+# ``completed``; the ABN + address are the ATO-mandated charity details
+# rendered in the body so the receipt qualifies as a tax-deductible gift
+# record. Defaults are placeholder text — every prod environment MUST
+# override via .env before the first live charge or donors get bogus ABN
+# data on their tax records.
+DONATIONS_FROM_EMAIL = env(
+    "DONATIONS_FROM_EMAIL",
+    default="receipts@merrymeal.org.au",
+)
+DONATIONS_CHARITY_ABN = env(
+    "DONATIONS_CHARITY_ABN",
+    default="12 345 678 901",
+)
+DONATIONS_CHARITY_ADDRESS = env(
+    "DONATIONS_CHARITY_ADDRESS",
+    default="PO Box 1, Melbourne VIC 3000",
+)

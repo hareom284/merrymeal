@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% load donation_extras %}
+
+{# Story 5.7 — magic-link landing page (active subscriptions).
+
+   The donor lands here from the one-shot URL in their email. The GET
+   that rendered this page already burned the magic-link token, so
+   reloading the URL returns 410. The cancel form below POSTs back to
+   the same URL — the view re-decodes the signed token but skips the
+   single-use check on POST so the cancel can still go through.
+
+   Each subscription card has its own ``<form>`` so cancelling one
+   donation does not affect the others.
+#}
+
+{% block title %}Your subscriptions · MerryMeal{% endblock %}
+
+{% block content %}
+<section class="mx-auto max-w-md px-4 py-10 space-y-6">
+  <header>
+    <h1 class="font-display text-3xl text-warm-900">Your subscriptions</h1>
+    <p class="mt-2 text-sm text-warm-600">
+      Signed in as <strong>{{ email }}</strong>. This link can only be
+      used once — keep this tab open until you're done.
+    </p>
+  </header>
+
+  {% if cancelled %}
+    <div
+      role="status"
+      class="rounded-md bg-emerald-50 p-3 text-sm text-emerald-900 ring-1 ring-emerald-200"
+    >
+      Subscription cancelled. You will not be charged again.
+    </div>
+  {% endif %}
+
+  {% if subscriptions %}
+    <ul class="space-y-4">
+      {% for d in subscriptions %}
+        <li class="rounded-2xl border border-warm-200 bg-white p-4 shadow-sm">
+          <p class="text-xs uppercase tracking-wide text-warm-500">
+            {{ d.campaign.name }}
+          </p>
+          <p class="mt-1 text-2xl font-semibold text-warm-900">
+            {{ d.amount_cents|dollars }}
+            <span class="text-base font-normal text-warm-500">/ month</span>
+          </p>
+          <p class="mt-1 text-xs text-warm-500">
+            Subscription <code>{{ d.stripe_subscription_id }}</code>
+          </p>
+
+          {# Cancel form posts back to the same URL — the view re-decodes
+             the signed token, then calls ``cancel_subscription``. #}
+          <form
+            method="post"
+            action="{% url 'donations:manage' token=token %}"
+            class="mt-4"
+          >
+            {% csrf_token %}
+            <input
+              type="hidden"
+              name="subscription_id"
+              value="{{ d.stripe_subscription_id }}"
+            >
+            <button
+              type="submit"
+              class="btn-secondary min-h-[44px] w-full"
+              onclick="return confirm('Cancel this monthly donation? You will not be charged again.');"
+            >
+              Cancel subscription
+            </button>
+          </form>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="text-warm-700">
+      You have no active recurring donations on file. Thank you for your
+      past support.
+    </p>
+    <a href="{% url 'donations:donate' %}" class="btn-primary min-h-[48px] w-full">
+      Donate again
+    </a>
+  {% endif %}
+</section>
+{% endblock %}
