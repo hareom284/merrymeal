@@ -107,11 +107,8 @@ class Command(BaseCommand):
         return existing, "updated"
 
     def _upsert_partner(self):
-        existing = Partner.objects.filter(legal_name=PARTNER_LEGAL_NAME).first()
-        if existing is None:
-            partner = Partner.objects.create(
-                legal_name=PARTNER_LEGAL_NAME,
-                type="charity",
-            )
-            return partner, "created"
-        return existing, "exists"
+        partner, created = Partner.objects.update_or_create(
+            legal_name=PARTNER_LEGAL_NAME,
+            defaults={"type": "charity"},
+        )
+        return partner, "created" if created else "updated"

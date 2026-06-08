@@ -10,6 +10,7 @@ class Command(BaseCommand):
         "seed_cities",
         "seed_dietary",
         "seed_ingredients",
+        "seed_test_users",
     ]
 
     def handle(self, *args, **options):
