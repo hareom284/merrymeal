@@ -12,5 +12,8 @@ echo "MySQL is up."
 # Apply migrations. Safe to run repeatedly.
 python manage.py migrate --noinput
 
+# Collect static files so whitenoise can serve them. Cheap when nothing changed.
+python manage.py collectstatic --noinput
+
 # Hand off to whatever was passed as CMD (gunicorn, qcluster, etc.).
 exec "$@"

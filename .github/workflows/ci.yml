@@ -126,3 +126,31 @@ jobs:
         with:
           name: playwright-report
           path: tests_e2e/playwright-report
+
+  release:
+    name: Build + push image to GHCR
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    needs: [lint, test, frontend]
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/merrymeal:latest
+            ghcr.io/${{ github.repository_owner }}/merrymeal:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
