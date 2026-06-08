@@ -232,7 +232,7 @@ within seconds of a failed delivery.
 ---
 
 ### Story 4.8 — Volunteer "today" route screen (mobile)
-**STATUS: backlog**
+**STATUS: done (sprint-08)**
 
 **As a** volunteer
 **I want** one screen with my route for today: pickup info at the top, then a list of stops in order, with a "Mark delivered" button anchored at the bottom of the screen for the current stop
@@ -264,7 +264,7 @@ within seconds of a failed delivery.
 ---
 
 ### Story 4.9 — Mark-delivered with proof-of-delivery photo
-**STATUS: backlog**
+**STATUS: done (sprint-08)**
 
 **As a** volunteer
 **I want** to tap "Mark delivered", take a photo (via the phone camera), and move to the next stop
@@ -301,7 +301,7 @@ within seconds of a failed delivery.
 ---
 
 ### Story 4.10 — Mark-failed with reason
-**STATUS: backlog**
+**STATUS: done (sprint-08)**
 
 **As a** volunteer
 **I want** to mark a delivery as failed with a reason (not home / no answer / refused / address wrong)
@@ -327,7 +327,7 @@ within seconds of a failed delivery.
 ---
 
 ### Story 4.11 — 2-tap meal feedback (member)
-**STATUS: backlog**
+**STATUS: done (sprint-08)**
 
 **As a** member
 **I want** to rate the meal I just received with two taps — stars + one of a few tag chips
@@ -356,7 +356,7 @@ within seconds of a failed delivery.
 ---
 
 ### Story 4.12 — Member tracking page ("is it on the way?")
-**STATUS: backlog**
+**STATUS: done (sprint-08)**
 
 **As a** member or caregiver
 **I want** to refresh a page and see whether today's meal is pending, on the way, or delivered
@@ -381,7 +381,7 @@ within seconds of a failed delivery.
 ---
 
 ### Story 4.13 — Caregiver alert on failed delivery (email + SMS)
-**STATUS: backlog**
+**STATUS: done (sprint-08)**
 
 **As a** caregiver
 **I want** an email AND text within 60 seconds of a member's delivery failing
@@ -412,7 +412,7 @@ within seconds of a failed delivery.
 ---
 
 ### Story 4.14 — Admin reassignment widget
-**STATUS: backlog**
+**STATUS: done (sprint-08)**
 
 **As an** admin
 **I want** to reassign a delivery to a different volunteer at any time
