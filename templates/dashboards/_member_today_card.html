@@ -1,0 +1,38 @@
+{% comment %}
+  Member home today-card extension point (Sprint 06 Story 3.4, extended
+  through Sprint 08).
+
+  This partial is intentionally a thin shell of `{% include %}` slots so
+  multiple sprint-08 stories can drop in their own fragments WITHOUT
+  conflicting in the same file:
+
+    Story 4.12 — tracking status pill (this commit; section below).
+    Story 4.11 — kitchen ETA banner   (later wave; insert ABOVE the
+                                       tracking section, keep this
+                                       comment block as the marker).
+
+  Render contract:
+    * `card`     — the dict from `apps.dashboards.services.member_today
+                   .get_today_card(member)`. Optional; absent on
+                   tracking-only re-renders.
+    * `delivery` — `apps.delivery.models.Delivery` for today, when the
+                   tracking context is included. Optional.
+
+  Both keys are optional so callers can render any subset (e.g. the
+  member home includes everything; an HTMX tracking-poll only injects
+  the tracking sub-partial directly via its dedicated URL).
+{% endcomment %}
+
+{# === 4.11 kitchen-ETA banner extension point — leave empty for now. === #}
+
+{# === 4.12 tracking status (member-facing "is it on the way?") === #}
+{% if delivery %}
+  <section class="mb-4" data-testid="tracking-section">
+    {% include "delivery/member/_tracking_card.html" %}
+  </section>
+{% endif %}
+
+{# === Existing meal/ingredient card (Story 3.4). === #}
+{% if card %}
+  {% include "dashboards/_partials/today_card.html" with card=card %}
+{% endif %}

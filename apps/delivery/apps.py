@@ -12,13 +12,37 @@ class DeliveryConfig(AppConfig):
     label = "delivery"
 
     def ready(self):
-        """Register the nightly dispatch schedule with Django-Q2.
+        """Register the nightly dispatch schedule with Django-Q2 and
+        register ``Delivery`` with django-auditlog (Story 4.9).
 
         `update_or_create` keeps the call idempotent across deploys.
         Wrapped in a broad try/except because `ready()` runs even when
         the django_q tables haven't been migrated yet (fresh install,
         `manage.py migrate` on an empty DB, test bootstrap, etc.).
         """
+        # auditlog registration is import-only and side-effect-free at
+        # ready() time (no DB writes) so we do it outside the django_q
+        # try-block — wrapping it in OperationalError would mask import
+        # bugs in the registry module itself.
+        try:
+            from auditlog.registry import auditlog
+
+            from apps.delivery.models import Delivery
+
+            if not auditlog.contains(Delivery):
+                auditlog.register(
+                    Delivery,
+                    include_fields=[
+                        "status",
+                        "delivered_time",
+                        "photo",
+                        "latitude",
+                        "longitude",
+                    ],
+                )
+        except Exception:  # noqa: BLE001
+            logger.exception("Failed to register Delivery with auditlog.")
+
         try:
             from django_q.models import Schedule
 
