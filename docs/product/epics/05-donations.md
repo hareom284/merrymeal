@@ -31,7 +31,7 @@ Pay from a mobile, and recover that pipeline in a single sprint.
 ## Stories
 
 ### Story 5.1 — `donations` app: `Campaign` model
-**STATUS: backlog**
+**STATUS: done (sprint-09)**
 
 **As an** admin
 **I want** to define campaigns with a goal, start/end dates, and a partner attribution
@@ -54,7 +54,7 @@ Pay from a mobile, and recover that pipeline in a single sprint.
 ---
 
 ### Story 5.2 — `Donation` model
-**STATUS: backlog**
+**STATUS: done (sprint-09)**
 
 **As a** developer
 **I want** a `Donation` row per pledge with payment status
@@ -78,7 +78,7 @@ Pay from a mobile, and recover that pipeline in a single sprint.
 ---
 
 ### Story 5.3 — Public donate page (mobile-first)
-**STATUS: backlog**
+**STATUS: done (sprint-09)**
 
 **As a** stranger
 **I want** to give money in under 30 seconds without creating an account
@@ -107,7 +107,7 @@ Pay from a mobile, and recover that pipeline in a single sprint.
 ---
 
 ### Story 5.4 — Stripe Checkout integration (one-time + recurring)
-**STATUS: backlog**
+**STATUS: done (sprint-09)**
 
 **As a** developer
 **I want** to start a Stripe Checkout session for one-time or recurring donations
@@ -147,7 +147,7 @@ Pay from a mobile, and recover that pipeline in a single sprint.
 ---
 
 ### Story 5.5 — Thank-you page + receipt email
-**STATUS: backlog**
+**STATUS: done (sprint-09)**
 
 **As a** donor
 **I want** an immediate "thank you" page and an emailed receipt
@@ -175,7 +175,7 @@ Pay from a mobile, and recover that pipeline in a single sprint.
 ---
 
 ### Story 5.6 — Donor impact view ("your $50 = 17 meals")
-**STATUS: backlog**
+**STATUS: done (sprint-09)**
 
 **As a** donor
 **I want** to see what my money paid for
@@ -198,7 +198,7 @@ Pay from a mobile, and recover that pipeline in a single sprint.
 ---
 
 ### Story 5.7 — Recurring-donation management page
-**STATUS: backlog**
+**STATUS: done (sprint-09)**
 
 **As a** recurring donor
 **I want** to manage or cancel my subscription
@@ -226,7 +226,7 @@ Pay from a mobile, and recover that pipeline in a single sprint.
 ---
 
 ### Story 5.8 — Admin campaign-progress card
-**STATUS: backlog**
+**STATUS: done (sprint-09)**
 
 **As an** admin
 **I want** a live progress card per active campaign on my dashboard

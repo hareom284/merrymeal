@@ -1,0 +1,16 @@
+{% load donation_extras %}MerryMeal — Donation receipt
+
+Thank you, {{ donation.donor_email }}.
+
+Receipt number: {{ receipt_number }}
+Date:           {{ local_dt|date:"j F Y H:i" }} (Melbourne)
+Campaign:       {{ campaign.name }}
+Amount:         {{ donation.amount_cents|dollars }}
+Impact:         ~{{ meals }} meal{{ meals|pluralize }} delivered
+
+This receipt is for an income tax deductible gift.
+MerryMeal is a registered Australian charity.
+ABN {{ abn }}
+{{ address }}
+
+You can print this email for your tax records.
