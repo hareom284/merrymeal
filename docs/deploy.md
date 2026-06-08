@@ -20,14 +20,14 @@ sudo apt update && sudo apt install -y docker-ce docker-ce-cli containerd.io doc
 ```
 
 Confirm Compose is v2.24+ (required for the `!reset` override syntax used
-in `compose.prod.yaml`):
+in `docker-compose.prod.yml`):
 
 ```bash
 docker compose version
 ```
 
 If older, either upgrade or remove the `ports: !reset []` line from
-`compose.prod.yaml` and instead delete the `ports:` block in `compose.yaml`
+`docker-compose.prod.yml` and instead delete the `ports:` block in `docker-compose.yml`
 when deploying to prod.
 
 ## 3. Clone and configure
@@ -43,7 +43,7 @@ sudo nano .env   # fill in real values
 ## 4. Bring up the stack
 
 ```bash
-sudo docker compose -f compose.yaml -f compose.prod.yaml up -d --build
+sudo docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
 ```
 
 The first build takes 3–4 minutes. Once `docker compose ps` shows all
@@ -90,7 +90,7 @@ setting in `.env` and restart `web`.
 ## Daily ops
 
 - **Pull updates:**
-  `cd /srv/merrymeal && sudo git pull && sudo docker compose -f compose.yaml -f compose.prod.yaml up -d --build`
+  `cd /srv/merrymeal && sudo git pull && sudo docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build`
 - **Tail logs:** `sudo docker compose logs -f web worker`
 - **DB backup:** see Story 7.8 (Epic 07) for the nightly backup script.
 
