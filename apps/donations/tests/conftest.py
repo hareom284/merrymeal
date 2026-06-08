@@ -63,6 +63,18 @@ def _install_stripe_stub() -> None:
 
     stripe.Webhook = _Webhook  # type: ignore[attr-defined]
 
+    # stripe.Subscription.delete — Story 5.7 cancel-subscription path.
+    # Tests patch ``stripe.Subscription.delete``; production code calls
+    # ``stripe.Subscription.delete(sub_id)`` to cancel a recurring gift.
+    class _Subscription:
+        @staticmethod
+        def delete(subscription_id, **kwargs):  # pragma: no cover
+            raise RuntimeError(
+                "stripe.Subscription.delete called without a test patch."
+            )
+
+    stripe.Subscription = _Subscription  # type: ignore[attr-defined]
+
     # stripe.error.SignatureVerificationError — webhook view catches this.
     error_mod = types.ModuleType("stripe.error")
 
