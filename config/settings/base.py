@@ -193,3 +193,23 @@ DONATIONS_CANCEL_URL = "/donate/?cancelled=1"
 # CoGS / portion served — see Sprint 09 brief). Overridable in ops
 # without a deploy.
 MEAL_COST_CENTS = env.int("MEAL_COST_CENTS", default=300)
+
+# Receipt email (Story 5.5). ``DONATIONS_FROM_EMAIL`` is the From address
+# stamped on the transactional receipt sent when a Donation flips to
+# ``completed``; the ABN + address are the ATO-mandated charity details
+# rendered in the body so the receipt qualifies as a tax-deductible gift
+# record. Defaults are placeholder text — every prod environment MUST
+# override via .env before the first live charge or donors get bogus ABN
+# data on their tax records.
+DONATIONS_FROM_EMAIL = env(
+    "DONATIONS_FROM_EMAIL",
+    default="receipts@merrymeal.org.au",
+)
+DONATIONS_CHARITY_ABN = env(
+    "DONATIONS_CHARITY_ABN",
+    default="12 345 678 901",
+)
+DONATIONS_CHARITY_ADDRESS = env(
+    "DONATIONS_CHARITY_ADDRESS",
+    default="PO Box 1, Melbourne VIC 3000",
+)

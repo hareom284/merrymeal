@@ -19,10 +19,12 @@ decorator never accidentally bleeds onto a user-facing form.
 from apps.donations.views.checkout import stripe_webhook
 from apps.donations.views.donate import donate_page, donate_start
 from apps.donations.views.impact import impact_view
+from apps.donations.views.thanks import thanks_page
 
 __all__ = [
     "donate_page",
     "donate_start",
     "impact_view",
     "stripe_webhook",
+    "thanks_page",
 ]
