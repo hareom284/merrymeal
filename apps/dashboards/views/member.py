@@ -1,28 +1,57 @@
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render
+from django.shortcuts import redirect, render
+from django.utils import timezone
 
+from apps.dashboards.services.member_today import get_today_card
 from apps.dashboards.views.caregiver import caregiver_list_view
+
+# Every non-member role has its own home elsewhere. ``/dashboard/`` is
+# the single post-login landing URL (see ``apps.dashboards.views.landing``),
+# so this view doubles as the role router that fans users out to the
+# correct screen. ``caregiver`` is handled inline below because it
+# renders directly without changing URL (Story 3.8). ``member`` (and any
+# partner-affiliated member) falls through to the member template.
+ROLE_HOME_URLS = {
+    "admin": "dashboards:admin_home",
+    "volunteer": "delivery:volunteer_today",
+    "donor": "dashboards:donor_history",
+    "kitchen_staff": "kitchens:stock_receive",
+}
 
 
 @login_required
 def member_dashboard_view(request):
-    """Member home — 'what's coming today + this week' overview.
+    """Member home.
 
-    Phase 0: all data is mocked. Phase 3 (planning) wires `today_meal` +
-    `week_menu` to MealPlan; Phase 4 (delivery) wires `delivery`.
-
-    Role router: when a caregiver hits `/dashboard/`, defer to the
-    caregiver multi-member view (Story 3.8) instead of rendering a
-    member-specific template they have no use for.
+    Story 3.4 wires the "today's meal" card to real ``MealPlan`` data via
+    ``get_today_card``. The hero ETA, the 3-stage delivery progress, the
+    week-menu strip and the rate-yesterday card are still mock — those
+    belong to Epic 04 (delivery) and Story 3.6 (week menu) and will be
+    swapped out as those services land.
     """
-    if getattr(request.user, "role", None) == "caregiver":
+    role = getattr(request.user, "role", None)
+    if role == "caregiver":
         return caregiver_list_view(request)
+    if role in ROLE_HOME_URLS:
+        return redirect(ROLE_HOME_URLS[role])
+    if request.user.partner_id:
+        return redirect("dashboards:partner_outcomes")
+
+    today = timezone.localdate()
+    full_name = (request.user.full_name or request.user.email or "there").strip()
+    greeting_name = full_name.split()[0] if full_name else "there"
+    card = get_today_card(request.user)
     context = {
         "page_title": "Dashboard",
-        "today_date_label": "Tuesday, 14 October",
+        "today_date_label": today.strftime("%A, %d %B"),
+        "card": card,
         "hero": {
-            "greeting_name": request.user.full_name.split()[0],
-            "eta_text": "Your warm meal arrives in about 32 minutes.",
+            "greeting_name": greeting_name,
+            "eta_text": (
+                "Your warm meal arrives in about 32 minutes."
+                if card["has_meal"]
+                else "No meal scheduled for today."
+            ),
             "eta_time": "12:32",
             "eta_period": "PM",
         },
@@ -38,15 +67,6 @@ def member_dashboard_view(request):
                 "name": "Sarah M.",
                 "subtitle": "Your volunteer · 12 stops on her route",
             },
-        },
-        "today_meal": {
-            "name": "Herb-roasted chicken",
-            "description": "Steamed asparagus, quinoa. Low-sodium for diabetic plan.",
-            "badges": [
-                {"label": "Diabetic", "tone": "green"},
-                {"label": "Soft food", "tone": "neutral"},
-                {"label": "410 kcal", "tone": "outline"},
-            ],
         },
         "week_menu": [
             {"day": "MON", "meal": "Lentil stew", "state": "done"},

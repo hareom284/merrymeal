@@ -11,12 +11,16 @@ def test_landing_page_renders_for_anonymous_visitor(client):
 
 
 @pytest.mark.django_db
-def test_landing_page_has_three_persona_cards(client):
+def test_landing_page_lists_every_get_involved_path(client):
+    """The landing page is the 'How would you like to help?' role
+    picker. Each of the four entry-points must be present so the user
+    can self-serve into the right flow without having to ask."""
     response = client.get("/")
     body = response.content
-    assert b"For members" in body
-    assert b"For caregivers" in body
-    assert b"For volunteers" in body
+    assert b"Apply for meals" in body
+    assert b"caregiver" in body
+    assert b"Become a volunteer" in body
+    assert b"Partner with us" in body
 
 
 @pytest.mark.django_db
@@ -38,10 +42,11 @@ def test_volunteer_card_uses_mailto_link(client):
 
 
 @pytest.mark.django_db
-def test_landing_title_includes_brand_and_tagline(client):
+def test_landing_title_includes_brand_and_heading(client):
     response = client.get("/")
     assert b"MerryMeal" in response.content
-    assert b"Warm meals, delivered with care" in response.content
+    assert b"How would you like to help?" in response.content
+    assert b"Join the community" in response.content
 
 
 @pytest.mark.django_db

@@ -14,7 +14,7 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap"
     />
 
-    <link rel="stylesheet" href="{% static 'output.css' %}" />
+    <link rel="stylesheet" href="{% static 'dist/output.css' %}" />
 
     <!-- Story 6.4 — print-only stylesheet for the FY tax receipt page.
          Loaded at media="print" so the screen view is never touched. -->
@@ -28,6 +28,21 @@
     <script src="{% static 'src/volunteer-offline.js' %}" defer></script>
   </head>
   <body class="h-full">
+    {% if request.user.is_authenticated %}
+      <div class="fixed top-4 right-4 z-50 flex items-center gap-2 rounded-full border border-warm-200 bg-warm-100 px-2 py-1 shadow-card">
+        <span
+          class="flex h-8 w-8 items-center justify-center rounded-full bg-brand-green text-sm font-semibold uppercase text-white"
+          aria-hidden="true"
+        >{{ request.user.full_name|slice:":1"|default:"M" }}</span>
+        <form method="post" action="{% url 'accounts:logout' %}" class="m-0">
+          {% csrf_token %}
+          <button
+            type="submit"
+            class="rounded-full px-3 py-1 text-sm font-medium text-warm-700 hover:text-brand-green focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-green"
+          >Sign out</button>
+        </form>
+      </div>
+    {% endif %}
     <main class="mx-auto flex min-h-full {% block main_max_width %}max-w-md{% endblock %} flex-col px-4 py-8 sm:py-12">
       {% block content %}{% endblock %}
     </main>

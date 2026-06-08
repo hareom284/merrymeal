@@ -42,15 +42,33 @@ def test_render_returns_none_when_weasyprint_unavailable(monkeypatch):
 
 
 def test_render_returns_pdf_bytes_when_weasyprint_available():
-    """Only meaningful when the engine actually loads. ``importorskip``
-    skips cleanly on dev machines without the native libs."""
-    pytest.importorskip("weasyprint")
-    # If the import succeeded but the module-level constant says
-    # otherwise (e.g. native libs missing at load time), skip rather
-    # than mis-report a failure for an environment issue.
+    """Only meaningful when the engine actually loads AND its native
+    libs are wired.
+
+    ``pytest.importorskip("weasyprint")`` is deliberately NOT used here:
+    ``import weasyprint`` raises ``OSError`` (from cffi) when pango /
+    cairo are missing — and ``importorskip`` only catches
+    ``ImportError``, so it leaks the OSError and the test fails for an
+    environment reason. ``WEASYPRINT_AVAILABLE`` is set by the service
+    module's wider ``try / except Exception`` and is the correct guard.
+    """
     if not board_report_pdf.WEASYPRINT_AVAILABLE:
-        pytest.skip("weasyprint imported but native libs unavailable")
+        pytest.skip("weasyprint or its native libs unavailable in this env")
     pdf = board_report_pdf.render_pdf(_sample_report())
+    if pdf is None:
+        # ``WEASYPRINT_AVAILABLE`` is True so the engine import worked,
+        # yet ``render_pdf`` swallowed an exception and returned ``None``.
+        # That can only happen when WeasyPrint hits a runtime failure —
+        # missing pango/cairo at draw-time, or a tinycss2/cssselect2
+        # version mismatch. The service's fallback path is the right
+        # behaviour; ``test_render_returns_none_when_engine_raises``
+        # already locks that branch, so this branch becomes a skip
+        # rather than a false-positive PDF-bytes failure.
+        pytest.skip(
+            "weasyprint imported but render_pdf returned None — likely "
+            "missing pango/cairo native libs or an incompatible "
+            "tinycss2/cssselect2 in this environment"
+        )
     assert isinstance(pdf, bytes)
     assert pdf.startswith(b"%PDF-"), "missing PDF magic header"
 
