@@ -48,7 +48,11 @@ from apps.volunteers.models import Availability
 logger = logging.getLogger("merrymeal.dispatch")
 User = get_user_model()
 
-ROUTE_CAPACITY = 12
+# Maximum deliveries (stops) we will pack onto a single volunteer's route
+# for a given day. Imported by ``apps.delivery.services.reassign`` so the
+# manual-reassign widget enforces the same cap as the nightly packer.
+MAX_STOPS_PER_ROUTE = 12
+ROUTE_CAPACITY = MAX_STOPS_PER_ROUTE
 _WEEKDAY_TO_ENUM = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
 
 

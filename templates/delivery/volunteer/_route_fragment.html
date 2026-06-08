@@ -1,0 +1,24 @@
+{% comment %}
+  Route fragment — the HTMX swap target for Story 4.9's mark-delivered
+  endpoint. The mark-delivered view re-renders this whole block so the
+  next-pending stop card slides into the "current" slot, the sticky
+  CTA on that newly-current stop appears, and the just-completed stop
+  loses its CTA.
+
+  The actual ``<form>`` + ``<input type=file>`` live inside
+  ``_stop_card.html`` (current-stop branch). This wrapper only owns
+  the swap target id and the empty-state copy.
+{% endcomment %}
+<div id="route-fragment">
+  <main class="flex-1 space-y-3 pb-28" data-testid="stop-list">
+    {% if not stops %}
+      <div class="card p-6 text-center text-warm-500" data-testid="empty-state">
+        <p class="font-display text-xl text-warm-900">All done</p>
+        <p class="mt-2">Thank you. No more stops on today's route.</p>
+      </div>
+    {% endif %}
+    {% for stop in stops %}
+      {% include "delivery/volunteer/_stop_card.html" with stop=stop %}
+    {% endfor %}
+  </main>
+</div>

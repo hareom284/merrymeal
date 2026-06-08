@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Today's route — MerryMeal{% endblock %}
+{% block content %}
+<div class="flex min-h-full flex-col text-[18px] text-warm-900" data-testid="today-screen">
+  <header class="card mb-3 p-4" data-testid="kitchen-card">
+    <p class="text-xs font-semibold uppercase tracking-wider text-brand-green">Pickup</p>
+    <h1 class="mt-1 font-display text-2xl text-warm-900">
+      {{ kitchen.name|default:"No kitchen assigned" }}
+    </h1>
+    {% if kitchen.address %}
+      <p class="mt-1 text-warm-500">{{ kitchen.address }}</p>
+    {% endif %}
+    <p class="mt-2">
+      Be there by <strong>{{ kitchen.pickup_time|time:"H:i" }}</strong>
+    </p>
+  </header>
+
+  <main class="flex-1 space-y-3 pb-28" data-testid="stop-list">
+    {% if not stops %}
+      <div class="card p-6 text-center text-warm-500" data-testid="empty-state">
+        <p class="font-display text-xl text-warm-900">All done</p>
+        <p class="mt-2">Nothing scheduled for today.</p>
+      </div>
+    {% endif %}
+    {% for stop in stops %}
+      {% include "delivery/volunteer/_stop_card.html" with stop=stop %}
+    {% endfor %}
+  </main>
+
+  {% comment %}
+    Bottom-anchored CTA. Spec calls for ``position: sticky; bottom: 0``
+    inside the scroll container (NOT ``fixed`` — fixed jumps when iOS
+    Safari's URL bar shows/hides). The CTA only renders when there is
+    a current stop (first ``pending`` / ``out_for_delivery``). The form
+    action is a placeholder ``#`` — Story 4.9 introduces the
+    ``mark_delivered`` endpoint and will wire it up at that point.
+  {% endcomment %}
+  {% for stop in stops %}
+    {% if stop.is_current %}
+      <div class="sticky bottom-0 left-0 right-0 -mx-4 border-t border-warm-200 bg-warm-50 px-4 py-3"
+           data-testid="cta-bar">
+        <form method="post" action="#">
+          {% csrf_token %}
+          <button type="submit"
+                  class="btn-primary w-full min-h-[44px] py-3 text-[18px]"
+                  data-testid="mark-delivered-cta">
+            Mark {{ stop.member_display }} delivered
+          </button>
+        </form>
+      </div>
+    {% endif %}
+  {% endfor %}
+</div>
+{% endblock %}

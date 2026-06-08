@@ -1,0 +1,35 @@
+{# Reassign modal — loaded into #modal-slot via HTMX GET, removed by
+   the closeModal listener after a successful POST. #}
+<div class="fixed inset-0 z-50 bg-black/40 flex items-center justify-center"
+     id="reassign-modal"
+     data-testid="reassign-modal"
+     @keydown.escape.window="document.getElementById('modal-slot').innerHTML=''">
+  <div class="card bg-warm-50 p-6 w-[420px] max-w-[90vw]">
+    <h2 class="font-display text-xl mb-3">
+      Reassign {{ delivery.member.full_name }}
+    </h2>
+    <form hx-post="{% url 'delivery:admin_reassign' delivery.id %}"
+          hx-target="#delivery-row-{{ delivery.id }}"
+          hx-swap="outerHTML">
+      {% csrf_token %}
+      <label class="label" for="id_volunteer">Volunteer</label>
+      {{ form.volunteer }}
+      <div class="flex justify-end gap-2 mt-4">
+        <button type="button" class="btn-secondary"
+                onclick="document.getElementById('modal-slot').innerHTML=''">
+          Cancel
+        </button>
+        <button type="submit" class="btn-primary" data-testid="reassign-save">
+          Save
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  document.body.addEventListener("closeModal", () => {
+    const slot = document.getElementById("modal-slot");
+    if (slot) slot.innerHTML = "";
+  });
+</script>

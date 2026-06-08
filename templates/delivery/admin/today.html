@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Today's deliveries — admin{% endblock %}
+{% block content %}
+<div class="p-6" x-data="{modal: null}">
+  <h1 class="font-display text-2xl mb-4">Today — {{ today|date:"D j M" }}</h1>
+
+  {# Desktop ≥ md: table layout. Below md the table is hidden and the
+     mobile fallback (stacked cards) is shown instead. #}
+  <div class="hidden md:block">
+    <table class="w-full text-[16px]">
+      <thead class="text-left text-warm-500 border-b border-warm-200">
+        <tr>
+          <th class="py-2">Member</th>
+          <th>Volunteer</th>
+          <th>Status</th>
+          <th>Route</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for delivery in deliveries %}
+          {% include "delivery/admin/_row.html" %}
+        {% empty %}
+          <tr>
+            <td colspan="5" class="py-4 text-warm-500">
+              No deliveries today.
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {# Mobile (< md) fallback — stacked cards. Tap target ≥ 44 px. #}
+  <div class="md:hidden space-y-2">
+    {% for delivery in deliveries %}
+      <div class="card p-3 text-[16px]" data-testid="delivery-card">
+        <strong>{{ delivery.member.full_name }}</strong>
+        <p class="text-warm-500">
+          {{ delivery.volunteer.full_name }} — {{ delivery.get_status_display }}
+        </p>
+        <button hx-get="{% url 'delivery:admin_reassign' delivery.id %}"
+                hx-target="#modal-slot"
+                class="btn-secondary mt-2 min-h-[44px]">
+          Reassign
+        </button>
+      </div>
+    {% empty %}
+      <p class="text-warm-500">No deliveries today.</p>
+    {% endfor %}
+  </div>
+
+  <div id="modal-slot"></div>
+</div>
+{% endblock %}

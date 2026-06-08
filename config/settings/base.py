@@ -123,3 +123,23 @@ SERVER_EMAIL = env("SERVER_EMAIL", default=DEFAULT_FROM_EMAIL)
 # LOGIN_URL = "accounts:login"
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "accounts:login"
+
+# Media / file storage. Story 4.9 (POD photos) writes JPEGs to S3 in
+# prod and ``media/`` on disk in dev. The S3 environment variables are
+# read here so the env-example audit (scripts/check_env_example.py)
+# stays happy in every environment; the actual ``DEFAULT_FILE_STORAGE``
+# swap to django-storages happens in ``config/settings/prod.py`` (so
+# CI / dev never need real AWS creds).
+MEDIA_URL = env("MEDIA_URL", default="/media/")
+MEDIA_ROOT = env("MEDIA_ROOT", default=str(BASE_DIR / "media"))
+
+AWS_STORAGE_BUCKET_NAME = env("AWS_S3_BUCKET", default="")
+AWS_S3_REGION_NAME = env("AWS_S3_REGION", default="ap-southeast-2")
+AWS_ACCESS_KEY_ID = env("AWS_ACCESS_KEY_ID", default="")
+AWS_SECRET_ACCESS_KEY = env("AWS_SECRET_ACCESS_KEY", default="")
+# AWS deprecated bucket ACLs for buckets created after April 2023, so
+# we must NOT send an ACL on upload. ``None`` (not the string "private")
+# is the django-storages contract for "omit the header entirely".
+AWS_DEFAULT_ACL = None
+AWS_QUERYSTRING_AUTH = False
+AWS_S3_FILE_OVERWRITE = False
