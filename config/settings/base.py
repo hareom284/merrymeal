@@ -20,6 +20,8 @@ INSTALLED_APPS = [
     # Local
     "apps.core",
     "apps.accounts",
+    "apps.partners",
+    "apps.dietary",
     "apps.dashboards",
 ]
 

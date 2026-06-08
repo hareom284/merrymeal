@@ -43,10 +43,19 @@ def test_no_django_admin_routes_anywhere(client):
 
 
 @pytest.mark.django_db
-def test_dashboard_lives_at_root(client):
+def test_root_redirects_authenticated_user_to_dashboard(client):
     user = UserFactory(role="member")
     client.force_login(user)
     response = client.get("/")
+    assert response.status_code == 302
+    assert response.url == "/dashboard/"
+
+
+@pytest.mark.django_db
+def test_member_dashboard_lives_at_slash_dashboard(client):
+    user = UserFactory(role="member")
+    client.force_login(user)
+    response = client.get("/dashboard/")
     assert response.status_code == 200
     assert b"Today's delivery" in response.content
 

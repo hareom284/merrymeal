@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}MerryMeal — Warm meals, delivered with care{% endblock %}
+
+{% block content %}
+<section class="flex flex-col gap-10 md:gap-14">
+
+  <!-- HERO -->
+  <header class="flex flex-col gap-6 text-center">
+    <p class="text-sm font-medium uppercase tracking-wider text-brand-green">
+      Mon–Fri fresh · weekend frozen
+    </p>
+    <h1 class="font-display text-4xl font-semibold leading-tight text-warm-900 md:text-5xl">
+      Warm meals, delivered with care
+    </h1>
+    <p class="text-warm-700 text-lg leading-relaxed">
+      Home-cooked meals for older Victorians, delivered by neighbours.
+      Apply in 5 minutes — no phone calls, no paperwork.
+    </p>
+    <div class="flex flex-col items-center gap-3 pt-2">
+      <a href="/apply/" class="btn-primary w-full max-w-xs">Apply for meals</a>
+      <a href="{% url 'accounts:login' %}"
+         class="text-sm text-brand-green underline hover:text-brand-green-hover min-h-[44px] flex items-center">
+        Already enrolled? Sign in
+      </a>
+    </div>
+  </header>
+
+  <!-- THREE PERSONA CARDS -->
+  <section aria-labelledby="who-heading" class="flex flex-col gap-4">
+    <h2 id="who-heading" class="sr-only">Who MerryMeal is for</h2>
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+
+      <article class="card flex flex-col gap-3">
+        <h3 class="font-display text-xl text-warm-900">For members</h3>
+        <p class="text-warm-700">
+          You'd like meals delivered to your door. Apply once; we visit, confirm, and start delivering.
+        </p>
+        <a href="/apply/" class="btn-secondary mt-auto">Start an application</a>
+      </article>
+
+      <article class="card flex flex-col gap-3">
+        <h3 class="font-display text-xl text-warm-900">For caregivers</h3>
+        <p class="text-warm-700">
+          Applying on behalf of someone you look after? We'll record the relationship so you can manage their account.
+        </p>
+        <a href="/apply/?for_other=1" class="btn-secondary mt-auto">Apply for someone else</a>
+      </article>
+
+      <article class="card flex flex-col gap-3">
+        <h3 class="font-display text-xl text-warm-900">For volunteers</h3>
+        <p class="text-warm-700">
+          Drive one route a week and deliver 12 meals in 90 minutes. Email us and we'll send the next intake date.
+        </p>
+        <a href="mailto:hello@merrymeal.org.au" class="btn-secondary mt-auto">Get in touch</a>
+      </article>
+
+    </div>
+  </section>
+
+</section>
+{% endblock %}
