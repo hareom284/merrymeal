@@ -49,7 +49,7 @@ def test_create_delivery_calls_assign_meal_type_with_kitchen(mock_assign):
     mock_assign.assert_called_once_with(
         member=d.member,
         kitchen=d.meal_plan.kitchen,
-        scheduled_date=d.scheduled_date,
+        service_date=d.scheduled_date,
     )
     assert delivery.meal_type == "fresh"
 

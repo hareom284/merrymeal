@@ -38,7 +38,7 @@ def create_delivery(
     meal_type = assign_meal_type(
         member=member,
         kitchen=meal_plan.kitchen,
-        scheduled_date=scheduled_date,
+        service_date=scheduled_date,
     )
 
     with transaction.atomic():
