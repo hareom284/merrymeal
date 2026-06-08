@@ -38,7 +38,7 @@ within seconds of a failed delivery.
 ## Stories
 
 ### Story 4.1 — `volunteers` app: `Availability` model
-**STATUS: backlog**
+**STATUS: done (sprint-07)**
 
 **As a** volunteer
 **I want** to declare which days and times of the week I am available
@@ -62,7 +62,7 @@ within seconds of a failed delivery.
 ---
 
 ### Story 4.2 — Volunteer availability editor (mobile)
-**STATUS: backlog**
+**STATUS: done (sprint-07)**
 
 **As a** volunteer
 **I want** a simple grid (days × morning/afternoon/evening) on my phone
@@ -89,7 +89,7 @@ within seconds of a failed delivery.
 ---
 
 ### Story 4.3 — `delivery` app: `Route` model
-**STATUS: backlog**
+**STATUS: done (sprint-07)**
 
 **As a** developer
 **I want** a `Route` model representing "one volunteer's deliveries on one day"
@@ -112,7 +112,7 @@ within seconds of a failed delivery.
 ---
 
 ### Story 4.4 — `Delivery` model
-**STATUS: backlog**
+**STATUS: done (sprint-07)**
 
 **As a** developer
 **I want** a `Delivery` row per (member, meal_plan, scheduled_date)
@@ -141,7 +141,7 @@ within seconds of a failed delivery.
 ---
 
 ### Story 4.5 — `DeliveryFeedback` model
-**STATUS: backlog**
+**STATUS: done (sprint-07)**
 
 **As a** member
 **I want** to rate the meal I received and add an optional note
@@ -164,7 +164,7 @@ within seconds of a failed delivery.
 ---
 
 ### Story 4.6 — Auto-assign service: generate today's deliveries
-**STATUS: backlog**
+**STATUS: done (sprint-07)**
 
 **As an** admin
 **I want** a job that turns "today's `MealPlan` × every active member" into one `Delivery` row per member
@@ -196,7 +196,7 @@ within seconds of a failed delivery.
 ---
 
 ### Story 4.7 — Auto-assign service: pack today's deliveries into routes
-**STATUS: backlog**
+**STATUS: done (sprint-07)**
 
 **As an** admin
 **I want** today's `pending` deliveries grouped into `Route`s assigned to available volunteers, balanced by proximity
