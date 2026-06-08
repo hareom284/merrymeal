@@ -8,7 +8,7 @@ class MealIngredient(models.Model):
     meal = models.ForeignKey(
         "meals.Meal",
         on_delete=models.PROTECT,
-        related_name="ingredients",
+        related_name="meal_ingredients",
         db_column="meal_id",
     )
     ingredient = models.ForeignKey(

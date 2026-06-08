@@ -1,7 +1,7 @@
 import factory
 from django.contrib.auth import get_user_model
 
-from apps.accounts.models import Address, City
+from apps.accounts.models import Address, CaregiverLink, City
 
 User = get_user_model()
 
@@ -39,3 +39,16 @@ class AddressFactory(factory.django.DjangoModelFactory):
     city = factory.SubFactory(CityFactory)
     label = "Home"
     postal_code = factory.Sequence(lambda n: f"3{n:03d}")
+
+
+# Alias used by sprint-06 stories that follow the UserAddressFactory naming convention.
+UserAddressFactory = AddressFactory
+
+
+class MemberCaregiverLinkFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = CaregiverLink
+
+    member = factory.SubFactory(UserFactory, role="member")
+    caregiver = factory.SubFactory(UserFactory, role="caregiver")
+    relationship = "family"

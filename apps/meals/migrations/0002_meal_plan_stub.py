@@ -10,13 +10,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.CreateModel(
-            name='MealPlan',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-            ],
-            options={
-                'db_table': 'meal_plans',
-            },
-        ),
+        # Stub replaced by apps.planning.MealPlan (planning.0001_initial).
+        # Migration kept as a state marker so food_safety.0001_initial
+        # dependency chain remains intact until 0003 cleans it up.
     ]
