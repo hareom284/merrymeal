@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}Refer a member — MerryMeal{% endblock %}
+
+{% block content %}
+<section class="mx-auto flex w-full max-w-md flex-col gap-6 px-4 py-8">
+  <header>
+    <h1 class="font-display text-3xl font-semibold text-warm-900">Refer a member</h1>
+    <p class="mt-2 text-warm-600">
+      Submit a member on behalf of your organisation. We'll contact you and
+      the member once an admin has reviewed the referral.
+    </p>
+  </header>
+
+  <form method="post" class="flex flex-col gap-5" novalidate>
+    {% csrf_token %}
+
+    {# Honeypot — visually hidden. A real user cannot see this field; #}
+    {# bots that auto-fill every input give themselves away here.     #}
+    <div class="hidden" aria-hidden="true">
+      <label for="id_website">Leave this field blank</label>
+      {{ form.website }}
+    </div>
+
+    {% if form.non_field_errors %}
+      <div class="rounded-2xl bg-red-50 border border-red-200 px-4 py-3 text-red-800" role="alert">
+        {{ form.non_field_errors.0 }}
+      </div>
+    {% endif %}
+
+    <fieldset class="flex flex-col gap-5">
+      <legend class="label">About you (the referrer)</legend>
+
+      <label class="flex flex-col gap-2">
+        <span class="label">Your organisation</span>
+        {{ form.partner_id }}
+        {% if form.partner_id.errors %}<span class="text-sm text-red-700">{{ form.partner_id.errors.0 }}</span>{% endif %}
+      </label>
+
+      <label class="flex flex-col gap-2">
+        <span class="label">Your name</span>
+        {{ form.partner_contact_name }}
+        {% if form.partner_contact_name.errors %}<span class="text-sm text-red-700">{{ form.partner_contact_name.errors.0 }}</span>{% endif %}
+      </label>
+
+      <label class="flex flex-col gap-2">
+        <span class="label">Your email</span>
+        {{ form.partner_contact_email }}
+        {% if form.partner_contact_email.errors %}<span class="text-sm text-red-700">{{ form.partner_contact_email.errors.0 }}</span>{% endif %}
+      </label>
+    </fieldset>
+
+    <hr class="border-warm-200">
+
+    <fieldset class="flex flex-col gap-5">
+      <legend class="label">About the member</legend>
+
+      <label class="flex flex-col gap-2">
+        <span class="label">Member's full name</span>
+        {{ form.member_full_name }}
+        {% if form.member_full_name.errors %}<span class="text-sm text-red-700">{{ form.member_full_name.errors.0 }}</span>{% endif %}
+      </label>
+
+      <label class="flex flex-col gap-2">
+        <span class="label">Member's email <span class="text-warm-500">(optional)</span></span>
+        {{ form.member_email }}
+        {% if form.member_email.errors %}<span class="text-sm text-red-700">{{ form.member_email.errors.0 }}</span>{% endif %}
+      </label>
+
+      <label class="flex flex-col gap-2">
+        <span class="label">Member's date of birth</span>
+        {{ form.member_dob }}
+        {% if form.member_dob.errors %}<span class="text-sm text-red-700">{{ form.member_dob.errors.0 }}</span>{% endif %}
+      </label>
+
+      <label class="flex flex-col gap-2">
+        <span class="label">Member's phone <span class="text-warm-500">(optional)</span></span>
+        {{ form.member_phone }}
+        {% if form.member_phone.errors %}<span class="text-sm text-red-700">{{ form.member_phone.errors.0 }}</span>{% endif %}
+      </label>
+    </fieldset>
+
+    <button type="submit" class="btn-primary mt-2 min-h-[44px]">Submit referral</button>
+  </form>
+</section>
+{% endblock %}

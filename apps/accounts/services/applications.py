@@ -209,8 +209,15 @@ def _create_member_user(application: Application) -> User:
         is_active=False,
         dob=application.dob,
     )
-    user.set_unusable_password()
-    user.save(update_fields=["password"])
+    # Story 6.7 — propagate the referring charity onto the new member so
+    # Story 6.2 retention counts attribute the member to the partner.
+    if application.partner_id is not None:
+        user.partner_id = application.partner_id
+        user.set_unusable_password()
+        user.save(update_fields=["password", "partner"])
+    else:
+        user.set_unusable_password()
+        user.save(update_fields=["password"])
     return user
 
 
@@ -326,6 +333,54 @@ def _send_welcome_email(
     )
     msg.attach_alternative(html_body, "text/html")
     msg.send(fail_silently=False)
+
+
+def create_partner_referral(
+    *,
+    partner,
+    partner_contact_name: str,
+    partner_contact_email: str,
+    member_full_name: str,
+    member_email: str,
+    member_dob,
+    member_phone: str | None = None,
+) -> Application:
+    """Story 6.7 — persist a partner-submitted referral as a SUBMITTED
+    application.
+
+    Unlike :func:`create_draft_application`, this skips the multi-step
+    wizard: the social worker fills a single public form and the row
+    lands ready for an admin to triage. The referring partner is stored
+    on the FK so an approval can copy it onto the resulting User.
+
+    The social worker's name and email are stored on
+    ``Application.metadata`` rather than as dedicated columns to avoid
+    schema churn — Story 7.x admin search can promote them later if
+    needed.
+    """
+
+    member_email_norm = (member_email or "").strip().lower()
+    if member_email_norm and User.objects.filter(
+        email__iexact=member_email_norm
+    ).exists():
+        raise ValueError(
+            f"A user with email {member_email_norm} already exists"
+        )
+
+    return Application.objects.create(
+        full_name=member_full_name.strip(),
+        email=member_email_norm,
+        dob=member_dob,
+        phone=(member_phone or "").strip() or None,
+        status=Application.STATUS_SUBMITTED,
+        partner=partner,
+        metadata={
+            "partner_contact_name": partner_contact_name.strip(),
+            "partner_contact_email": (
+                partner_contact_email or ""
+            ).strip().lower(),
+        },
+    )
 
 
 def reject_application(application: Application, admin_user, *, reason: str) -> Application:

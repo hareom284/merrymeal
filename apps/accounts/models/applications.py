@@ -46,6 +46,26 @@ class Application(models.Model):
     dietary_ids = models.JSONField(default=list, blank=True)
     allergy_ids = models.JSONField(default=list, blank=True)
 
+    # ---- Story 6.7: partner referral attribution ----
+    # Set when a social worker at a charity partner submits an
+    # application on behalf of a member via the public referral form
+    # (`/partners/refer/`). On approval the FK is copied onto the
+    # resulting `User` so retention reporting (Story 6.2) can attribute
+    # the member back to the referring partner.
+    partner = models.ForeignKey(
+        "partners.Partner",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        db_column="partner_id",
+        related_name="referred_applications",
+    )
+    # Free-form payload for non-relational data carried alongside the
+    # application — currently the referring social worker's name and
+    # email (Story 6.7). Keeping this JSON avoids a per-feature schema
+    # change every time we add a new optional capture field.
+    metadata = models.JSONField(default=dict, blank=True)
+
     # ---- workflow ----
     status = models.CharField(
         max_length=20, choices=STATUS_CHOICES, default=STATUS_DRAFT
