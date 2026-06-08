@@ -3,7 +3,7 @@ from decimal import Decimal
 import pytest
 from django.contrib import admin as django_admin
 
-from apps.accounts.models import Address, City, User
+from apps.accounts.models import Address, User
 from apps.accounts.tests.factories import CityFactory, UserFactory
 
 

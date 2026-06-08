@@ -4,4 +4,8 @@ target-version = "py312"
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "UP", "DJ"]
-ignore = ["E501"]
+# DJ001 — `null=True` on string fields. Our schema (merrymeal_schema_corrected.sql)
+# is locked and intentionally uses NULL for "not yet supplied" on optional CharField
+# / EmailField / TextField columns; converting to "" would diverge the model from
+# the SQL contract. Convention is enforced by the schema, not the linter.
+ignore = ["E501", "DJ001"]

@@ -3,7 +3,6 @@ from django.urls import reverse
 
 from apps.accounts.tests.factories import UserFactory
 
-
 pytestmark = pytest.mark.django_db
 
 
@@ -42,8 +41,8 @@ def test_contact_form_rejects_email_that_collides_with_existing_user():
 # ---------- service ----------
 
 def test_create_draft_application_persists_a_draft_row():
-    from apps.accounts.services import create_draft_application
     from apps.accounts.models import Application
+    from apps.accounts.services import create_draft_application
 
     app = create_draft_application(
         full_name="Margaret W.",

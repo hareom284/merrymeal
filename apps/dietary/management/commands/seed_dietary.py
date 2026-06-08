@@ -2,7 +2,6 @@ from django.core.management.base import BaseCommand
 
 from apps.dietary.models import Allergy, DietPreference
 
-
 DIET_PREFERENCES = [
     "vegetarian",
     "vegan",

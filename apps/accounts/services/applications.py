@@ -81,10 +81,8 @@ def submit_application(
     """Step 3 — transitions a draft to submitted, writes the selected
     dietary/allergy ids, and dispatches the confirmation email.
     """
+
     from apps.dietary.models import Allergy, DietPreference
-    from django.core.mail import EmailMultiAlternatives
-    from django.template.loader import render_to_string
-    from django.utils import timezone
 
     try:
         application = Application.objects.get(id=application_id)
@@ -159,18 +157,11 @@ def approve_application(application: Application, admin_user) -> User:
     All writes are atomic. The welcome email is dispatched on commit so a
     rollback (any exception in the block) silently drops the message.
     """
-    import logging
-
     from auditlog.context import set_actor
     from django.db import transaction
     from django.utils import timezone
 
-    from apps.accounts.models import Address, CaregiverLink
     from apps.accounts.services.tokens import issue_password_setup_token
-    from apps.accounts.services.users import create_user
-    from apps.dietary.models import UserAllergy, UserDietPreference
-
-    logger = logging.getLogger(__name__)
 
     if application.status != Application.STATUS_SUBMITTED:
         raise ValueError(
@@ -207,6 +198,7 @@ def approve_application(application: Application, admin_user) -> User:
 
 def _create_member_user(application: Application) -> User:
     import secrets
+
     from apps.accounts.services.users import create_user
 
     user = create_user(
@@ -224,6 +216,7 @@ def _create_member_user(application: Application) -> User:
 
 def _create_or_reuse_caregiver(application: Application):
     import secrets
+
     from apps.accounts.services.users import create_user
 
     if not application.applying_for_other:

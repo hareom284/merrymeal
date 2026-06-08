@@ -4,7 +4,6 @@ from django.urls import reverse
 
 from apps.accounts.models import Application
 
-
 pytestmark = pytest.mark.django_db
 
 
@@ -124,7 +123,8 @@ def test_step_3_redirects_to_step_1_without_session(client):
 
 
 def test_step_3_get_renders(client):
-    _diet("vegan"); _allergy("dairy")
+    _diet("vegan")
+    _allergy("dairy")
     app = _draft()
     _start_session(client, app)
     response = client.get(reverse("accounts:application_step_3"))
