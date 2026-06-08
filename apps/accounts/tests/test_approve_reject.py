@@ -1,11 +1,9 @@
 import pytest
 from django.core import mail
-from django.test import TestCase
 
 from apps.accounts.models import Application, CaregiverLink, User
 from apps.accounts.services.applications import approve_application, reject_application
 from apps.accounts.tests.factories import CityFactory, UserFactory
-
 
 pytestmark = pytest.mark.django_db(transaction=True)
 

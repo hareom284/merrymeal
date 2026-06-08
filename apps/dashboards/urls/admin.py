@@ -7,7 +7,6 @@ from apps.dashboards.views.admin_applications import (
     admin_applications_list,
 )
 
-
 urlpatterns = [
     path("applications/", admin_applications_list, name="admin_applications"),
     path(

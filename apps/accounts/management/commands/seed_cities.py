@@ -2,7 +2,6 @@ from django.core.management.base import BaseCommand
 
 from apps.accounts.models import City
 
-
 STARTER_CITIES = ["Melbourne", "Geelong", "Ballarat", "Bendigo", "Frankston"]
 
 

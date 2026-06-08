@@ -1,4 +1,3 @@
-import time
 
 import pytest
 from django.utils import timezone
@@ -12,7 +11,6 @@ from apps.accounts.services.tokens import (
     issue_password_setup_token,
 )
 from apps.accounts.tests.factories import UserFactory
-
 
 pytestmark = pytest.mark.django_db
 

@@ -7,7 +7,6 @@ from django.utils import timezone
 
 from apps.accounts.models import PasswordSetupToken, User
 
-
 TOKEN_TTL = timedelta(days=7)
 TOKEN_SALT = "merrymeal.password_setup_token.v1"
 

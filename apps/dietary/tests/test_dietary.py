@@ -12,7 +12,6 @@ from apps.dietary.models import (
     UserDietPreference,
 )
 
-
 # ---------- DietPreference / Allergy root models ----------
 
 

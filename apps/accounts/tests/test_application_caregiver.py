@@ -4,7 +4,6 @@ from django.urls import reverse
 from apps.accounts.models import Application
 from apps.accounts.tests.factories import UserFactory
 
-
 pytestmark = pytest.mark.django_db
 
 

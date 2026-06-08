@@ -3,8 +3,6 @@ from django.urls import reverse
 
 from apps.accounts.models import Application
 from apps.accounts.tests.factories import CityFactory, UserFactory
-from apps.dietary.models import Allergy, DietPreference
-
 
 pytestmark = pytest.mark.django_db(transaction=True)
 
