@@ -9,15 +9,23 @@ until python -c "import socket; socket.create_connection(('${MYSQL_HOST}', 3306)
 done
 echo "MySQL is up."
 
-# Apply migrations. Safe to run repeatedly.
-python manage.py migrate --noinput
-
-# Seed lookup tables + the super-admin user. All commands are idempotent;
-# the admin command also updates the password when DJANGO_ADMIN_PASSWORD changes.
-python manage.py seed_all
-
-# Collect static files so whitenoise can serve them. Cheap when nothing changed.
-python manage.py collectstatic --noinput
+# Bootstrap (migrate + seed + collectstatic) runs in EXACTLY ONE container.
+# The compose stack runs both ``web`` (gunicorn) and ``worker`` (qcluster)
+# from this same image, and both ``depends_on: mysql: service_healthy`` —
+# so without a gate they both race to ``CREATE TABLE django_migrations`` and
+# whichever loses the race crashes with "already exists", restarts under
+# ``restart: unless-stopped``, and the stack loops.
+#
+# ``--fake-initial`` is added defensively: if a deployed server's
+# ``django_migrations`` ever loses sync with the actual schema (e.g. a
+# SQL dump was loaded out-of-band), Django will mark initial migrations
+# applied where the tables already match, then run the rest normally.
+# On a fresh DB the flag is a no-op.
+if [[ "${1:-}" == "gunicorn" ]]; then
+  python manage.py migrate --noinput --fake-initial
+  python manage.py seed_all
+  python manage.py collectstatic --noinput
+fi
 
 # Hand off to whatever was passed as CMD (gunicorn, qcluster, etc.).
 exec "$@"
