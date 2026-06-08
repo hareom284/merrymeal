@@ -8,6 +8,15 @@ from django.urls import include, path
 
 urlpatterns = [
     path("", include("apps.accounts.urls")),
+    # Story 5.8 — admin campaign-progress card lives at /admin/campaigns/.
+    # Included *before* the generic dashboards URLs so the namespace
+    # ``dashboards_admin_campaigns`` resolves cleanly and the slug capture
+    # never collides with the dashboards admin sub-include
+    # (/admin/applications/, /admin/kitchens/).
+    path(
+        "admin/campaigns/",
+        include("apps.dashboards.urls.admin_campaigns"),
+    ),
     path("", include("apps.dashboards.urls")),
     path("admin/planner/", include("apps.planning.urls")),
     path("kitchen/", include("apps.kitchens.urls")),
