@@ -1,0 +1,17 @@
+.git
+.gitignore
+.github
+node_modules
+__pycache__
+*.pyc
+.pytest_cache
+db.sqlite3
+.env
+.env.local
+.venv
+docs/
+tests_e2e/__playwright_report
+tests_e2e/node_modules
+tests_e2e/playwright-report
+tests_e2e/test-results
+staticfiles/
