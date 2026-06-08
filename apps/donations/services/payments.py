@@ -29,6 +29,36 @@ from __future__ import annotations
 from django.db import transaction
 
 from apps.donations.models import Campaign, Donation
+from apps.donations.services.receipts import send_receipt_email
+
+
+def _complete_and_notify(donation: Donation) -> None:
+    """Single transition point: flip status to ``completed`` AND send the receipt.
+
+    Story 5.5's idempotency hinge. The gate is
+    ``donation.receipt_number`` being already set — once a row has a
+    receipt number it has also been emailed, so any re-fire (Stripe
+    retries network blips for up to 3 days) short-circuits before the
+    SMTP call. Without this guard a flaky webhook would email donors a
+    new receipt on every retry.
+
+    Caller must already hold the row under ``select_for_update()`` (see
+    :func:`apply_checkout_completed` / :func:`apply_invoice_paid`); the
+    receipt-number assignment opens its own nested ``atomic()`` block
+    which is safe inside the surrounding transaction.
+
+    The ``send_receipt_email`` call lives **inside** the transaction
+    rather than via ``transaction.on_commit`` because the test backend
+    (``locmem``) needs to see the message in ``mail.outbox`` before the
+    response returns. Prod uses SMTP — a failed send raises and rolls
+    back the status flip, so the next retry replays cleanly (no
+    "completed but receipt missing" gap).
+    """
+    if donation.receipt_number:
+        return  # Already notified — re-fire short-circuit.
+    donation.status = "completed"
+    donation.save(update_fields=["status", "updated_at"])
+    send_receipt_email(donation)
 
 # ----------------------------------------------------------------------
 # checkout.session.completed (one-time)
@@ -73,26 +103,33 @@ def apply_checkout_completed(session: dict) -> Donation:
             donation_id = None
 
     if donation_id:
-        donation.status = "completed"
-        donation.transaction_id = session_id
+        # Stamp the transaction-id + subscription-id BEFORE the status
+        # flip so the receipt email rendered inside
+        # ``_complete_and_notify`` sees them. ``_complete_and_notify``
+        # owns the status save + receipt send (Story 5.5 idempotency
+        # gate), so we persist these columns first via a narrow save.
+        fields_to_save: list[str] = []
+        if donation.transaction_id != session_id:
+            donation.transaction_id = session_id
+            fields_to_save.append("transaction_id")
         if subscription_id and not donation.stripe_subscription_id:
             donation.stripe_subscription_id = subscription_id
-        donation.save(
-            update_fields=[
-                "status",
-                "transaction_id",
-                "stripe_subscription_id",
-                "updated_at",
-            ]
-        )
+            fields_to_save.append("stripe_subscription_id")
+        if fields_to_save:
+            fields_to_save.append("updated_at")
+            donation.save(update_fields=fields_to_save)
+        _complete_and_notify(donation)
         return donation
 
     # Last-resort upsert: no usable metadata link. Use ``transaction_id``
     # as the dedupe key. ``update_or_create`` short-circuits a re-fire.
+    # We intentionally do NOT set ``status="completed"`` in defaults —
+    # ``_complete_and_notify`` owns that transition (Story 5.5) so the
+    # receipt-number idempotency gate triggers correctly for re-fires
+    # via this branch too.
     donation, _ = Donation.objects.update_or_create(
         transaction_id=session_id,
         defaults={
-            "status": "completed",
             "payment_type": "card",
             # campaign + donor_email are required NOT NULL; if we hit
             # this branch the session payload must carry them or the row
@@ -104,6 +141,7 @@ def apply_checkout_completed(session: dict) -> Donation:
             "amount_cents": int(session.get("amount_total") or 0),
         },
     )
+    _complete_and_notify(donation)
     return donation
 
 
@@ -151,11 +189,13 @@ def apply_invoice_paid(invoice: dict) -> Donation:
         .first()
     )
     if pending is not None:
-        pending.status = "completed"
+        # Stamp transaction-id BEFORE the status flip so the receipt
+        # email (sent by ``_complete_and_notify``) sees it. Status save
+        # + receipt send is owned by ``_complete_and_notify`` per the
+        # Story 5.5 idempotency contract.
         pending.transaction_id = invoice_id
-        pending.save(
-            update_fields=["status", "transaction_id", "updated_at"]
-        )
+        pending.save(update_fields=["transaction_id", "updated_at"])
+        _complete_and_notify(pending)
         return pending
 
     # Subsequent-invoice path: clone shape from any sibling row.
@@ -175,16 +215,24 @@ def apply_invoice_paid(invoice: dict) -> Donation:
         campaign = Campaign.objects.get(slug="general-fund")
         donor_email = email
 
-    return Donation.objects.create(
+    # Create the row in ``pending`` state then transition through
+    # ``_complete_and_notify`` so every completion goes through the
+    # single receipt-send gate (Story 5.5). The alternative — creating
+    # with ``status="completed"`` and then calling ``send_receipt_email``
+    # directly — would bypass the ``receipt_number`` idempotency check
+    # on a future refactor that re-uses this branch.
+    new_donation = Donation.objects.create(
         campaign=campaign,
         donor_email=donor_email,
         amount_cents=amount,
         payment_type="card",
-        status="completed",
+        status="pending",
         is_recurring=True,
         stripe_subscription_id=subscription_id,
         transaction_id=invoice_id,
     )
+    _complete_and_notify(new_donation)
+    return new_donation
 
 
 # ----------------------------------------------------------------------
