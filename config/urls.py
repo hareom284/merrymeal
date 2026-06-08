@@ -18,4 +18,6 @@ urlpatterns = [
     # volunteer-facing screens (Stories 4.8 / 4.12) and the admin
     # reassign widget (Story 4.14) share one ``delivery`` namespace.
     path("", include("apps.delivery.urls")),
+    # Story 5.3 — public donate page (no login required).
+    path("donate/", include("apps.donations.urls")),
 ]
