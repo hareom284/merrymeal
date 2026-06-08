@@ -1,5 +1,8 @@
 # /etc/nginx/sites-available/merrymeal — sample, NOT auto-loaded.
-# Copy to /etc/nginx/sites-enabled/, replace YOUR_DOMAIN, then `nginx -t && systemctl reload nginx`.
+# Copy to /etc/nginx/sites-enabled/. Domain (merrymeal.freebarcodeqr.com) is
+# already inlined; if you deploy to a different host, sed it through:
+#   sudo sed -i 's/merrymeal.freebarcodeqr.com/your.domain.tld/g' /etc/nginx/sites-available/merrymeal
+# Then `nginx -t && systemctl reload nginx`.
 
 upstream merrymeal_web {
     server 127.0.0.1:8000 fail_timeout=0;
@@ -8,16 +11,16 @@ upstream merrymeal_web {
 # HTTP → HTTPS redirect.
 server {
     listen 80;
-    server_name YOUR_DOMAIN;
+    server_name merrymeal.freebarcodeqr.com;
     return 301 https://$host$request_uri;
 }
 
 server {
     listen 443 ssl http2;
-    server_name YOUR_DOMAIN;
+    server_name merrymeal.freebarcodeqr.com;
 
-    ssl_certificate     /etc/letsencrypt/live/YOUR_DOMAIN/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/YOUR_DOMAIN/privkey.pem;
+    ssl_certificate     /etc/letsencrypt/live/merrymeal.freebarcodeqr.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/merrymeal.freebarcodeqr.com/privkey.pem;
     ssl_protocols       TLSv1.2 TLSv1.3;
     ssl_prefer_server_ciphers on;
 
