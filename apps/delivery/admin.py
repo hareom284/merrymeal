@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from apps.delivery.models import Delivery, Route
+from apps.delivery.models import Delivery, DeliveryFeedback, Route
 
 
 @admin.register(Route)
@@ -26,3 +26,11 @@ class DeliveryAdmin(admin.ModelAdmin):
     # adding it here trips admin.E039. Use raw_id_fields as a fallback.
     autocomplete_fields = ("route", "meal_plan", "volunteer", "member")
     raw_id_fields = ("member_address",)
+
+
+@admin.register(DeliveryFeedback)
+class DeliveryFeedbackAdmin(admin.ModelAdmin):
+    list_display = ("id", "delivery", "rating")
+    list_filter = ("rating",)
+    search_fields = ("delivery__member__email",)
+    autocomplete_fields = ("delivery",)

@@ -2,7 +2,7 @@ import datetime as dt
 
 import factory
 
-from apps.delivery.models import Delivery, Route
+from apps.delivery.models import Delivery, DeliveryFeedback, Route
 from apps.volunteers.tests.factories import VolunteerFactory
 
 
@@ -32,3 +32,12 @@ class DeliveryFactory(factory.django.DjangoModelFactory):
     meal_type = "fresh"
     status = "pending"
     scheduled_date = factory.LazyFunction(dt.date.today)
+
+
+class DeliveryFeedbackFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = DeliveryFeedback
+
+    delivery = factory.SubFactory(DeliveryFactory)
+    rating = 5
+    note = ""
