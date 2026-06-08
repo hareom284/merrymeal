@@ -1,0 +1,40 @@
+# Layered on top of compose.yaml. Bring up with:
+#   docker compose -f compose.yaml -f compose.prod.yaml up -d
+# Requires Compose CLI v2.24+ for the !reset list override.
+
+services:
+  web:
+    restart: always
+    environment:
+      DJANGO_SETTINGS_MODULE: config.settings.prod
+      DJANGO_DEBUG: "False"
+      DJANGO_SECURE_SSL_REDIRECT: "True"
+      DJANGO_SESSION_COOKIE_SECURE: "True"
+      DJANGO_CSRF_COOKIE_SECURE: "True"
+      DJANGO_SECURE_HSTS_SECONDS: "31536000"
+      DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS: "True"
+      DJANGO_SECURE_HSTS_PRELOAD: "True"
+    ports: !reset []
+    expose:
+      - "8000"
+    command:
+      - gunicorn
+      - config.wsgi:application
+      - --bind=0.0.0.0:8000
+      - --workers=4
+      - --access-logfile=-
+      - --error-logfile=-
+
+  worker:
+    restart: always
+    environment:
+      DJANGO_SETTINGS_MODULE: config.settings.prod
+
+  mysql:
+    restart: always
+    # In prod, point this at managed MySQL (RDS / DigitalOcean DB) instead.
+    # The volume below is fine for single-VPS deploys; swap for an external
+    # host once you migrate.
+
+  redis:
+    restart: always
