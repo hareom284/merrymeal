@@ -212,7 +212,13 @@ Expected: 0 issues. Anything reported maps directly to a setting in `.env`
 
 ## Daily ops
 
-- **Deploy a new release:**
+- **Deploy a new release — automatic (default):**
+  Just `git push origin main`. The `deploy` job in `.github/workflows/ci.yml`
+  SSHes into the server and runs `docker compose pull && up -d` for you. See
+  `.github/workflows/README.md` for the required GitHub secrets
+  (`DEPLOY_HOST`, `DEPLOY_USER`, `DEPLOY_SSH_KEY`, optional `DEPLOY_PORT`).
+
+- **Deploy manually (fallback if the auto-deploy job is paused/broken):**
   ```bash
   ssh root@<server-ip>
   cd /srv/merrymeal
