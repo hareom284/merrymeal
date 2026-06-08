@@ -12,6 +12,34 @@ No virtualenv. Deps install globally to Python 3.12.
 
 ---
 
+## Setup — Docker (quickstart)
+
+This path needs only Docker Desktop installed. No Python, MySQL, Node setup.
+
+```bash
+git clone <repo-url> merrymeal
+cd merrymeal
+cp .env.example .env
+docker compose up
+```
+
+Open <http://localhost:8000/accounts/login/>. On first start, MySQL takes
+~30 s to initialise; migrations then run automatically.
+
+To create a superuser:
+
+```bash
+docker compose run --rm web python manage.py createsuperuser
+```
+
+To stop everything (and wipe the DB volume):
+
+```bash
+docker compose down -v
+```
+
+---
+
 ## Setup — macOS (Homebrew)
 
 ### 1. Install tools
