@@ -3,7 +3,8 @@
   "private": true,
   "scripts": {
     "build:css": "tailwindcss -i ./static/src/input.css -o ./static/dist/output.css --minify",
-    "watch:css": "tailwindcss -i ./static/src/input.css -o ./static/dist/output.css --watch"
+    "watch:css": "tailwindcss -i ./static/src/input.css -o ./static/dist/output.css --watch",
+    "test:e2e": "cd tests_e2e && npm run test"
   },
   "devDependencies": {
     "tailwindcss": "^3.4.0"
