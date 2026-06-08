@@ -26,6 +26,14 @@ twilio>=8
 # the module graph and run the test suite (tests patch the SDK via a
 # sys.modules stub installed in apps/donations/tests/conftest.py).
 stripe>=8
+# Story 6.5 — server-side PDF rendering for the board report. WeasyPrint
+# needs system libs (``libpango``, ``libpangoft2``, ``libharfbuzz``,
+# ``libcairo2``, ``libgdk-pixbuf-2.0``, ``shared-mime-info``,
+# ``fonts-liberation``) installed in the Debian-slim runtime stage. On
+# developer machines without those libs the import fails at module
+# load; ``apps.dashboards.services.board_report_pdf`` catches that and
+# falls back to a print-friendly HTML response with a banner.
+weasyprint>=62,<63
 
 # Dev / test
 pytest>=8,<9

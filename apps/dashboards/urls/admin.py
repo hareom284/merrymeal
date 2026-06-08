@@ -9,6 +9,7 @@ from apps.dashboards.views.admin_applications import (
 from apps.dashboards.views.admin_home import admin_home, admin_home_cards
 from apps.dashboards.views.admin_kitchens import admin_kitchens
 from apps.dashboards.views.audit import audit_viewer
+from apps.dashboards.views.board_report import board_report_view
 
 urlpatterns = [
     path("applications/", admin_applications_list, name="admin_applications"),
@@ -37,4 +38,6 @@ urlpatterns = [
     # renders five cards; the HTMX partial re-fetches every 5 minutes.
     path("home/", admin_home, name="admin_home"),
     path("home/cards/", admin_home_cards, name="admin_home_cards"),
+    # Story 6.5 — one-click monthly board pack (CSV / PDF / printable HTML).
+    path("reports/board/", board_report_view, name="board_report"),
 ]

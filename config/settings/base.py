@@ -213,3 +213,20 @@ DONATIONS_CHARITY_ADDRESS = env(
     "DONATIONS_CHARITY_ADDRESS",
     default="PO Box 1, Melbourne VIC 3000",
 )
+
+# FY tax receipt (Story 6.4 — printer-friendly per-donor FY receipt
+# at ``/donor/receipts/<fy>/``). These are the same data points the
+# email receipt above carries, but the donor-facing FY page renders
+# them as the page footer and the JSON-format endpoint exposes them
+# under ``charity.abn`` / ``charity.address`` for accountants ingesting
+# the response. Defaulting to the existing ``DONATIONS_CHARITY_*``
+# values keeps the two surfaces in lockstep until Story 7.x replaces
+# both with the real ABN/address from the accountant.
+MERRYMEAL_ABN = env(
+    "MERRYMEAL_ABN",
+    default=DONATIONS_CHARITY_ABN,
+)
+MERRYMEAL_ADDRESS = env(
+    "MERRYMEAL_ADDRESS",
+    default=DONATIONS_CHARITY_ADDRESS,
+)

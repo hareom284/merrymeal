@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% load donation_extras %}
+
+{% block title %}Tax receipt — FY {{ fy }}{% endblock %}
+
+{% block extra_head %}
+<style media="print">
+    nav, header.site-header, footer.site-footer, .no-print { display: none !important; }
+    body { background: #fff; color: #000; }
+    .fy-receipt { box-shadow: none !important; border: none !important; padding: 0 !important; }
+    a { color: #000 !important; text-decoration: none !important; }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="mx-auto w-full max-w-2xl px-4 py-6 print:py-0">
+
+    <div class="mb-4 flex items-center justify-between no-print">
+        <a href="{% url 'dashboards:donor_history' %}" class="text-sm text-warm-600 hover:text-warm-900">
+            ← Back to donation history
+        </a>
+        <button type="button" onclick="window.print()"
+                class="rounded-md bg-brand-green px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brand-green-hover">
+            Print / Save as PDF
+        </button>
+    </div>
+
+    <article class="fy-receipt rounded-lg border border-warm-200 bg-white p-8 shadow-sm">
+
+        <header class="border-b border-warm-300 pb-4">
+            <h1 class="font-display text-2xl text-warm-900">MerryMeal — Tax receipt</h1>
+            <p class="mt-1 text-sm text-warm-600">
+                Financial year {{ fy }} ({{ period_start|date:"d M Y" }} to {{ period_end|date:"d M Y" }})
+            </p>
+        </header>
+
+        <section class="mt-6 grid gap-1 text-sm text-warm-800">
+            <div><span class="font-semibold">Donor:</span> {{ request.user.full_name|default:request.user.email }}</div>
+            <div><span class="font-semibold">Email:</span> {{ request.user.email }}</div>
+        </section>
+
+        <section class="mt-6">
+            {% if rows %}
+            <table class="w-full border-collapse text-sm">
+                <thead>
+                    <tr class="border-b border-warm-300 text-left text-warm-700">
+                        <th class="py-2 pr-2">Date</th>
+                        <th class="py-2 pr-2">Campaign</th>
+                        <th class="py-2 pr-2">Receipt #</th>
+                        <th class="py-2 text-right">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in rows %}
+                    <tr class="border-b border-warm-100">
+                        <td class="py-2 pr-2">{{ r.created_at|date:"d M Y" }}</td>
+                        <td class="py-2 pr-2">{{ r.campaign_name }}</td>
+                        <td class="py-2 pr-2 font-mono text-xs text-warm-600">{{ r.receipt_number }}</td>
+                        <td class="py-2 text-right tabular-nums">{{ r.amount_cents|dollars }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr class="border-t-2 border-warm-400 font-semibold text-warm-900">
+                        <td class="pt-3" colspan="3">Total for FY {{ fy }}</td>
+                        <td class="pt-3 text-right text-lg tabular-nums">{{ total_cents|dollars }}</td>
+                    </tr>
+                </tfoot>
+            </table>
+            {% else %}
+            <p class="py-4 text-sm text-warm-600">No donations recorded for this financial year.</p>
+            {% endif %}
+        </section>
+
+        <footer class="mt-8 border-t border-warm-300 pt-4 text-xs leading-relaxed text-warm-700">
+            <p>MerryMeal Charity — <strong>ABN {{ abn }}</strong></p>
+            <p>{{ address }}</p>
+            <p class="mt-2">
+                Donations of $2 or more are tax deductible in Australia under
+                the charity's Deductible Gift Recipient (DGR) status. Please
+                retain this receipt for your records.
+            </p>
+        </footer>
+
+    </article>
+</main>
+{% endblock %}

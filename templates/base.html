@@ -16,6 +16,10 @@
 
     <link rel="stylesheet" href="{% static 'output.css' %}" />
 
+    <!-- Story 6.4 — print-only stylesheet for the FY tax receipt page.
+         Loaded at media="print" so the screen view is never touched. -->
+    <link rel="stylesheet" href="{% static 'src/print.css' %}" media="print" />
+
     <!-- HTMX for partial swaps, Alpine for light reactivity -->
     <script src="https://unpkg.com/htmx.org@1.9.12" defer></script>
     <script src="https://unpkg.com/alpinejs@3.14.1" defer></script>
