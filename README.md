@@ -175,6 +175,23 @@ Open:
 
 ---
 
+## After setup — verify your environment
+
+A teammate should be able to tick all of these after their first
+`docker compose up` (or after the macOS / Windows native path):
+
+- [ ] `http://localhost:8000/accounts/login/` returns the login screen.
+- [ ] `http://localhost:8000/admin/` returns the Django admin login.
+- [ ] `python3 -m pytest` (or `docker compose run --rm web pytest`) is green.
+- [ ] `npm run watch:css` rebuilds Tailwind on file save.
+- [ ] `python3 scripts/check_env_example.py` exits 0.
+- [ ] (Optional) `npm run test:e2e` is green when the stack is up.
+
+If any item fails, fix it **and** open a PR updating this checklist with
+the missing step. The checklist is the contract.
+
+---
+
 ## Tests
 
 macOS / Linux:
