@@ -1,0 +1,21 @@
+<li>
+  <a href="{% url 'dashboards:caregiver-member' entry.member.pk %}"
+     class="caregiver-row card flex items-center gap-3 min-h-[44px]">
+    <span class="w-10 h-10 rounded-full bg-warm-200 flex items-center justify-center font-display text-warm-800">
+      {{ entry.member.full_name|slice:":1" }}
+    </span>
+    <span class="flex-1 min-w-0">
+      <span class="block font-display text-lg text-warm-900 truncate">
+        {{ entry.member.full_name }}
+      </span>
+      <span class="block text-warm-500 truncate">
+        {% if entry.card.has_meal %}{{ entry.card.meal_name }}{% else %}No meal today{% endif %}
+      </span>
+      {% if entry.allergen_label %}
+        <span class="block text-red-700 text-sm truncate">{{ entry.allergen_label }}</span>
+      {% endif %}
+      <span class="block text-warm-400 text-xs">{{ entry.card.delivery_status_label }}</span>
+    </span>
+    <span aria-hidden="true" class="text-warm-500">›</span>
+  </a>
+</li>

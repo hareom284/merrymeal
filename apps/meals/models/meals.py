@@ -16,6 +16,11 @@ class Meal(SoftDeleteModel):
         related_name="meals",
         blank=True,
     )
+    diets = models.ManyToManyField(
+        "dietary.DietPreference",
+        related_name="compatible_meals",
+        blank=True,
+    )
 
     class Meta:
         app_label = "meals"

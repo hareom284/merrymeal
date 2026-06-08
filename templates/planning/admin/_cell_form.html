@@ -1,0 +1,60 @@
+{% comment %}
+HTMX modal contents for editing a single planner cell.
+
+Rendered into <div id="modal"> by the "Set meal" / "Edit" buttons. The
+form POSTs back to the same endpoint and targets the cell <td> so the
+table updates in place without a full page reload.
+{% endcomment %}
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-warm-900/40 px-4"
+     x-data="{ open: true }" x-show="open"
+     @keydown.escape.window="document.getElementById('modal').innerHTML=''">
+  <div class="w-full max-w-md rounded-2xl bg-warm-50 p-6 shadow-xl">
+    <header class="mb-4 flex items-start justify-between">
+      <div>
+        <h2 class="font-display text-xl text-warm-900">Plan a meal</h2>
+        <p class="text-sm text-warm-500">
+          {{ kitchen.name }} · {{ date|date:"D j M Y" }}
+        </p>
+      </div>
+      <button type="button"
+              class="text-warm-500 hover:text-warm-900"
+              aria-label="Close"
+              onclick="document.getElementById('modal').innerHTML=''">
+        ×
+      </button>
+    </header>
+
+    <form hx-post="{% url 'planning:cell-edit' %}?kitchen={{ kitchen.id }}&amp;date={{ date|date:'Y-m-d' }}"
+          hx-target="#cell-{{ kitchen.id }}-{{ date|date:'Y-m-d' }}"
+          hx-swap="outerHTML"
+          hx-on::after-request="if(event.detail.successful) document.getElementById('modal').innerHTML=''"
+          class="flex flex-col gap-4">
+      {% csrf_token %}
+
+      <label class="flex flex-col gap-1 text-sm">
+        <span class="label">Meal</span>
+        {{ form.meal }}
+        {% if form.meal.errors %}
+          <span class="text-xs text-red-600">{{ form.meal.errors|join:" " }}</span>
+        {% endif %}
+      </label>
+
+      <label class="flex flex-col gap-1 text-sm">
+        <span class="label">Planned quantity</span>
+        {{ form.planned_quantity }}
+        {% if form.planned_quantity.errors %}
+          <span class="text-xs text-red-600">{{ form.planned_quantity.errors|join:" " }}</span>
+        {% endif %}
+      </label>
+
+      <div class="flex items-center justify-end gap-2 pt-2">
+        <button type="button"
+                class="btn-secondary"
+                onclick="document.getElementById('modal').innerHTML=''">
+          Cancel
+        </button>
+        <button class="btn-primary" type="submit">Save</button>
+      </div>
+    </form>
+  </div>
+</div>

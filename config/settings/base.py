@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     "apps.dashboards",
     "apps.kitchens",
     "apps.meals",
+    "apps.planning",
     "apps.food_safety",
 ]
 

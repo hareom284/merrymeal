@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Weekly planner · MerryMeal{% endblock %}
+
+{% block content %}
+<section class="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-8">
+  <header class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+    <div>
+      <h1 class="font-display text-3xl font-semibold text-warm-900">Weekly planner</h1>
+      <p class="text-warm-600 text-sm">
+        Week of <span class="font-medium">{{ monday|date:"D j M Y" }}</span>
+        (Mon–Sun). Drop a meal in each cell.
+      </p>
+    </div>
+
+    <nav class="flex items-center gap-2" aria-label="Week navigation">
+      <a class="btn-secondary text-sm"
+         href="?week={{ prev_week }}">&larr; Previous</a>
+      <a class="btn-secondary text-sm"
+         href="{% url 'planning:planner' %}">This week</a>
+      <a class="btn-secondary text-sm"
+         href="?week={{ next_week }}">Next &rarr;</a>
+    </nav>
+  </header>
+
+  <div class="overflow-x-auto rounded-2xl border border-warm-200 bg-warm-50">
+    <table class="planner-grid w-full border-collapse text-left text-sm">
+      <thead>
+        <tr class="bg-warm-100 text-warm-700">
+          <th scope="col" class="sticky left-0 z-10 bg-warm-100 px-3 py-2 min-w-[12rem]">
+            Kitchen
+          </th>
+          {% for d in days %}
+            <th scope="col" class="px-3 py-2 min-w-[10rem]">
+              <div class="flex flex-col">
+                <span class="font-medium">{{ d|date:"D" }}</span>
+                <span class="text-xs text-warm-500">{{ d|date:"Y-m-d" }}</span>
+              </div>
+            </th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in grid %}
+          <tr class="border-t border-warm-200">
+            <th scope="row"
+                class="sticky left-0 z-10 bg-warm-50 px-3 py-3 align-top font-medium text-warm-900">
+              {{ row.kitchen.name }}
+            </th>
+            {% for cell in row.cells %}
+              {% include "planning/admin/_cell.html" with kitchen=row.kitchen date=cell.date plan=cell.plan %}
+            {% endfor %}
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="8" class="px-4 py-8 text-center text-warm-500">
+              No kitchens registered yet. Add a kitchen before planning meals.
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+{# HTMX modal mount-point. Cell buttons set hx-target="#modal" #}
+<div id="modal"></div>
+{% endblock %}

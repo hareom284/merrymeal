@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('kitchens', '0004_ingredientbatch'),
-        ('meals', '0002_meal_plan_stub'),
+        ('planning', '0001_initial'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
@@ -27,7 +27,7 @@ class Migration(migrations.Migration):
                 ('notes', models.TextField(blank=True, null=True)),
                 ('checked_by', models.ForeignKey(db_column='checked_by', on_delete=django.db.models.deletion.PROTECT, related_name='safety_checks', to=settings.AUTH_USER_MODEL)),
                 ('kitchen', models.ForeignKey(db_column='kitchen_id', on_delete=django.db.models.deletion.PROTECT, related_name='safety_checks', to='kitchens.kitchen')),
-                ('meal_plan', models.ForeignKey(blank=True, db_column='meal_plan_id', null=True, on_delete=django.db.models.deletion.PROTECT, related_name='safety_checks', to='meals.mealplan')),
+                ('meal_plan', models.ForeignKey(blank=True, db_column='meal_plan_id', null=True, on_delete=django.db.models.deletion.PROTECT, related_name='safety_checks', to='planning.mealplan')),
             ],
             options={
                 'db_table': 'food_safety_checks',
