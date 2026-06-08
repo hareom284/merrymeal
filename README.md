@@ -173,6 +173,8 @@ Open:
 - App: <http://localhost:8000/accounts/login/>
 - Admin: <http://localhost:8000/admin/>
 
+For production deploy, see [`docs/deploy.md`](docs/deploy.md).
+
 ---
 
 ## After setup — verify your environment
