@@ -30,20 +30,20 @@ def test_generate_returns_text_from_first_candidate(mock_post):
             ]
         },
     )
-    with override_settings(GEMINI_API_KEY="pk.test"):
+    with override_settings(GEMINI_API_KEY="AIzaTEST"):
         result = generate("system", "what is my meal?")
     assert result == "Today's meal is roast chicken."
 
     # Confirm we hit the right endpoint with the key in the query string.
     call = mock_post.call_args
     assert "generateContent" in call.args[0]
-    assert call.kwargs["params"] == {"key": "pk.test"}
+    assert call.kwargs["params"] == {"key": "AIzaTEST"}
 
 
 @patch("apps.ai_assistant.services.client.requests.post")
 def test_generate_wraps_network_error_as_unavailable(mock_post):
     mock_post.side_effect = requests.ConnectionError("timeout")
-    with override_settings(GEMINI_API_KEY="pk.test"):
+    with override_settings(GEMINI_API_KEY="AIzaTEST"):
         with pytest.raises(GeminiUnavailable, match="network"):
             generate("system", "hi")
 
@@ -57,6 +57,6 @@ def test_generate_wraps_safety_block_as_unavailable(mock_post):
         raise_for_status=MagicMock(),
         json=lambda: {"promptFeedback": {"blockReason": "SAFETY"}},
     )
-    with override_settings(GEMINI_API_KEY="pk.test"):
+    with override_settings(GEMINI_API_KEY="AIzaTEST"):
         with pytest.raises(GeminiUnavailable, match="empty"):
             generate("system", "anything")

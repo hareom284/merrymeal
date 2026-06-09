@@ -70,6 +70,19 @@ def generate(
         },
     }
 
+    # Gemini API keys start with ``AIza``; OAuth tokens (``AQ.Ab...``,
+    # ``ya29...``) and service-account tokens use different endpoints
+    # entirely and will 401 here. Fail loud and early so the operator
+    # gets a clear hint in the log instead of a silent fallback reply.
+    if not api_key.startswith("AIza"):
+        logger.warning(
+            "GEMINI_API_KEY does not look like a Gemini key "
+            "(should start with 'AIza...'). Got prefix=%r. "
+            "Generate one at https://aistudio.google.com/apikey.",
+            api_key[:6],
+        )
+        raise GeminiUnavailable("wrong key format (expected 'AIza...')")
+
     try:
         response = requests.post(
             url,
@@ -79,6 +92,12 @@ def generate(
         )
         response.raise_for_status()
         data = response.json()
+    except requests.HTTPError as exc:
+        # 401/403 → bad key; surface the upstream message so the dev
+        # log shows "API key not valid" instead of a generic "network".
+        body = exc.response.text[:300] if exc.response is not None else ""
+        logger.warning("Gemini HTTP %s: %s", exc.response.status_code if exc.response else "?", body)
+        raise GeminiUnavailable(f"http {exc.response.status_code if exc.response else '?'}: {body}") from exc
     except requests.RequestException as exc:
         logger.warning("Gemini network error: %s", exc)
         raise GeminiUnavailable(f"network: {exc}") from exc
