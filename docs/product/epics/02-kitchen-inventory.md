@@ -33,7 +33,7 @@ constraints enforceable. **Without this epic, planning has nothing to plan.**
 ## Stories
 
 ### Story 2.1 — `kitchens` app: `Kitchen` model
-**STATUS: backlog**
+**STATUS: done (sprint-04/05)**
 
 **As an** admin
 **I want** to register the kitchens we use (own + outsourced) with their location and service radius
@@ -58,7 +58,7 @@ constraints enforceable. **Without this epic, planning has nothing to plan.**
 ---
 
 ### Story 2.2 — `Ingredient` model
-**STATUS: backlog**
+**STATUS: done (sprint-04/05)**
 
 **As an** admin
 **I want** to maintain a catalogue of ingredients with units of measure
@@ -82,7 +82,7 @@ constraints enforceable. **Without this epic, planning has nothing to plan.**
 ---
 
 ### Story 2.3 — `meals` app: `Meal` (recipe) model
-**STATUS: backlog**
+**STATUS: done (sprint-04/05)**
 
 **As an** admin / dietitian
 **I want** to maintain a list of meals (recipes) with prep + cook times
@@ -105,7 +105,7 @@ constraints enforceable. **Without this epic, planning has nothing to plan.**
 ---
 
 ### Story 2.4 — `MealIngredient` through-model + admin inline
-**STATUS: backlog**
+**STATUS: done (sprint-04/05)**
 
 **As an** admin
 **I want** to associate ingredients with a recipe, including quantity
@@ -128,7 +128,7 @@ constraints enforceable. **Without this epic, planning has nothing to plan.**
 ---
 
 ### Story 2.5 — `IngredientBatch` model (expiration tracking)
-**STATUS: backlog**
+**STATUS: done (sprint-04/05)**
 
 **As an** admin
 **I want** to record incoming stock as batches with expiry dates per kitchen
@@ -153,7 +153,7 @@ constraints enforceable. **Without this epic, planning has nothing to plan.**
 ---
 
 ### Story 2.6 — Stock receipt UI (mobile-readable)
-**STATUS: backlog**
+**STATUS: done (sprint-04/05)**
 
 **As a** kitchen staff member
 **I want** a single screen to record a new batch (ingredient, quantity, expiry, lot)
@@ -182,7 +182,7 @@ constraints enforceable. **Without this epic, planning has nothing to plan.**
 ---
 
 ### Story 2.7 — `food_safety` app: `FoodSafetyCheck` model
-**STATUS: backlog**
+**STATUS: done (sprint-04/05)**
 
 **As a** kitchen staff member
 **I want** to record food-safety checks with the result and (where relevant) temperature
@@ -208,7 +208,7 @@ constraints enforceable. **Without this epic, planning has nothing to plan.**
 ---
 
 ### Story 2.8 — Daily food-safety check form (mobile-first)
-**STATUS: backlog**
+**STATUS: done (sprint-04/05)**
 
 **As a** kitchen staff member
 **I want** a one-screen form on my tablet/phone to log today's safety checks
@@ -239,7 +239,7 @@ constraints enforceable. **Without this epic, planning has nothing to plan.**
 ---
 
 ### Story 2.9 — Nightly job: alert on expiring batches (≤ 3 days)
-**STATUS: backlog**
+**STATUS: done (sprint-04/05)**
 
 **As an** admin
 **I want** an email every morning listing batches expiring within 3 days
@@ -273,7 +273,7 @@ constraints enforceable. **Without this epic, planning has nothing to plan.**
 ---
 
 ### Story 2.10 — "Today's stock at a glance" admin widget
-**STATUS: backlog**
+**STATUS: done (sprint-04/05)**
 
 **As an** admin
 **I want** a single dashboard card showing each kitchen's:

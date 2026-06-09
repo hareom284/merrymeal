@@ -231,3 +231,25 @@ MERRYMEAL_ADDRESS = env(
     "MERRYMEAL_ADDRESS",
     default=DONATIONS_CHARITY_ADDRESS,
 )
+
+
+# Django-Q2 cluster. We only set the knobs needed to silence the
+# ``Retry and timeout are misconfigured`` warning emitted on every
+# ``manage.py`` call when the defaults disagree — ``retry`` MUST be
+# strictly greater than ``timeout`` or the cluster requeues the same
+# task before its first run finishes. The dispatch jobs (Story 4.5
+# generate, 4.6 routes) finish in <30s on a real DB; 60s timeout +
+# 90s retry gives a comfortable margin without keeping a failed task
+# in flight too long. Test settings override to ``sync=True`` and
+# never reach this code path.
+Q_CLUSTER = {
+    "name": "merrymeal",
+    "orm": "default",
+    "timeout": 60,
+    "retry": 90,
+    "workers": 2,
+    "recycle": 500,
+    "save_limit": 250,
+    "queue_limit": 50,
+    "label": "Django Q",
+}

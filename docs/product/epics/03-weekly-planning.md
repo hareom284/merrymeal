@@ -36,7 +36,7 @@ shipped in Epic 00 in anger.
 ## Stories
 
 ### Story 3.1 — `planning` app: `MealPlan` model
-**STATUS: backlog**
+**STATUS: done (sprint-06)**
 
 **As an** admin
 **I want** to schedule one meal per (kitchen, service date)
@@ -62,7 +62,7 @@ shipped in Epic 00 in anger.
 ---
 
 ### Story 3.2 — `planning.services.assign_meal_type(member, kitchen, service_date)`
-**STATUS: backlog**
+**STATUS: done (sprint-06)**
 
 **As a** backend developer
 **I want** a single function that returns `fresh` or `frozen` for a
@@ -94,7 +94,7 @@ frozen, (d) edge: exactly at radius → fresh, (e) no address → raises.
 ---
 
 ### Story 3.3 — Admin weekly planner UI
-**STATUS: backlog**
+**STATUS: done (sprint-06)**
 
 **As an** admin
 **I want** a one-screen grid of (kitchen × day) cells where I drop a meal
@@ -129,7 +129,7 @@ frozen, (d) edge: exactly at radius → fresh, (e) no address → raises.
 ---
 
 ### Story 3.4 — Member dashboard: "today's meal" card
-**STATUS: backlog**
+**STATUS: done (sprint-06)**
 
 **As a** member
 **I want** to see today's meal — name, photo, key ingredients, and any of
@@ -165,7 +165,7 @@ and "no meal today" paths.
 ---
 
 ### Story 3.5 — Allergen mapping (ingredient → allergen)
-**STATUS: backlog**
+**STATUS: done (sprint-06)**
 
 **As a** dietitian
 **I want** ingredients to declare which allergens they contain
@@ -196,7 +196,7 @@ match → one allergen; multiple matches → de-duplicated list.
 ---
 
 ### Story 3.6 — Diet-coverage warning ("no halal Thursday")
-**STATUS: backlog**
+**STATUS: done (sprint-06)**
 
 **As an** admin
 **I want** the planner to warn me if a day's meal is incompatible with any
@@ -226,7 +226,7 @@ suitable meal.
 ---
 
 ### Story 3.7 — `validate_radius_assignments` management command (CI guard)
-**STATUS: backlog**
+**STATUS: done (sprint-06)**
 
 **As the** team
 **I want** a command that walks every active member's address and asserts
@@ -256,7 +256,7 @@ assert command exit code = 1 and stdout names the row.
 ---
 
 ### Story 3.8 — Caregiver multi-member view
-**STATUS: backlog**
+**STATUS: done (sprint-06)**
 
 **As a** caregiver looking after two or more people
 **I want** one screen listing every member I look after with each one's "today" card summary
