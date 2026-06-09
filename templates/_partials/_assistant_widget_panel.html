@@ -50,11 +50,10 @@
         <p class="text-[11px] text-warm-500 leading-tight">{{ assistant_subtitle }}</p>
       </div>
       <form
-        method="post"
-        action="{% url 'ai_assistant:clear' %}"
+        onsubmit="return false"
         hx-post="{% url 'ai_assistant:clear' %}"
         hx-swap="none"
-        hx-on::after-request="resetLog()"
+        hx-on:htmx:after-request="resetLog()"
         class="m-0"
       >
         {% csrf_token %}
@@ -75,17 +74,19 @@
       </div>
     </div>
 
-    {# Native ``method`` + ``action`` so the form still POSTs correctly
-       if HTMX hasn't loaded (CDN block, ad-blocker, etc.). HTMX wins
-       when present and does the inline swap; native fall-back just
-       re-navigates to /assistant/chat/ which 200s with the partial. #}
+    {# ``onsubmit="return false"`` is the no-JS guard: it stops the
+       browser's default GET-to-current-URL submit if HTMX hasn't
+       loaded yet. With HTMX present, ``hx-post`` takes over and the
+       AJAX POST runs as normal. We intentionally do NOT set ``action``
+       — older HTMX versions can race against the native submit when
+       both are present, leaking a GET to ``/assistant/chat/`` before
+       HTMX's preventDefault fires. #}
     <form
-      method="post"
-      action="{{ assistant_post_url }}"
+      onsubmit="return false"
       hx-post="{{ assistant_post_url }}"
       hx-target="#assistant-chat-log"
       hx-swap="beforeend"
-      hx-on::after-request="this.reset(); document.getElementById('assistant-chat-log').scrollTop = document.getElementById('assistant-chat-log').scrollHeight;"
+      hx-on:htmx:after-request="this.reset(); document.getElementById('assistant-chat-log').scrollTop = document.getElementById('assistant-chat-log').scrollHeight;"
       hx-indicator="#assistant-typing"
       class="border-t border-warm-200 p-2 flex items-center gap-2"
     >

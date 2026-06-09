@@ -16,9 +16,9 @@ def test_admin_home_renders_assistant_widget(client):
     assert response.status_code == 200
     body = response.content
     assert b"assistant-chat-log" in body
-    assert b"/admin/assistant/chat/" in body
+    assert b'hx-post="/admin/assistant/chat/"' in body
     # Must NOT carry the member endpoint on an admin page.
-    assert b'action="/assistant/chat/"' not in body
+    assert b'hx-post="/assistant/chat/"' not in body
 
 
 @pytest.mark.django_db
@@ -29,7 +29,7 @@ def test_member_dashboard_renders_member_widget(client):
     assert response.status_code == 200
     body = response.content
     assert b"assistant-chat-log" in body
-    assert b'action="/assistant/chat/"' in body
+    assert b'hx-post="/assistant/chat/"' in body
     # Must NOT carry the admin endpoint on a member page.
     assert b"/admin/assistant/chat/" not in body
 
@@ -43,5 +43,9 @@ def test_form_carries_native_post_action_for_no_js_fallback(client):
     client.force_login(admin)
     response = client.get("/admin/home/")
     body = response.content
-    assert b'method="post"' in body
-    assert b'action="/admin/assistant/chat/"' in body
+    # The widget intentionally does NOT carry a native ``action`` — we
+    # rely on ``onsubmit="return false"`` so a no-JS browser does not
+    # leak a GET to the POST-only endpoint. The hx-post URL is what
+    # HTMX uses for the actual request.
+    assert b'onsubmit="return false"' in body
+    assert b'hx-post="/admin/assistant/chat/"' in body
