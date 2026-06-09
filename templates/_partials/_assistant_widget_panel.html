@@ -20,12 +20,14 @@
       while (log.children.length > 1) log.removeChild(log.lastChild);
     }
   }"
-  class="fixed z-40 right-4 bottom-24 md:bottom-6"
+  style="position: fixed; right: 16px; bottom: 96px; z-index: 40;"
+  class="md:!bottom-6"
 >
   <button
     type="button"
     @click="open = !open; $nextTick(() => scrollBottom())"
-    class="w-14 h-14 rounded-full bg-brand-green text-white shadow-lg flex items-center justify-center hover:bg-brand-green-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green focus-visible:ring-offset-2"
+    style="width: 56px; height: 56px; border-radius: 9999px; background-color: #16a34a; color: white; box-shadow: 0 10px 25px rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center; border: 0; cursor: pointer;"
+    class="hover:bg-brand-green-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green focus-visible:ring-offset-2"
     aria-label="Open MerryMeal assistant"
   >
     <svg x-show="!open" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
@@ -74,13 +76,15 @@
       </div>
     </div>
 
-    {# ``onsubmit="return false"`` is the no-JS guard: it stops the
-       browser's default GET-to-current-URL submit if HTMX hasn't
-       loaded yet. With HTMX present, ``hx-post`` takes over and the
-       AJAX POST runs as normal. We intentionally do NOT set ``action``
-       — older HTMX versions can race against the native submit when
-       both are present, leaking a GET to ``/assistant/chat/`` before
-       HTMX's preventDefault fires. #}
+    {% comment %}
+      ``onsubmit="return false"`` is the no-JS guard: it stops the
+      browser's default GET-to-current-URL submit if HTMX hasn't
+      loaded yet. With HTMX present, ``hx-post`` takes over and the
+      AJAX POST runs as normal. We intentionally do NOT set ``action``
+      — older HTMX versions can race against the native submit when
+      both are present, leaking a GET to ``/assistant/chat/`` before
+      HTMX's preventDefault fires.
+    {% endcomment %}
     <form
       onsubmit="return false"
       hx-post="{{ assistant_post_url }}"
