@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load donation_extras %}
 
-{# Story 5.7 — magic-link landing page (active subscriptions).
+{% comment %} Story 5.7 — magic-link landing page (active subscriptions).
 
    The donor lands here from the one-shot URL in their email. The GET
    that rendered this page already burned the magic-link token, so
@@ -11,7 +11,7 @@
 
    Each subscription card has its own ``<form>`` so cancelling one
    donation does not affect the others.
-#}
+{% endcomment %}
 
 {% block title %}Your subscriptions · MerryMeal{% endblock %}
 
@@ -49,8 +49,8 @@
             Subscription <code>{{ d.stripe_subscription_id }}</code>
           </p>
 
-          {# Cancel form posts back to the same URL — the view re-decodes
-             the signed token, then calls ``cancel_subscription``. #}
+          {% comment %} Cancel form posts back to the same URL — the view re-decodes
+             the signed token, then calls ``cancel_subscription``. {% endcomment %}
           <form
             method="post"
             action="{% url 'donations:manage' token=token %}"

@@ -31,16 +31,16 @@
   the tracking sub-partial directly via its dedicated URL).
 {% endcomment %}
 
-{# === 4.11 feedback prompt — wraps 4.12's tracking partial so a
-       delivered stop swaps its live tracking for the feedback CTA. === #}
+{% comment %} === 4.11 feedback prompt — wraps 4.12's tracking partial so a
+       delivered stop swaps its live tracking for the feedback CTA. === {% endcomment %}
 {% if delivery %}
   {% if delivery.status == "delivered" %}
     <section class="mb-4" data-testid="feedback-section">
-      {# ``delivery.feedback`` is a reverse ``OneToOneField`` — Django's
+      {% comment %} ``delivery.feedback`` is a reverse ``OneToOneField`` — Django's
          template engine treats a missing related object as falsy
          (``DoesNotExist`` is swallowed by the variable resolver). So
          this conditional renders the thanks card if a row already
-         exists and the prompt if it doesn't. #}
+         exists and the prompt if it doesn't. {% endcomment %}
       {% if delivery.feedback %}
         {% include "delivery/member/_feedback_thanks.html" with already=True %}
       {% else %}

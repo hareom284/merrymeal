@@ -3,7 +3,7 @@
 
 {% block title %}My donations — MerryMeal{% endblock %}
 
-{# Story 6.3 — Donor history page.
+{% comment %} Story 6.3 — Donor history page.
 
    Mobile-first: the outer ``main`` in base.html already constrains
    width to ``max-w-md`` on small screens, so this template lays out as
@@ -18,7 +18,7 @@
    * ``failed`` / ``cancelled`` — red; donor may need to retry. We
      surface these (rather than hide them per the original spec) so
      donors are never left wondering why a charge "disappeared".
-#}
+{% endcomment %}
 {% block content %}
 <section class="flex w-full flex-col gap-6">
   <header class="flex flex-col gap-2">
