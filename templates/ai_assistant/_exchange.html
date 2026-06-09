@@ -7,12 +7,12 @@
   carry the load-bearing layout so a Tailwind purge can't break the
   bubble shape (same approach as the panel itself).
 {% endcomment %}
-<div style="display: flex; justify-content: flex-end;" data-testid="assistant-user-bubble">
+<div style="display: flex; justify-content: flex-end; flex-shrink: 0;" data-testid="assistant-user-bubble">
   <div style="background: #16a34a; color: white; border-radius: 16px; border-bottom-right-radius: 4px; padding: 8px 12px; font-size: 14px; max-width: 80%; word-break: break-word;">
     {{ message }}
   </div>
 </div>
-<div style="display: flex; justify-content: flex-start; align-items: flex-end; gap: 8px;" data-testid="assistant-reply-bubble">
+<div style="display: flex; justify-content: flex-start; align-items: flex-end; gap: 8px; flex-shrink: 0;" data-testid="assistant-reply-bubble">
   <img src="{% static 'img/logo.png' %}" alt="" aria-hidden="true"
        style="width: 28px; height: 28px; border-radius: 8px; object-fit: contain; flex-shrink: 0;">
   <div style="background: #f5f4f1; color: #1a1917; border-radius: 16px; border-bottom-left-radius: 4px; padding: 8px 12px; font-size: 14px; max-width: 75%; white-space: pre-wrap; word-break: break-word;">{{ reply }}</div>
