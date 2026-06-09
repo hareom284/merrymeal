@@ -92,16 +92,23 @@ def test_fs_list_filter_by_result(client):
 def test_fs_list_filter_by_date_range(client):
     admin = UserFactory(role="admin")
     kitchen = KitchenFactory(name="K")
-    today = timezone.now()
-    week_ago = today - timedelta(days=7)
+    # The list view interprets ``from``/``to`` query params as Melbourne
+    # local dates (admins type them into a form on a Melbourne-local
+    # page), so the test must compare against the Melbourne-local date
+    # too. Using ``timezone.now().date()`` would give the UTC date —
+    # which is one day behind in the late-UTC / early-AEDT window and
+    # would push the "recent" row outside the filter.
+    now = timezone.now()
+    today_local = timezone.localdate(now)
+    week_ago = now - timedelta(days=7)
     old = _make_check(kitchen=kitchen, checker=admin, when=week_ago)
-    recent = _make_check(kitchen=kitchen, checker=admin, when=today)
+    recent = _make_check(kitchen=kitchen, checker=admin, when=now)
     client.force_login(admin)
 
     # Only-today window
     response = client.get(
         "/admin/food_safety/",
-        {"from": today.date().isoformat(), "to": today.date().isoformat()},
+        {"from": today_local.isoformat(), "to": today_local.isoformat()},
     )
     body = response.content
     assert f"/admin/food_safety/{recent.id}/".encode() in body
