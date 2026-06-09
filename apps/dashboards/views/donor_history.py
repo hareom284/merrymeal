@@ -37,7 +37,11 @@ def donor_history_view(request):
     return render(
         request,
         "dashboards/donor/history.html",
-        {"donations": donations},
+        {
+            "donations": donations,
+            "active": "history",
+            "page_title": "My donations",
+        },
     )
 
 

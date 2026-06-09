@@ -40,5 +40,7 @@ def stock_receive_view(request):
             "form": form,
             "single_kitchen": single_kitchen,
             "just_created_id": request.GET.get("created"),
+            "active": "receive",
+            "page_title": "Receive stock",
         },
     )

@@ -12,7 +12,7 @@ def admin_home(request):
     return render(
         request,
         "dashboards/admin/home.html",
-        {"cards": cards},
+        {"cards": cards, "active": "home", "page_title": "Admin home"},
     )
 
 

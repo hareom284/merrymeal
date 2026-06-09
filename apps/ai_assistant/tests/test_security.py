@@ -15,7 +15,6 @@ from apps.ai_assistant.services.chat import (
     build_member_reply,
 )
 
-
 # ---- service-level sanitisation -------------------------------------
 
 def test_sanitise_redacts_data_block_delimiter():

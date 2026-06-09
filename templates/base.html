@@ -10,6 +10,8 @@
        at the foot of the page so the install prompt becomes available
        on Android Chrome and the homescreen icon appears on iOS Safari. {% endcomment %}
     <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'icons/favicon-32.png' %}" />
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'icons/favicon-16.png' %}" />
     <link rel="apple-touch-icon" href="{% static 'icons/apple-touch-icon.png' %}" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
@@ -54,6 +56,23 @@
       </div>
     {% endif %}
     <main class="mx-auto flex min-h-full {% block main_max_width %}max-w-md{% endblock %} flex-col px-4 py-8 sm:py-12">
+      {% block brand_header %}
+        {% comment %}
+          Default brand mark for every page that extends base.html
+          (login, password reset, apply flow, donations). Pages with
+          their own header — landing.html (has Log-in button) and
+          fy_receipt.html (print-optimised) — override this block to
+          empty so they don't double up.
+        {% endcomment %}
+        <a href="{% url 'dashboards:landing' %}"
+           class="self-center mb-6 flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green focus-visible:ring-offset-2 rounded-xl">
+          <img src="{% static 'img/logo.png' %}" alt="MerryMeal"
+               class="h-14 w-14 rounded-xl object-contain shrink-0">
+          <span class="text-xl font-semibold tracking-tight">
+            <span class="text-warm-900">Merry</span><span class="text-brand-green">Meal</span>
+          </span>
+        </a>
+      {% endblock %}
       {% block content %}{% endblock %}
     </main>
 

@@ -25,7 +25,11 @@ def outcomes(request):
 
     if request.GET.get("format") == "csv":
         return _csv_response(data)
-    return render(request, "dashboards/partner/outcomes.html", data)
+    return render(
+        request,
+        "dashboards/partner/outcomes.html",
+        {**data, "page_title": "Partner outcomes"},
+    )
 
 
 def _csv_response(data: dict) -> HttpResponse:

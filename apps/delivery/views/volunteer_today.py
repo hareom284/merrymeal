@@ -34,6 +34,8 @@ logger = logging.getLogger("merrymeal.pod")
 @role_required("volunteer")
 def today_view(request):
     context = get_today_route(request.user)
+    context["active"] = "today"
+    context["page_title"] = "Today"
     return render(request, "delivery/volunteer/today.html", context)
 
 

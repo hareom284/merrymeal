@@ -1,154 +1,138 @@
 {% extends "base.html" %}
-{% block title %}Get involved · MerryMeal{% endblock %}
-
-{# Mobile-first single column; cards stay full-width up to the default max-w-md. #}
+{% load static %}
+{% block title %}MerryMeal · Warm meals delivered with a friendly smile{% endblock %}
+{% block brand_header %}{% endblock %}
 
 {% block content %}
-<section class="flex flex-col gap-8">
+<section class="flex flex-col gap-10">
 
-  <!-- Brand mark -->
-  <div class="flex items-center gap-3">
-    <span aria-hidden="true"
-          class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-brand-green text-white font-bold shadow-sm">
-      M
-    </span>
-    <span class="text-xl font-semibold tracking-tight">
-      <span class="text-warm-900">Merry</span><span class="text-brand-green">Meal</span>
-    </span>
-  </div>
-
-  <!-- Heading -->
-  <header class="flex flex-col gap-2">
-    <p class="text-xs font-semibold uppercase tracking-[0.14em] text-brand-green">
-      Join the community
-    </p>
-    <h1 class="font-display text-3xl font-semibold leading-tight text-warm-900 sm:text-4xl">
-      How would you like to help?
-    </h1>
-    <p class="text-warm-600">Pick the one that fits.</p>
+  <header class="flex items-center justify-between">
+    <a href="{% url 'dashboards:landing' %}" class="flex items-center gap-2">
+      <img src="{% static 'img/logo.png' %}" alt="MerryMeal"
+           class="h-12 w-12 rounded-xl object-contain shrink-0">
+      <span class="text-lg font-semibold tracking-tight">
+        <span class="text-warm-900">Merry</span><span class="text-brand-green">Meal</span>
+      </span>
+    </a>
+    <a href="{% url 'accounts:login' %}"
+       class="text-sm font-semibold text-brand-green hover:text-brand-green-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green focus-visible:ring-offset-2 rounded">
+      Log in
+    </a>
   </header>
 
-  <!-- Role cards -->
-  <ul class="flex flex-col gap-3" aria-label="Ways to get involved">
+  <div class="flex flex-col gap-5">
+    <span class="inline-flex items-center gap-2 self-start rounded-full bg-brand-green/10 px-3 py-1 text-xs font-semibold tracking-wider text-brand-green">
+      <span aria-hidden="true" class="w-2 h-2 rounded-full bg-brand-green"></span>
+      5,000+ MEALS DAILY
+    </span>
+    <h1 class="font-display text-3xl font-semibold leading-tight text-warm-900 sm:text-4xl">
+      Warm meals delivered
+      <span class="block">with a <span class="text-brand-green">friendly smile.</span></span>
+    </h1>
+    <p class="text-warm-600 text-base sm:text-lg leading-relaxed">
+      Nutritious meals for seniors and anyone who can't cook for themselves right now.
+    </p>
 
-    {# Apply for meals — the primary CTA; greener accent + slightly stronger border. #}
-    <li>
+    <div class="flex flex-col gap-3 mt-2">
       <a href="/apply/"
-         class="group relative flex items-center gap-4 rounded-2xl border-2 border-brand-green/70 bg-white p-4 shadow-sm
-                transition hover:border-brand-green hover:shadow-md
-                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green focus-visible:ring-offset-2">
-        <span aria-hidden="true"
-              class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-brand-green/10 text-brand-green">
-          <svg class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"
-               stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 13c0-2 1.5-3 3-3h2l2-2a2 2 0 0 1 3 0l4 4a2 2 0 0 1-1.4 3.4H10"/>
-            <path d="M3 13v6h12v-3"/>
-            <path d="M14 7a3 3 0 1 1 4-4 3 3 0 0 1 4 4c0 3-4 6-4 6s-4-3-4-6z"/>
-          </svg>
-        </span>
-        <span class="flex-1 min-w-0">
-          <p class="font-display text-lg font-semibold text-warm-900">Apply for meals</p>
-          <p class="text-sm text-warm-600">For yourself.</p>
-        </span>
-        <svg aria-hidden="true" class="h-5 w-5 shrink-0 text-warm-400 transition-transform group-hover:translate-x-0.5"
-             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-             stroke-linecap="round" stroke-linejoin="round">
-          <path d="m9 6 6 6-6 6"/>
-        </svg>
+         class="inline-flex items-center justify-center rounded-xl bg-brand-green py-3.5 text-white text-base font-semibold shadow-sm hover:bg-brand-green-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green focus-visible:ring-offset-2 transition">
+        Apply for meals
       </a>
-    </li>
-
-    {# Caregiver — same shape as the others, no green ring. #}
-    <li>
-      <a href="/apply/?for_other=1"
-         class="group relative flex items-center gap-4 rounded-2xl border border-warm-200 bg-white p-4 shadow-sm
-                transition hover:border-warm-300 hover:shadow-md
-                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green focus-visible:ring-offset-2">
-        <span aria-hidden="true"
-              class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-brand-green/10 text-brand-green">
-          <svg class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"
-               stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="8" r="3.25"/>
-            <path d="M5 21c1-4 4-6 7-6s6 2 7 6"/>
-            <path d="M9 4.5h6"/>
-          </svg>
-        </span>
-        <span class="flex-1 min-w-0">
-          <p class="font-display text-lg font-semibold text-warm-900">I&rsquo;m a caregiver</p>
-          <p class="text-sm text-warm-600">Apply for someone you care for.</p>
-        </span>
-        <svg aria-hidden="true" class="h-5 w-5 shrink-0 text-warm-400 transition-transform group-hover:translate-x-0.5"
-             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-             stroke-linecap="round" stroke-linejoin="round">
-          <path d="m9 6 6 6-6 6"/>
-        </svg>
+      <a href="/donate/"
+         class="inline-flex items-center justify-center gap-2 rounded-xl bg-white border border-warm-300 py-3.5 text-base font-semibold text-warm-900 hover:border-brand-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green focus-visible:ring-offset-2 transition">
+        <svg class="w-4 h-4 text-brand-green" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21s-7-4.35-9.33-9.5a5.5 5.5 0 0 1 9.33-5 5.5 5.5 0 0 1 9.33 5C19 16.65 12 21 12 21z"/></svg>
+        Donate
       </a>
-    </li>
+    </div>
+  </div>
 
-    {# Volunteer — uses the email intake for now (matches the prior landing copy). #}
-    <li>
-      <a href="mailto:hello@merrymeal.org.au?subject=Volunteer%20intake"
-         class="group relative flex items-center gap-4 rounded-2xl border border-warm-200 bg-white p-4 shadow-sm
-                transition hover:border-warm-300 hover:shadow-md
-                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green focus-visible:ring-offset-2">
+  <div aria-hidden="true"
+       class="relative h-44 sm:h-56 rounded-3xl overflow-hidden bg-gradient-to-br from-warm-100 via-brand-green/10 to-warm-200 flex items-center justify-center">
+    <p class="text-xs font-semibold tracking-[0.2em] uppercase text-warm-500">Volunteer · Member</p>
+  </div>
+
+  <section class="flex flex-col gap-4">
+    <header class="flex flex-col gap-1">
+      <p class="text-xs font-semibold uppercase tracking-[0.18em] text-warm-500">How it works</p>
+      <h2 class="font-display text-2xl text-warm-900">Three caring steps</h2>
+    </header>
+
+    <ol class="flex flex-col gap-3">
+      <li class="rounded-2xl border border-warm-200 bg-white p-4 flex items-start gap-3">
         <span aria-hidden="true"
-              class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-brand-green/10 text-brand-green">
-          <svg class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"
-               stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="5.5" cy="17.5" r="3.25"/>
-            <circle cx="18.5" cy="17.5" r="3.25"/>
-            <path d="M5.5 17.5 9 9h4l2 4h3.5"/>
-            <path d="M11 9h-2"/>
-          </svg>
+              class="w-10 h-10 rounded-xl bg-brand-green/10 text-brand-green flex items-center justify-center shrink-0">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 2v6h6M8 13h8M8 17h6" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </span>
-        <span class="flex-1 min-w-0">
-          <p class="font-display text-lg font-semibold text-warm-900">Become a volunteer</p>
-          <p class="text-sm text-warm-600">Deliver meals near you.</p>
-        </span>
-        <svg aria-hidden="true" class="h-5 w-5 shrink-0 text-warm-400 transition-transform group-hover:translate-x-0.5"
-             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-             stroke-linecap="round" stroke-linejoin="round">
-          <path d="m9 6 6 6-6 6"/>
-        </svg>
-      </a>
-    </li>
-
-    {# Partner referral — Story 6.7 public form at /partners/refer/. #}
-    <li>
-      <a href="/partners/refer/"
-         class="group relative flex items-center gap-4 rounded-2xl border border-warm-200 bg-white p-4 shadow-sm
-                transition hover:border-warm-300 hover:shadow-md
-                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green focus-visible:ring-offset-2">
+        <div class="min-w-0">
+          <p class="font-semibold text-warm-900">01. Sign up &amp; assess</p>
+          <p class="text-sm text-warm-600 leading-relaxed mt-0.5">Quick online form. Capture your dietary needs.</p>
+        </div>
+      </li>
+      <li class="rounded-2xl border border-warm-200 bg-white p-4 flex items-start gap-3">
         <span aria-hidden="true"
-              class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-brand-green/10 text-brand-green">
-          <svg class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"
-               stroke-linecap="round" stroke-linejoin="round">
-            <path d="m3 12 4-4 5 5 5-5 4 4"/>
-            <path d="m7 12 3 3a2 2 0 0 0 3 0l1-1"/>
-            <path d="m17 12-3 3"/>
-          </svg>
+              class="w-10 h-10 rounded-xl bg-brand-green/10 text-brand-green flex items-center justify-center shrink-0">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 2v9M5 2v6a3 3 0 0 0 3 3M11 2v9M16 2v20" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </span>
-        <span class="flex-1 min-w-0">
-          <p class="font-display text-lg font-semibold text-warm-900">Partner with us</p>
-          <p class="text-sm text-warm-600">Hospital &middot; NGO &middot; kitchen.</p>
+        <div class="min-w-0">
+          <p class="font-semibold text-warm-900">02. Meals planned weekly</p>
+          <p class="text-sm text-warm-600 leading-relaxed mt-0.5">Cooked in our kitchens. Always allergen-checked.</p>
+        </div>
+      </li>
+      <li class="rounded-2xl border border-warm-200 bg-white p-4 flex items-start gap-3">
+        <span aria-hidden="true"
+              class="w-10 h-10 rounded-xl bg-brand-green/10 text-brand-green flex items-center justify-center shrink-0">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 3h15v13H1zM16 8h4l3 3v5h-7" stroke-linecap="round" stroke-linejoin="round"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
         </span>
-        <svg aria-hidden="true" class="h-5 w-5 shrink-0 text-warm-400 transition-transform group-hover:translate-x-0.5"
-             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-             stroke-linecap="round" stroke-linejoin="round">
-          <path d="m9 6 6 6-6 6"/>
-        </svg>
-      </a>
-    </li>
-  </ul>
+        <div class="min-w-0">
+          <p class="font-semibold text-warm-900">03. Delivered with care</p>
+          <p class="text-sm text-warm-600 leading-relaxed mt-0.5">A friendly volunteer brings your meal to the door.</p>
+        </div>
+      </li>
+    </ol>
+  </section>
 
-  <!-- Sign in -->
-  <p class="text-center text-sm text-warm-600">
-    Already a member?
-    <a href="{% url 'accounts:login' %}"
-       class="font-semibold text-brand-green underline-offset-4 hover:text-brand-green-hover hover:underline">
-      Sign in
-    </a>
-  </p>
+  {% comment %}
+    Other ways to help — the original landing was a 4-card role picker
+    (member / caregiver / volunteer / partner). The redesign promotes
+    member-first CTAs above; this section keeps the other entry-points
+    reachable so charities, carers, and volunteers can still self-serve
+    without needing to email the team.
+  {% endcomment %}
+  <section class="flex flex-col gap-3 border-t border-warm-200 pt-6">
+    <p class="text-xs font-semibold uppercase tracking-[0.18em] text-warm-500">Other ways to help</p>
+    <ul class="flex flex-col gap-2">
+      <li>
+        <a href="/apply/?for_other=1"
+           class="flex items-center gap-3 rounded-xl p-3 hover:bg-warm-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green">
+          <span class="w-9 h-9 rounded-lg bg-warm-100 text-warm-700 flex items-center justify-center shrink-0">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="7" r="4"/><path d="M3 21a6 6 0 0 1 12 0M16 11l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+          <span class="flex-1 text-sm text-warm-800">I'm a caregiver applying for someone</span>
+          <svg class="w-4 h-4 text-warm-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </li>
+      <li>
+        <a href="mailto:hello@merrymeal.org.au?subject=Become%20a%20volunteer"
+           class="flex items-center gap-3 rounded-xl p-3 hover:bg-warm-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green">
+          <span class="w-9 h-9 rounded-lg bg-warm-100 text-warm-700 flex items-center justify-center shrink-0">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 3h15v13H1zM16 8h4l3 3v5h-7" stroke-linecap="round" stroke-linejoin="round"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+          </span>
+          <span class="flex-1 text-sm text-warm-800">Become a volunteer driver</span>
+          <svg class="w-4 h-4 text-warm-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </li>
+      <li>
+        <a href="/partners/refer/"
+           class="flex items-center gap-3 rounded-xl p-3 hover:bg-warm-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green">
+          <span class="w-9 h-9 rounded-lg bg-warm-100 text-warm-700 flex items-center justify-center shrink-0">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v3M12 14v3M16 14v3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+          <span class="flex-1 text-sm text-warm-800">Partner with us (charities &amp; clinicians)</span>
+          <svg class="w-4 h-4 text-warm-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </li>
+    </ul>
+  </section>
 
 </section>
 {% endblock %}

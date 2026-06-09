@@ -71,6 +71,8 @@ def admin_applications_list(request):
         "cities": list(City.objects.order_by("name")),
         "selected_city": int(selected_city) if selected_city else None,
         "has_allergies": has_allergies,
+        "active": "applications",
+        "page_title": "Applications",
     }
     return render(
         request, "dashboards/admin/applications_list.html", context
@@ -103,6 +105,8 @@ def admin_application_detail(request, pk: int):
             "diet_chips": diet_chips,
             "allergy_chips": allergy_chips,
             "reject_error": request.GET.get("reject_error", ""),
+            "active": "applications",
+            "page_title": application.full_name,
         },
     )
 
@@ -145,6 +149,8 @@ def admin_application_reject(request, pk: int):
                 "diet_chips": [],
                 "allergy_chips": [],
                 "reject_error": "Please provide a reason.",
+                "active": "applications",
+                "page_title": application.full_name,
             },
             status=200,
         )

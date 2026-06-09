@@ -69,5 +69,7 @@ def audit_viewer(request):
             },
             "action_options": ACTION_OPTIONS,
             "base_querystring": base_querystring,
+            "active": "audit",
+            "page_title": "Audit log",
         },
     )

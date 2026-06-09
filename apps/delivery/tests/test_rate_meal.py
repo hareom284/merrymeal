@@ -1,5 +1,4 @@
 """Tests for the standalone rate-meal page (Story 12.8)."""
-import datetime as dt
 
 import pytest
 

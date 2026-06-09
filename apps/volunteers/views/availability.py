@@ -31,7 +31,11 @@ def availability_view(request):
         }
         for day, label in Availability.DAY_OF_WEEK_CHOICES
     ]
-    return render(request, "volunteers/availability.html", {"grid": grid})
+    return render(
+        request,
+        "volunteers/availability.html",
+        {"grid": grid, "active": "availability", "page_title": "Availability"},
+    )
 
 
 @login_required

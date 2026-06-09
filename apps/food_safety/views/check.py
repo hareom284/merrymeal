@@ -38,4 +38,6 @@ def check_view(request):
         "form": form,
         "kitchen_form": kitchen_form,
         "today_rows": today_checks_for(request.user),
+        "active": "safety",
+        "page_title": "Food safety check",
     })
