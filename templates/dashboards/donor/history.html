@@ -53,13 +53,13 @@
               {{ d.get_status_display }}
             </span>
 
-            {# TODO(story 6.4): point at ``dashboards:donor_receipt`` once
-               the receipt-detail view exists. Until then, ``#`` keeps
-               the link visible (so the design is correct) without a
-               NoReverseMatch crash. Only completed/refunded donations
-               can be receipted; the rest hide the link entirely. #}
+            {% comment %} Links to the per-FY tax receipt page (Story 6.4). The
+               view annotates each donation with ``.fy`` (the FY ending
+               year) so the URL reverses correctly per row. Only
+               completed / refunded donations can be receipted; the rest
+               hide the link entirely. {% endcomment %}
             {% if d.status == 'completed' or d.status == 'refunded' %}
-              <a href="#"
+              <a href="{% url 'dashboards:donor_fy_receipt' d.fy %}"
                  class="inline-flex min-h-[44px] items-center text-sm font-medium text-brand-green underline">
                 Tax receipt &rarr;
               </a>
