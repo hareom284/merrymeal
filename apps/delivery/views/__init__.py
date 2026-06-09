@@ -1,6 +1,7 @@
 from apps.delivery.views.admin_reassign import reassign_view
 from apps.delivery.views.admin_today import admin_today_view
 from apps.delivery.views.feedback import feedback_view
+from apps.delivery.views.rate import rate_meal_view
 from apps.delivery.views.tracking import tracking_status_view
 from apps.delivery.views.volunteer_today import (
     mark_delivered_view,
@@ -13,6 +14,7 @@ __all__ = [
     "feedback_view",
     "mark_delivered_view",
     "mark_failed_view",
+    "rate_meal_view",
     "reassign_view",
     "today_view",
     "tracking_status_view",

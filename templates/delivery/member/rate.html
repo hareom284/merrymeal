@@ -1,0 +1,51 @@
+{% extends "app_base.html" %}
+{% block title %}Rate your meal &middot; MerryMeal{% endblock %}
+
+{% block content %}
+<div class="flex flex-col gap-6 max-w-2xl mx-auto">
+
+  <a href="{% url 'dashboards:member' %}"
+     class="inline-flex items-center gap-2 text-sm font-medium text-warm-700 hover:text-warm-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green focus-visible:ring-offset-2 rounded"
+     aria-label="Back to dashboard">
+    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m15 18-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Back
+  </a>
+
+  <header class="px-1">
+    <h1 class="font-display text-2xl text-warm-900">Rate your meal</h1>
+    <p class="text-warm-500 text-sm mt-0.5">A quick rating helps the kitchen plan better.</p>
+  </header>
+
+  <section class="card overflow-hidden p-0">
+    <div class="h-24 bg-gradient-to-br from-warm-100 to-warm-200 flex items-end justify-start p-4">
+      <p class="text-xs font-semibold tracking-widest uppercase text-warm-600 bg-white/80 rounded-full px-3 py-1">
+        Delivered {{ delivery.scheduled_date|date:"D d M" }}
+      </p>
+    </div>
+    <div class="p-4">
+      <h2 class="font-display text-xl text-warm-900">{{ meal.name }}</h2>
+      {% if meal.description %}
+        <p class="text-sm text-warm-600 leading-relaxed mt-1">{{ meal.description }}</p>
+      {% endif %}
+    </div>
+  </section>
+
+  {% if already_rated %}
+    <section class="card p-4 text-center">
+      <p class="font-display text-lg text-warm-900">Thanks — we already have your rating.</p>
+      <p class="text-sm text-warm-600 mt-1">Want to change something? Call the office on (555) 444-MEAL.</p>
+      <a href="{% url 'dashboards:member' %}"
+         class="mt-4 inline-flex min-h-[44px] items-center justify-center rounded-xl bg-brand-green px-5 text-sm font-semibold text-white hover:bg-brand-green-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green focus-visible:ring-offset-2">
+        Back to dashboard
+      </a>
+    </section>
+  {% else %}
+    {% include "delivery/member/_feedback_card.html" with delivery=delivery tag_choices=tag_choices %}
+    <a href="{% url 'dashboards:member' %}"
+       class="text-center text-sm font-medium text-warm-600 hover:text-warm-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green focus-visible:ring-offset-2 rounded">
+      Skip for now
+    </a>
+  {% endif %}
+
+</div>
+{% endblock %}
