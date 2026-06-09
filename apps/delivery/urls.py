@@ -14,6 +14,7 @@ Reverse names:
     * ``delivery:admin_today``        — Story 4.14
     * ``delivery:admin_reassign``     — Story 4.14
     * ``delivery:rate_meal``          — Story 12.8
+    * ``delivery:member_track``       — Story 12.7
 """
 from django.urls import path
 
@@ -22,6 +23,7 @@ from apps.delivery.views import (
     feedback_view,
     mark_delivered_view,
     mark_failed_view,
+    member_track_view,
     rate_meal_view,
     reassign_view,
     today_view,
@@ -63,6 +65,8 @@ urlpatterns = [
         rate_meal_view,
         name="rate_meal",
     ),
+    # --- Full-page track delivery (Story 12.7) ------------------------
+    path("track/", member_track_view, name="member_track"),
     # --- Admin reassign widget (Story 4.14) ---------------------------
     path("admin/today/", admin_today_view, name="admin_today"),
     path(

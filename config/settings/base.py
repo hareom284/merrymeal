@@ -253,3 +253,9 @@ Q_CLUSTER = {
     "queue_limit": 50,
     "label": "Django Q",
 }
+
+# Mapbox Static Images API token (Story 12.7 — the member track-delivery
+# page renders an <img> against this token). Leave unset in dev/test so
+# ``static_map_url`` returns ``None`` and the template falls back to a
+# stylised placeholder block — no broken images, no failing tests.
+MAPBOX_TOKEN = env("MAPBOX_TOKEN", default="")

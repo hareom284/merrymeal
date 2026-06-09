@@ -46,7 +46,7 @@ def admin_expiring_stock(request):
     return render(
         request,
         "dashboards/admin/attention_expiring_stock.html",
-        {"page_title": "Expiring stock", "batches": batches, "today": today},
+        {"page_title": "Expiring stock", "batches": batches, "today": today, "active": "home"},
     )
 
 
@@ -72,6 +72,7 @@ def admin_failed_deliveries_today(request):
             "page_title": "Failed deliveries today",
             "deliveries": deliveries,
             "today": today,
+            "active": "home",
         },
     )
 
@@ -109,6 +110,7 @@ def admin_unassigned_deliveries_today(request):
             "page_title": "Unassigned deliveries today",
             "deliveries": deliveries,
             "today": today,
+            "active": "home",
         },
     )
 
@@ -135,5 +137,6 @@ def admin_fs_failures_recent(request):
             "page_title": "Recent food-safety failures",
             "checks": checks,
             "since": since,
+            "active": "home",
         },
     )
