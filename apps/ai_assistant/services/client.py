@@ -70,18 +70,26 @@ def generate(
         },
     }
 
-    # Gemini API keys start with ``AIza``; OAuth tokens (``AQ.Ab...``,
-    # ``ya29...``) and service-account tokens use different endpoints
-    # entirely and will 401 here. Fail loud and early so the operator
-    # gets a clear hint in the log instead of a silent fallback reply.
-    if not api_key.startswith("AIza"):
+    # Valid Gemini-capable keys come in two flavours:
+    #   * AI Studio keys ``AIzaSy...`` — free tier, easy path, the one
+    #     we recommend.
+    #   * Google Cloud API keys ``AQ.Ab...`` — work IF the project has
+    #     the "Generative Language API" enabled. Useful when the
+    #     charity already has a GCP project for other services.
+    # Anything else (OAuth access tokens ``ya29...``, service-account
+    # JSON, raw bearer tokens) belongs at a different endpoint and
+    # will 401 here. Warn early so the operator sees the cause in the
+    # log instead of a silent fallback.
+    _VALID_PREFIXES = ("AIza", "AQ.")
+    if not any(api_key.startswith(p) for p in _VALID_PREFIXES):
         logger.warning(
-            "GEMINI_API_KEY does not look like a Gemini key "
-            "(should start with 'AIza...'). Got prefix=%r. "
-            "Generate one at https://aistudio.google.com/apikey.",
+            "GEMINI_API_KEY does not look like a Gemini-capable key "
+            "(expected prefix 'AIza...' from AI Studio or 'AQ....' "
+            "from Google Cloud). Got prefix=%r. Generate one at "
+            "https://aistudio.google.com/apikey.",
             api_key[:6],
         )
-        raise GeminiUnavailable("wrong key format (expected 'AIza...')")
+        raise GeminiUnavailable("wrong key format (expected 'AIza...' or 'AQ....')")
 
     try:
         response = requests.post(
