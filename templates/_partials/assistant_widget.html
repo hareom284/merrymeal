@@ -1,102 +1,33 @@
+{% load static %}
 {% comment %}
   Floating "Ask MerryMeal" chat widget. Visible on every authenticated
-  page that extends ``app_base.html`` so a member can ask about today's
-  meal from anywhere in the app shell (dashboard, menu, profile, help).
+  page that extends ``app_base.html``.
 
-  Hidden for non-members for now — the system prompt and the data
-  context are member-shaped, and asking an admin "what's your meal
-  today?" would surface confusing empty data. A separate admin command
-  bar will land in a follow-up commit.
+  Members see a meal/delivery-focused assistant; admins see an
+  operations command bar pointed at the attention-card counters
+  (failed deliveries, expiring stock, etc.). Both share the same
+  panel partial — only the POST URL, header copy and placeholder text
+  change per role.
 
   Interaction:
     * Floating green bubble (bottom-right) toggles a panel.
     * Panel has a scrolling chat log + a single-line input.
-    * Submit POSTs to ``ai_assistant:chat`` via HTMX; the response is
+    * Submit POSTs to ``ai_assistant:chat`` (member) or
+      ``ai_assistant:admin_chat`` (admin) via HTMX; the response is
       an ``_exchange.html`` partial that HTMX appends to ``#chat-log``.
+    * Session-backed history is read server-side, so follow-up
+      questions ("and tomorrow?") get the right context.
+    * "Clear" button wipes the server-side history (POST
+      ``ai_assistant:clear``, returns 204) and the visible log.
     * Auto-scrolls to the bottom after each swap so the freshest
       assistant bubble is always visible.
 {% endcomment %}
-{% if request.user.is_authenticated and request.user.role == "member" %}
-<div
-  x-data="{
-    open: false,
-    scrollBottom() {
-      const log = document.getElementById('assistant-chat-log');
-      if (log) log.scrollTop = log.scrollHeight;
-    }
-  }"
-  class="fixed z-40 right-4 bottom-24 md:bottom-6"
->
-  <button
-    type="button"
-    @click="open = !open; $nextTick(() => scrollBottom())"
-    class="w-14 h-14 rounded-full bg-brand-green text-white shadow-lg flex items-center justify-center hover:bg-brand-green-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green focus-visible:ring-offset-2"
-    aria-label="Open MerryMeal assistant"
-  >
-    <svg x-show="!open" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-    <svg x-show="open" x-cloak class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-      <path d="M18 6 6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-  </button>
-
-  <div
-    x-show="open"
-    x-cloak
-    x-transition.opacity
-    class="absolute bottom-16 right-0 w-80 max-w-[calc(100vw-2rem)] h-[28rem] max-h-[calc(100vh-10rem)] bg-white rounded-2xl shadow-xl border border-warm-200 flex flex-col overflow-hidden"
-  >
-    <header class="flex items-center gap-2 px-3 py-2 border-b border-warm-200 bg-warm-50">
-      <span aria-hidden="true" class="w-8 h-8 rounded-lg bg-brand-green text-white flex items-center justify-center font-bold text-sm">M</span>
-      <div class="min-w-0">
-        <p class="font-display text-sm text-warm-900 leading-tight">Ask MerryMeal</p>
-        <p class="text-[11px] text-warm-500 leading-tight">Powered by Gemini · answers from your live data</p>
-      </div>
-    </header>
-
-    <div
-      id="assistant-chat-log"
-      class="flex-1 overflow-y-auto p-3 space-y-3 text-sm"
-    >
-      <div class="bg-warm-100 text-warm-900 rounded-2xl rounded-bl-sm px-3 py-2 max-w-[80%]">
-        Hi {{ request.user.full_name|default:"there"|cut:" "|slice:":12" }}! Ask me about today's meal, your delivery, or this week's menu.
-      </div>
-    </div>
-
-    <form
-      hx-post="{% url 'ai_assistant:chat' %}"
-      hx-target="#assistant-chat-log"
-      hx-swap="beforeend"
-      hx-on::after-request="this.reset(); document.getElementById('assistant-chat-log').scrollTop = document.getElementById('assistant-chat-log').scrollHeight;"
-      hx-indicator="#assistant-typing"
-      class="border-t border-warm-200 p-2 flex items-center gap-2"
-    >
-      {% csrf_token %}
-      <input
-        type="text"
-        name="message"
-        placeholder="Type a question..."
-        required
-        maxlength="600"
-        autocomplete="off"
-        class="flex-1 min-w-0 rounded-lg border border-warm-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-green"
-      />
-      <button
-        type="submit"
-        class="rounded-lg bg-brand-green text-white px-3 py-2 text-sm font-medium hover:bg-brand-green-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green focus-visible:ring-offset-2"
-        aria-label="Send"
-      >
-        Send
-      </button>
-    </form>
-
-    <p
-      id="assistant-typing"
-      class="htmx-indicator px-3 py-1 text-[11px] text-warm-500 border-t border-warm-200 bg-warm-50"
-    >
-      MerryMeal is thinking...
-    </p>
-  </div>
-</div>
+{% if request.user.is_authenticated %}
+  {% if request.user.role == "member" %}
+    {% url 'ai_assistant:chat' as assistant_post_url %}
+    {% include "_partials/_assistant_widget_panel.html" with assistant_post_url=assistant_post_url assistant_title="Ask MerryMeal" assistant_subtitle="Powered by Gemini · answers from your live data" assistant_placeholder="Ask about your meal or delivery..." assistant_intro="Ask me about today's meal, your delivery, or this week's menu." %}
+  {% elif request.user.role == "admin" %}
+    {% url 'ai_assistant:admin_chat' as assistant_post_url %}
+    {% include "_partials/_assistant_widget_panel.html" with assistant_post_url=assistant_post_url assistant_title="Ops assistant" assistant_subtitle="Powered by Gemini · live attention-card data" assistant_placeholder="How many failed deliveries today?" assistant_intro="Ask about failed or unassigned deliveries, expiring stock, food-safety failures, or pending applications." %}
+  {% endif %}
 {% endif %}
