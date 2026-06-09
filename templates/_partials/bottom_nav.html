@@ -1,33 +1,23 @@
 {% comment %}
   Mobile bottom tab bar. Visible <md, hidden on desktop (sidebar takes
   over). Items come from `nav_items`; pass `active` via {% include %}
-  `with` to highlight the current tab. Sign-out is the final cell so
-  members always have one tap to log out without opening a drawer.
+  `with` to highlight the current tab. Sign-out lives in the Profile
+  tab (Story 12.4) so the bar can stay a clean role-specific tab strip.
 {% endcomment %}
 {% if request.user.is_authenticated and nav_items %}
 <nav class="md:hidden fixed inset-x-0 bottom-0 z-40 bg-white border-t border-warm-200 pb-[env(safe-area-inset-bottom)]"
      aria-label="Primary">
-  <ul class="grid grid-flow-col auto-cols-fr">
+  <ul class="flex items-stretch w-full m-0 p-0 list-none">
     {% for item in nav_items %}
-      <li>
+      <li class="flex-1 min-w-0">
         <a href="{% url item.url_name %}"
-           class="flex flex-col items-center justify-center gap-1 py-2 text-xs
+           class="flex flex-col items-center justify-center gap-1 py-2 text-xs w-full
                   {% if active == item.key %}text-brand-green font-semibold{% else %}text-warm-600{% endif %}">
           {% include "_partials/nav_icon.html" with name=item.icon class="w-6 h-6" %}
           <span>{{ item.label }}</span>
         </a>
       </li>
     {% endfor %}
-    <li>
-      <form method="post" action="{% url 'accounts:logout' %}" class="m-0 h-full">
-        {% csrf_token %}
-        <button type="submit"
-                class="w-full h-full flex flex-col items-center justify-center gap-1 py-2 text-xs text-warm-600">
-          <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          <span>Sign out</span>
-        </button>
-      </form>
-    </li>
   </ul>
 </nav>
 {% endif %}

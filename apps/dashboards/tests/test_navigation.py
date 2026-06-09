@@ -28,10 +28,13 @@ def test_anonymous_user_gets_no_nav_items():
 
 
 @pytest.mark.django_db
-def test_member_nav_has_dashboard_and_donate():
+def test_member_nav_matches_mockup_tabs():
+    """Story 12.1 — bottom tabs are Home / Menu / Profile / Help.
+    Donate moved out (donors have their own dashboard); Sign-out moved
+    into the Profile page so the bar stays a 4-tab strip."""
     user = UserFactory(role="member")
     keys = [item.key for item in get_nav_items(user)]
-    assert keys == ["dashboard", "donate"]
+    assert keys == ["dashboard", "menu", "profile", "help"]
 
 
 @pytest.mark.django_db
@@ -70,6 +73,24 @@ def test_member_dashboard_renders_bottom_nav(client):
     assert b'aria-label="Primary"' in response.content
     # Confirm at least one nav item link is present (Dashboard).
     assert b"/dashboard/" in response.content
+
+
+@pytest.mark.django_db
+def test_bottom_nav_uses_horizontal_flex_layout():
+    """Regression: previously used ``grid grid-flow-col auto-cols-fr``,
+    but those classes weren't in the compiled Tailwind ``output.css`` so
+    the <ul> fell back to ``display: block`` and the tabs stacked
+    vertically. Stick to plain ``flex`` + ``flex-1`` (always compiled)."""
+    member = UserFactory.build(role="member")
+    context = {
+        "request": _RequestStub(member),
+        "nav_items": get_nav_items(member),
+        "active": "dashboard",
+    }
+    html = render_to_string("_partials/bottom_nav.html", context)
+    assert 'class="flex' in html
+    assert "flex-1" in html
+    assert "grid-flow-col" not in html
 
 
 @pytest.mark.django_db
