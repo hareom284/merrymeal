@@ -37,6 +37,10 @@ urlpatterns = [
     # Story 6.7 — public ``/partners/refer/`` form for charity
     # social workers to submit referrals on behalf of a member.
     path("partners/", include("apps.accounts.urls.partner_referral")),
+    # Public ``/apply-partner/`` form — charities & clinicians register
+    # their org. Lands as an ``Application`` row with
+    # ``metadata["kind"] == "partner_signup"`` for admin triage.
+    path("apply-partner/", include("apps.accounts.urls.partner_signup")),
     # Sprint 09 — donations app routes. Mounted at the project root so
     # ``/stripe/webhook/`` (Story 5.4) matches the URL we configure in
     # the Stripe dashboard; the donate / impact / thanks / manage routes

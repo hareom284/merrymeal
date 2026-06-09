@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Thank you — MerryMeal{% endblock %}
+
+{% block content %}
+<section class="mx-auto flex w-full max-w-md flex-col gap-6 px-4 py-12 text-center">
+  <span class="mx-auto inline-flex w-14 h-14 items-center justify-center rounded-full bg-brand-green/10 text-brand-green">
+    <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+      <path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </span>
+  <header>
+    <h1 class="font-display text-3xl font-semibold text-warm-900">Thank you — application received</h1>
+    <p class="mt-3 text-warm-600">
+      We've logged your organisation's application. A MerryMeal admin
+      will review it and reach out by email within a few business days
+      to set up your partner account.
+    </p>
+  </header>
+  <a href="/" class="text-sm font-medium text-brand-green hover:underline">
+    ← Back to home
+  </a>
+</section>
+{% endblock %}

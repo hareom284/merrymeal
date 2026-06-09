@@ -73,6 +73,14 @@ python scripts/check_env_example.py
 python manage.py seed_cities
 python manage.py seed_dietary
 python manage.py seed_ingredients
+python manage.py seed_kitchens
+python manage.py seed_meals
+python manage.py seed_addresses        # gives every member a primary address (needs seed_cities + users)
+python manage.py seed_availability     # gives every volunteer 7 days x 3 phrases
+python manage.py seed_meal_plans       # publishes one MealPlan per kitchen for today
+
+# Or run everything (admin, lookups, users, addresses, availability, meals, meal plans) in one shot
+DJANGO_ADMIN_PASSWORD=... python manage.py seed_all
 
 # Run dev server (MySQL via Docker compose; see README)
 python manage.py runserver

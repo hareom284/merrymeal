@@ -385,6 +385,51 @@ def create_partner_referral(
     )
 
 
+def create_partner_signup(
+    *,
+    org_legal_name: str,
+    org_type: str,
+    contact_name: str,
+    contact_email: str,
+    contact_phone: str = "",
+    message: str = "",
+) -> Application:
+    """Persist a public partner-org signup as a SUBMITTED application.
+
+    The ``Partner`` schema is locked to ``legal_name + type`` — no
+    columns for status, contact, or description — so we cannot land a
+    pending Partner row directly. Instead the submission lives on the
+    existing ``Application`` table with ``metadata["kind"]`` set to
+    ``"partner_signup"`` and the org-specific fields nested under
+    ``metadata``. The Application's own ``full_name`` / ``email`` /
+    ``dob`` columns hold the *contact person's* details so the row is
+    still discoverable in the admin application inbox.
+
+    ``dob`` is a NOT NULL column on Application; partner-org signups
+    don't carry a date of birth, so we use ``date.today()`` as a
+    sentinel. Admins distinguish partner signups by inspecting
+    ``metadata["kind"]``.
+
+    On approval an admin manually creates the ``Partner`` row via the
+    existing ``dashboards:admin_partner_create`` page, copying
+    ``org_legal_name`` and ``org_type`` from this metadata.
+    """
+    return Application.objects.create(
+        full_name=contact_name.strip(),
+        email=(contact_email or "").strip().lower(),
+        dob=date.today(),
+        phone=(contact_phone or "").strip() or None,
+        status=Application.STATUS_SUBMITTED,
+        metadata={
+            "kind": "partner_signup",
+            "org_legal_name": org_legal_name.strip(),
+            "org_type": org_type,
+            "contact_phone": (contact_phone or "").strip(),
+            "message": (message or "").strip(),
+        },
+    )
+
+
 def reject_application(application: Application, admin_user, *, reason: str) -> Application:
     from auditlog.context import set_actor
     from django.db import transaction

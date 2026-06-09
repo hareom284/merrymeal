@@ -1,0 +1,54 @@
+{% extends "app_base.html" %}
+{% block title %}Edit dietary preferences · MerryMeal{% endblock %}
+
+{% block content %}
+<div class="flex flex-col gap-5 max-w-2xl mx-auto">
+  <header>
+    <h1 class="font-display text-2xl text-warm-900">Edit dietary preferences</h1>
+    <p class="text-sm text-warm-500 mt-1">
+      Tell us what you eat and what to avoid. The kitchen uses this when planning your meals.
+    </p>
+  </header>
+
+  <form method="post" class="flex flex-col gap-5">
+    {% csrf_token %}
+
+    <section class="rounded-2xl bg-white border border-warm-200 p-5">
+      <p class="text-xs uppercase tracking-wider text-warm-500 mb-3">Diet</p>
+      <div class="flex flex-col gap-2">
+        {% for choice in form.diet_preferences %}
+          <label class="flex items-center gap-3 min-h-[44px] text-sm text-warm-900 cursor-pointer">
+            {{ choice.tag }}
+            <span>{{ choice.choice_label }}</span>
+          </label>
+        {% endfor %}
+      </div>
+      {{ form.diet_preferences.errors }}
+    </section>
+
+    <section class="rounded-2xl bg-white border border-warm-200 p-5">
+      <p class="text-xs uppercase tracking-wider text-warm-500 mb-3">Allergies</p>
+      <div class="flex flex-col gap-2">
+        {% for choice in form.allergies %}
+          <label class="flex items-center gap-3 min-h-[44px] text-sm text-warm-900 cursor-pointer">
+            {{ choice.tag }}
+            <span>{{ choice.choice_label }}</span>
+          </label>
+        {% endfor %}
+      </div>
+      {{ form.allergies.errors }}
+    </section>
+
+    <div class="flex gap-3">
+      <button type="submit"
+              class="flex-1 rounded-2xl bg-brand-green py-3 text-sm font-semibold text-white hover:bg-brand-green-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green min-h-[44px]">
+        Save changes
+      </button>
+      <a href="{% url 'dashboards:member_profile' %}"
+         class="flex-1 rounded-2xl border border-warm-300 bg-white py-3 text-sm font-semibold text-warm-800 hover:border-brand-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green min-h-[44px] flex items-center justify-center">
+        Cancel
+      </a>
+    </div>
+  </form>
+</div>
+{% endblock %}

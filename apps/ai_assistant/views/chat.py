@@ -20,8 +20,8 @@ from apps.ai_assistant.services.rate_limit import check as check_rate_limit
 from apps.core.decorators import role_required
 
 _MAX_MESSAGE_LEN = 600
-# Six entries = three user/model exchange pairs. Keeps follow-up
-# questions ("and tomorrow?") working without ballooning the Gemini
+# Six entries = three user/assistant exchange pairs. Keeps follow-up
+# questions ("and tomorrow?") working without ballooning the Claude
 # request: every turn re-sends the per-request data snapshot in the
 # system prompt, so old history is mostly redundant after a few turns.
 _HISTORY_MAX_TURNS = 6
@@ -31,7 +31,7 @@ _ADMIN_HISTORY_KEY = "ai_admin_history"
 # Strip ASCII control characters (0x00-0x1F + 0x7F) except newline and
 # tab. Without this, a member could paste an OS escape sequence or a
 # null byte into the message and the bytes would flow through to the
-# Gemini request unchanged; Gemini ignores them but the dev log shows
+# Claude request unchanged; Claude ignores them but the dev log shows
 # garbage. Newlines stay so multi-line questions render properly.
 _CTRL_CHARS_RE = re.compile(r"[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]")
 
@@ -99,7 +99,7 @@ def chat_send(request):
     reply = build_member_reply(request.user, message, history=history)
 
     _append_turn(request.session, _MEMBER_HISTORY_KEY, "user", message)
-    _append_turn(request.session, _MEMBER_HISTORY_KEY, "model", reply)
+    _append_turn(request.session, _MEMBER_HISTORY_KEY, "assistant", reply)
 
     return render(
         request,
@@ -127,7 +127,7 @@ def admin_chat_send(request):
     reply = build_admin_reply(request.user, message, history=history)
 
     _append_turn(request.session, _ADMIN_HISTORY_KEY, "user", message)
-    _append_turn(request.session, _ADMIN_HISTORY_KEY, "model", reply)
+    _append_turn(request.session, _ADMIN_HISTORY_KEY, "assistant", reply)
 
     return render(
         request,

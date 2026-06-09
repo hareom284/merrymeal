@@ -1,12 +1,14 @@
-"""Thin Gemini REST client.
+"""Thin Anthropic Messages API client.
 
-No dependency on ``google-generativeai`` so we keep the install footprint
-small — the official SDK pulls in grpc, protobuf, and a chain of
-google-auth packages just to wrap the same JSON endpoint we hit here.
+No dependency on the ``anthropic`` SDK so we keep the install footprint
+small — the official SDK pulls in httpx, pydantic, anyio, and a chain
+of typing-compat packages just to wrap the same JSON endpoint we hit
+here. The Messages API is stable and well documented; speaking HTTP
+directly is roughly fifty lines of code.
 
-Raises :class:`GeminiUnavailable` on every failure mode (missing key,
-network error, malformed response, safety block). The caller is
-expected to catch this and degrade gracefully — never let a flaky
+Raises :class:`ClaudeUnavailable` on every failure mode (missing key,
+network error, malformed response, safety stop, refusal). The caller
+is expected to catch this and degrade gracefully — never let a flaky
 upstream surface as a 500.
 """
 from __future__ import annotations
@@ -18,16 +20,21 @@ from django.conf import settings
 
 logger = logging.getLogger("merrymeal.ai_assistant")
 
-_ENDPOINT = (
-    "https://generativelanguage.googleapis.com/v1beta/models/"
-    "{model}:generateContent"
-)
+_ENDPOINT = "https://api.anthropic.com/v1/messages"
+_API_VERSION = "2023-06-01"
 _TIMEOUT_SECONDS = 15
 _MAX_OUTPUT_TOKENS = 512
 _TEMPERATURE = 0.7
 
+# History uses the role name ``"assistant"`` for prior model turns —
+# that matches the Anthropic Messages API and the role name we store
+# in the session. ``"model"`` is accepted as a legacy alias from older
+# session payloads, so a logged-in member with a half-finished
+# transcript doesn't lose their history on deploy.
+_ASSISTANT_ROLES = {"assistant", "model"}
 
-class GeminiUnavailable(Exception):
+
+class ClaudeUnavailable(Exception):
     """Raised on any failure path. The message is for logs, not users —
     views must render their own user-facing fallback copy."""
 
@@ -38,70 +45,54 @@ def generate(
     *,
     history: list[dict] | None = None,
 ) -> str:
-    """Call Gemini and return the model's text reply.
+    """Call Claude and return the model's text reply.
 
     ``system`` is the system instruction (data context + behaviour rules).
-    ``user_message`` is the latest member input. ``history`` is an optional
-    list of ``{"role": "user"|"model", "text": "..."}`` dicts for
-    conversational continuity — keep it short (the system prompt already
-    carries the per-request data context, so long histories add cost
-    without much benefit).
+    ``user_message`` is the latest member input. ``history`` is an
+    optional list of ``{"role": "user"|"assistant", "text": "..."}``
+    dicts for conversational continuity — keep it short (the system
+    prompt already carries the per-request data context, so long
+    histories add cost without much benefit).
     """
-    api_key = getattr(settings, "GEMINI_API_KEY", "") or ""
+    api_key = getattr(settings, "ANTHROPIC_API_KEY", "") or ""
     if not api_key:
-        raise GeminiUnavailable("GEMINI_API_KEY is not set")
+        raise ClaudeUnavailable("ANTHROPIC_API_KEY is not set")
 
-    model = getattr(settings, "GEMINI_MODEL", "gemini-2.0-flash")
-    url = _ENDPOINT.format(model=model)
+    model = getattr(settings, "ANTHROPIC_MODEL", "claude-haiku-4-5")
 
-    contents: list[dict] = []
+    messages: list[dict] = []
     for turn in history or []:
-        contents.append(
-            {"role": turn["role"], "parts": [{"text": turn["text"]}]}
-        )
-    contents.append({"role": "user", "parts": [{"text": user_message}]})
+        role = "assistant" if turn["role"] in _ASSISTANT_ROLES else "user"
+        messages.append({"role": role, "content": turn["text"]})
+    messages.append({"role": "user", "content": user_message})
 
     payload = {
-        "system_instruction": {"parts": [{"text": system}]},
-        "contents": contents,
-        "generationConfig": {
-            "temperature": _TEMPERATURE,
-            "maxOutputTokens": _MAX_OUTPUT_TOKENS,
-        },
+        "model": model,
+        "max_tokens": _MAX_OUTPUT_TOKENS,
+        "temperature": _TEMPERATURE,
+        "system": system,
+        "messages": messages,
     }
 
-    # Valid Gemini-capable keys come in two flavours:
-    #   * AI Studio keys ``AIzaSy...`` — free tier, easy path, the one
-    #     we recommend.
-    #   * Google Cloud API keys ``AQ.Ab...`` — work IF the project has
-    #     the "Generative Language API" enabled. Useful when the
-    #     charity already has a GCP project for other services.
-    # Anything else (OAuth access tokens ``ya29...``, service-account
-    # JSON, raw bearer tokens) belongs at a different endpoint and
-    # will 401 here. Warn early so the operator sees the cause in the
-    # log instead of a silent fallback.
-    _VALID_PREFIXES = ("AIza", "AQ.")
-    if not any(api_key.startswith(p) for p in _VALID_PREFIXES):
+    # Anthropic keys start ``sk-ant-``. Warn early if the operator
+    # pasted something else (a Gemini key, an OpenAI key, an OAuth
+    # token) so the dev log shows the cause instead of a silent fallback.
+    if not api_key.startswith("sk-ant-"):
         logger.warning(
-            "GEMINI_API_KEY does not look like a Gemini-capable key "
-            "(expected prefix 'AIza...' from AI Studio or 'AQ....' "
-            "from Google Cloud). Got prefix=%r. Generate one at "
-            "https://aistudio.google.com/apikey.",
-            api_key[:6],
+            "ANTHROPIC_API_KEY does not look like an Anthropic key "
+            "(expected prefix 'sk-ant-...'). Got prefix=%r. Generate "
+            "one at https://console.anthropic.com/settings/keys.",
+            api_key[:7],
         )
-        raise GeminiUnavailable("wrong key format (expected 'AIza...' or 'AQ....')")
+        raise ClaudeUnavailable("wrong key format (expected 'sk-ant-...')")
 
     try:
-        # ``X-goog-api-key`` header works for both AI Studio ``AIza...``
-        # keys AND Google Cloud ``AQ....`` keys. The legacy ``?key=...``
-        # query-string form only accepts ``AIza...`` and silently 401s
-        # for ``AQ....`` — header auth is the format Google's current
-        # docs recommend, so we standardise on it.
         response = requests.post(
-            url,
+            _ENDPOINT,
             headers={
                 "Content-Type": "application/json",
-                "X-goog-api-key": api_key,
+                "x-api-key": api_key,
+                "anthropic-version": _API_VERSION,
             },
             json=payload,
             timeout=_TIMEOUT_SECONDS,
@@ -109,23 +100,41 @@ def generate(
         response.raise_for_status()
         data = response.json()
     except requests.HTTPError as exc:
-        # 401/403 → bad key; surface the upstream message so the dev
-        # log shows "API key not valid" instead of a generic "network".
+        # 401/403 → bad key, 429 → over rate limit. Surface the upstream
+        # message in the log so the dev sees the exact reason.
         body = exc.response.text[:300] if exc.response is not None else ""
-        logger.warning("Gemini HTTP %s: %s", exc.response.status_code if exc.response else "?", body)
-        raise GeminiUnavailable(f"http {exc.response.status_code if exc.response else '?'}: {body}") from exc
+        status = exc.response.status_code if exc.response is not None else "?"
+        logger.warning("Claude HTTP %s: %s", status, body)
+        raise ClaudeUnavailable(f"http {status}: {body}") from exc
     except requests.RequestException as exc:
-        logger.warning("Gemini network error: %s", exc)
-        raise GeminiUnavailable(f"network: {exc}") from exc
+        logger.warning("Claude network error: %s", exc)
+        raise ClaudeUnavailable(f"network: {exc}") from exc
     except ValueError as exc:
-        logger.warning("Gemini returned non-JSON: %s", exc)
-        raise GeminiUnavailable(f"decode: {exc}") from exc
+        logger.warning("Claude returned non-JSON: %s", exc)
+        raise ClaudeUnavailable(f"decode: {exc}") from exc
 
+    # Anthropic returns ``content`` as a list of typed blocks. For a
+    # plain text reply there's exactly one ``{"type": "text", ...}``
+    # block. A refusal or safety stop comes back with ``stop_reason``
+    # set to ``refusal`` / ``end_turn`` but no usable text — treat
+    # that as unavailable so the view renders the static fallback
+    # instead of a blank bubble.
     try:
-        return data["candidates"][0]["content"]["parts"][0]["text"]
-    except (KeyError, IndexError, TypeError) as exc:
-        # Gemini surfaces safety blocks as ``promptFeedback.blockReason``
-        # with no ``candidates`` — log and fall back, never show the raw
-        # reason to the member.
-        logger.warning("Gemini returned no text: %s", data)
-        raise GeminiUnavailable(f"empty response: {exc}") from exc
+        blocks = data["content"]
+        text_parts = [b["text"] for b in blocks if b.get("type") == "text"]
+        text = "".join(text_parts).strip()
+    except (KeyError, TypeError) as exc:
+        logger.warning("Claude returned unexpected shape: %s", data)
+        raise ClaudeUnavailable(f"shape: {exc}") from exc
+
+    if not text:
+        logger.warning(
+            "Claude returned no text (stop_reason=%s): %s",
+            data.get("stop_reason"),
+            data,
+        )
+        raise ClaudeUnavailable(
+            f"empty response (stop_reason={data.get('stop_reason')!r})"
+        )
+
+    return text

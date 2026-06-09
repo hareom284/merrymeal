@@ -25,9 +25,9 @@
 {% if request.user.is_authenticated %}
   {% if request.user.role == "member" %}
     {% url 'ai_assistant:chat' as assistant_post_url %}
-    {% include "_partials/_assistant_widget_panel.html" with assistant_post_url=assistant_post_url assistant_title="Ask MerryMeal" assistant_subtitle="Powered by Gemini · answers from your live data" assistant_placeholder="Ask about your meal or delivery..." assistant_intro="Ask me about today's meal, your delivery, or this week's menu." %}
+    {% include "_partials/_assistant_widget_panel.html" with assistant_post_url=assistant_post_url assistant_title="Ask MerryMeal" assistant_subtitle="Powered by Claude · answers from your live data" assistant_placeholder="Ask about your meal or delivery..." assistant_intro="Ask me about today's meal, your delivery, or this week's menu." %}
   {% elif request.user.role == "admin" %}
     {% url 'ai_assistant:admin_chat' as assistant_post_url %}
-    {% include "_partials/_assistant_widget_panel.html" with assistant_post_url=assistant_post_url assistant_title="Ops assistant" assistant_subtitle="Powered by Gemini · live attention-card data" assistant_placeholder="How many failed deliveries today?" assistant_intro="Ask about failed or unassigned deliveries, expiring stock, food-safety failures, or pending applications." %}
+    {% include "_partials/_assistant_widget_panel.html" with assistant_post_url=assistant_post_url assistant_title="Ops assistant" assistant_subtitle="Powered by Claude · live attention-card data" assistant_placeholder="How many failed deliveries today?" assistant_intro="Ask about failed or unassigned deliveries, expiring stock, food-safety failures, or pending applications." %}
   {% endif %}
 {% endif %}

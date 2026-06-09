@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}Partner with us — MerryMeal{% endblock %}
+
+{% block content %}
+<section class="mx-auto flex w-full max-w-md flex-col gap-6 px-4 py-8">
+  <header>
+    <h1 class="font-display text-3xl font-semibold text-warm-900">Partner with us</h1>
+    <p class="mt-2 text-warm-600">
+      Charities, clinicians and other organisations supporting clients
+      in Melbourne — tell us a bit about you and we'll get in touch to
+      set up your account.
+    </p>
+  </header>
+
+  <form method="post" class="flex flex-col gap-5" novalidate
+        x-data="{ submitting: false }" @submit="submitting = true">
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+      <div class="rounded-2xl bg-red-50 border border-red-200 px-4 py-3 text-red-800" role="alert">
+        {{ form.non_field_errors.0 }}
+      </div>
+    {% endif %}
+
+    <fieldset class="flex flex-col gap-5">
+      <legend class="label">About your organisation</legend>
+
+      <label class="flex flex-col gap-2">
+        <span class="label">Organisation legal name</span>
+        {{ form.org_legal_name }}
+        {% if form.org_legal_name.errors %}<span class="text-sm text-red-700">{{ form.org_legal_name.errors.0 }}</span>{% endif %}
+      </label>
+
+      <label class="flex flex-col gap-2">
+        <span class="label">Organisation type</span>
+        {{ form.org_type }}
+        {% if form.org_type.errors %}<span class="text-sm text-red-700">{{ form.org_type.errors.0 }}</span>{% endif %}
+      </label>
+    </fieldset>
+
+    <fieldset class="flex flex-col gap-5">
+      <legend class="label">Primary contact</legend>
+
+      <label class="flex flex-col gap-2">
+        <span class="label">Full name</span>
+        {{ form.contact_name }}
+        {% if form.contact_name.errors %}<span class="text-sm text-red-700">{{ form.contact_name.errors.0 }}</span>{% endif %}
+      </label>
+
+      <label class="flex flex-col gap-2">
+        <span class="label">Email</span>
+        {{ form.contact_email }}
+        {% if form.contact_email.errors %}<span class="text-sm text-red-700">{{ form.contact_email.errors.0 }}</span>{% endif %}
+      </label>
+
+      <label class="flex flex-col gap-2">
+        <span class="label">Phone (optional)</span>
+        {{ form.contact_phone }}
+        {% if form.contact_phone.errors %}<span class="text-sm text-red-700">{{ form.contact_phone.errors.0 }}</span>{% endif %}
+      </label>
+    </fieldset>
+
+    <label class="flex flex-col gap-2">
+      <span class="label">Tell us a bit about your work (optional)</span>
+      {{ form.message }}
+      {% if form.message.errors %}<span class="text-sm text-red-700">{{ form.message.errors.0 }}</span>{% endif %}
+    </label>
+
+    <button type="submit"
+            class="rounded-2xl bg-brand-green py-3 font-semibold text-white hover:bg-brand-green-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green min-h-[44px]"
+            :disabled="submitting"
+            :class="{ 'opacity-70 cursor-not-allowed': submitting }">
+      <span x-show="!submitting">Submit application</span>
+      <span x-show="submitting" x-cloak>Submitting…</span>
+    </button>
+
+    <a href="/" class="text-center text-sm text-warm-600 hover:text-warm-900">
+      ← Back to home
+    </a>
+  </form>
+</section>
+{% endblock %}

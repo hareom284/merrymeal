@@ -22,8 +22,8 @@ def _clear_cache():
 
 def test_under_limit_allowed():
     with override_settings(
-        GEMINI_RATE_LIMIT_PER_USER=5,
-        GEMINI_RATE_LIMIT_GLOBAL=100,
+        ANTHROPIC_RATE_LIMIT_PER_USER=5,
+        ANTHROPIC_RATE_LIMIT_GLOBAL=100,
     ):
         for i in range(5):
             assert check(user_id=42).allowed, f"hit {i + 1} should still be allowed"
@@ -31,8 +31,8 @@ def test_under_limit_allowed():
 
 def test_per_user_trip():
     with override_settings(
-        GEMINI_RATE_LIMIT_PER_USER=3,
-        GEMINI_RATE_LIMIT_GLOBAL=100,
+        ANTHROPIC_RATE_LIMIT_PER_USER=3,
+        ANTHROPIC_RATE_LIMIT_GLOBAL=100,
     ):
         for _ in range(3):
             assert check(user_id=42).allowed
@@ -45,8 +45,8 @@ def test_per_user_trip():
 def test_per_user_isolates_users():
     """Tripping user A must not lock out user B."""
     with override_settings(
-        GEMINI_RATE_LIMIT_PER_USER=2,
-        GEMINI_RATE_LIMIT_GLOBAL=100,
+        ANTHROPIC_RATE_LIMIT_PER_USER=2,
+        ANTHROPIC_RATE_LIMIT_GLOBAL=100,
     ):
         for _ in range(2):
             check(user_id=1)
@@ -57,8 +57,8 @@ def test_per_user_isolates_users():
 def test_global_trip():
     """Once the project-wide cap is hit, every user gets a 'global' verdict."""
     with override_settings(
-        GEMINI_RATE_LIMIT_PER_USER=100,
-        GEMINI_RATE_LIMIT_GLOBAL=3,
+        ANTHROPIC_RATE_LIMIT_PER_USER=100,
+        ANTHROPIC_RATE_LIMIT_GLOBAL=3,
     ):
         # Spread hits across users so the per-user cap doesn't fire first.
         for uid in (1, 2, 3):
@@ -81,8 +81,8 @@ def test_chat_renders_soft_rate_limit_reply(mock_generate, client):
     client.force_login(user)
 
     with override_settings(
-        GEMINI_RATE_LIMIT_PER_USER=2,
-        GEMINI_RATE_LIMIT_GLOBAL=100,
+        ANTHROPIC_RATE_LIMIT_PER_USER=2,
+        ANTHROPIC_RATE_LIMIT_GLOBAL=100,
     ):
         client.post("/assistant/chat/", {"message": "q1"})
         client.post("/assistant/chat/", {"message": "q2"})
@@ -107,8 +107,8 @@ def test_global_limit_uses_busy_copy(mock_generate, client):
     b = UserFactory(role="member", email="b@example.com")
 
     with override_settings(
-        GEMINI_RATE_LIMIT_PER_USER=100,
-        GEMINI_RATE_LIMIT_GLOBAL=2,
+        ANTHROPIC_RATE_LIMIT_PER_USER=100,
+        ANTHROPIC_RATE_LIMIT_GLOBAL=2,
     ):
         client.force_login(a)
         client.post("/assistant/chat/", {"message": "first"})

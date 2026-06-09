@@ -42,7 +42,7 @@
     x-show="open"
     x-cloak
     x-transition.opacity
-    style="position: absolute; bottom: 72px; right: 0; width: 320px; max-width: calc(100vw - 32px); height: 480px; max-height: calc(100vh - 160px); background: white; border-radius: 16px; box-shadow: 0 20px 50px rgba(0,0,0,0.25); border: 1px solid #e8e6e1; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; overflow: hidden;"
+    style="position: absolute; bottom: 72px; right: 0; width: 320px; max-width: calc(100vw - 32px); height: 480px; max-height: calc(100dvh - 192px); background: white; border-radius: 16px; box-shadow: 0 20px 50px rgba(0,0,0,0.25); border: 1px solid #e8e6e1; display: grid; grid-template-rows: auto minmax(0, 1fr) auto auto; overflow: hidden;"
   >
     <header style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-bottom: 1px solid #e8e6e1; background: #faf9f8;" class="flex items-center gap-2 px-3 py-2 border-b border-warm-200 bg-warm-50">
       <img src="{% static 'img/logo.png' %}" alt="" aria-hidden="true"
@@ -69,7 +69,7 @@
 
     <div
       id="assistant-chat-log"
-      style="min-height: 0; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; scroll-behavior: smooth; padding: 12px; display: flex; flex-direction: column; gap: 12px;"
+      style="min-height: 0; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; padding: 12px; display: flex; flex-direction: column; gap: 12px;"
       class="text-sm"
     >
       <div style="display: flex; justify-content: flex-start; align-items: flex-end; gap: 8px; flex-shrink: 0;">

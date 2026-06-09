@@ -3,9 +3,9 @@
 Two checks per request, in this order:
 
 1. **Per-user** — caps a single member/admin's chat rate so one user
-   can't drain the daily Gemini quota with a runaway script.
-2. **Global** — caps the project's combined rate so the charity stays
-   under the Gemini free tier's ``15 req/min`` ceiling with headroom.
+   can't drain the project's Claude spend with a runaway script.
+2. **Global** — caps the project's combined rate so the charity's
+   Claude bill stays predictable even under a burst.
 
 A fixed window (``int(time.time() / window_seconds)``) is the
 cheapest atomic counter that survives a multi-worker deployment: each
@@ -38,15 +38,15 @@ class RateLimitResult:
 
 
 def _window_seconds() -> int:
-    return int(getattr(settings, "GEMINI_RATE_LIMIT_WINDOW_SECONDS", 60))
+    return int(getattr(settings, "ANTHROPIC_RATE_LIMIT_WINDOW_SECONDS", 60))
 
 
 def _per_user_cap() -> int:
-    return int(getattr(settings, "GEMINI_RATE_LIMIT_PER_USER", 10))
+    return int(getattr(settings, "ANTHROPIC_RATE_LIMIT_PER_USER", 10))
 
 
 def _global_cap() -> int:
-    return int(getattr(settings, "GEMINI_RATE_LIMIT_GLOBAL", 12))
+    return int(getattr(settings, "ANTHROPIC_RATE_LIMIT_GLOBAL", 12))
 
 
 def _increment(key: str, window: int) -> int:

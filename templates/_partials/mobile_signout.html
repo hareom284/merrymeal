@@ -1,0 +1,21 @@
+{% comment %}
+  Mobile-only sign-out card. Desktop users get sign-out via the
+  sidebar account menu (see _partials/sidebar.html), but the mobile
+  bottom-nav has no logout entry. Include this partial on pages that
+  are a role's primary surface but don't have a dedicated profile
+  page (e.g. kitchen-staff screens).
+{% endcomment %}
+{% if request.user.is_authenticated %}
+<div class="md:hidden mt-8 flex justify-center">
+  <form method="post" action="{% url 'accounts:logout' %}" class="m-0">
+    {% csrf_token %}
+    <button type="submit"
+            class="inline-flex items-center gap-2 rounded-xl border border-warm-200 bg-white px-4 py-2 text-sm font-medium text-warm-800 hover:bg-warm-50 min-h-[44px]">
+      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Sign out
+    </button>
+  </form>
+</div>
+{% endif %}

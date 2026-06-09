@@ -4,7 +4,7 @@ from unittest.mock import patch
 import pytest
 
 from apps.accounts.tests.factories import UserFactory
-from apps.ai_assistant.services.client import GeminiUnavailable
+from apps.ai_assistant.services.client import ClaudeUnavailable
 
 
 @pytest.mark.django_db
@@ -53,8 +53,8 @@ def test_admin_chat_uses_admin_system_prompt(mock_generate, client):
 
 @pytest.mark.django_db
 @patch("apps.ai_assistant.services.chat.generate")
-def test_admin_chat_falls_back_when_gemini_down(mock_generate, client):
-    mock_generate.side_effect = GeminiUnavailable("no key")
+def test_admin_chat_falls_back_when_claude_down(mock_generate, client):
+    mock_generate.side_effect = ClaudeUnavailable("no key")
     admin = UserFactory(role="admin")
     client.force_login(admin)
     response = client.post(

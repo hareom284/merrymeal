@@ -4,7 +4,7 @@ from unittest.mock import patch
 import pytest
 
 from apps.accounts.tests.factories import UserFactory
-from apps.ai_assistant.services.client import GeminiUnavailable
+from apps.ai_assistant.services.client import ClaudeUnavailable
 
 
 @pytest.mark.django_db
@@ -35,7 +35,7 @@ def test_chat_empty_message_returns_empty_body(client):
 @pytest.mark.django_db
 @patch("apps.ai_assistant.services.chat.generate")
 def test_chat_renders_user_and_assistant_bubbles(mock_generate, client):
-    """Happy path — mock Gemini, assert both bubbles are in the partial."""
+    """Happy path — mock Claude, assert both bubbles are in the partial."""
     mock_generate.return_value = "Today's meal is roast chicken."
     user = UserFactory(role="member")
     client.force_login(user)
@@ -52,10 +52,10 @@ def test_chat_renders_user_and_assistant_bubbles(mock_generate, client):
 
 @pytest.mark.django_db
 @patch("apps.ai_assistant.services.chat.generate")
-def test_chat_falls_back_when_gemini_unavailable(mock_generate, client):
-    """The widget must NEVER crash — Gemini-down returns the static
+def test_chat_falls_back_when_claude_unavailable(mock_generate, client):
+    """The widget must NEVER crash — Claude-down returns the static
     "please call the office" reply so the member sees a clear next step."""
-    mock_generate.side_effect = GeminiUnavailable("no key")
+    mock_generate.side_effect = ClaudeUnavailable("no key")
     user = UserFactory(role="member")
     client.force_login(user)
     response = client.post("/assistant/chat/", {"message": "hi"})

@@ -263,30 +263,34 @@ Q_CLUSTER = {
 # stylised placeholder block — no broken images, no failing tests.
 MAPBOX_TOKEN = env("MAPBOX_TOKEN", default="")
 
-# AI assistant (Gemini). Member-facing chat widget. Free tier of Gemini
-# 2.0 Flash is generous (1500 req/day) — plenty for a demo and the
-# early pilot. Leave the key blank to disable the widget gracefully:
-# ``apps.ai_assistant.services.client.generate`` raises GeminiUnavailable
+# AI assistant (Anthropic Claude). Member-facing chat widget. Leave
+# the key blank to disable the widget gracefully:
+# ``apps.ai_assistant.services.client.generate`` raises ClaudeUnavailable
 # when the key is missing, and the view falls back to a "please call
-# the office" message rather than crashing the page.
-GEMINI_API_KEY = env("GEMINI_API_KEY", default="")
-GEMINI_MODEL = env("GEMINI_MODEL", default="gemini-flash-latest")
+# the office" message rather than crashing the page. Generate a key at
+# https://console.anthropic.com/settings/keys (starts ``sk-ant-``).
+ANTHROPIC_API_KEY = env("ANTHROPIC_API_KEY", default="")
+# Claude Haiku 4.5 is the cheapest/fastest tier in the current
+# generation — plenty for short factual Q&A bounded by the per-request
+# data block. Bump to ``claude-sonnet-4-6`` if member replies start to
+# feel sloppy; ``claude-opus-4-7`` is overkill here.
+ANTHROPIC_MODEL = env("ANTHROPIC_MODEL", default="claude-haiku-4-5")
 # Rate limits for the AI assistant. Both caps are enforced by
 # ``apps.ai_assistant.services.rate_limit.check`` and protect the
-# Gemini free tier's 15 req/min ceiling.
+# project's Claude spend from a runaway chat client.
 #
-# * ``GEMINI_RATE_LIMIT_PER_USER`` — how many chat sends one user can
-#   make per window. 10 is generous for a real conversation and far
-#   enough below the global cap that one chatty user can't lock the
-#   whole charity out.
-# * ``GEMINI_RATE_LIMIT_GLOBAL`` — total across all users per window.
-#   12 leaves a 3 req/min cushion under Gemini's 15 req/min free-tier
-#   limit so a brief burst doesn't 429 at the upstream.
-# * ``GEMINI_RATE_LIMIT_WINDOW_SECONDS`` — bucket size. The window
+# * ``ANTHROPIC_RATE_LIMIT_PER_USER`` — how many chat sends one user
+#   can make per window. 10 is generous for a real conversation and
+#   far enough below the global cap that one chatty user can't lock
+#   the whole charity out.
+# * ``ANTHROPIC_RATE_LIMIT_GLOBAL`` — total across all users per
+#   window. 12 is a conservative ceiling that keeps spend predictable
+#   on the default Claude tier.
+# * ``ANTHROPIC_RATE_LIMIT_WINDOW_SECONDS`` — bucket size. The window
 #   slides over the wall clock (not per-user), so the moment the
 #   second hits the boundary, all counters reset.
-GEMINI_RATE_LIMIT_PER_USER = env.int("GEMINI_RATE_LIMIT_PER_USER", default=10)
-GEMINI_RATE_LIMIT_GLOBAL = env.int("GEMINI_RATE_LIMIT_GLOBAL", default=12)
-GEMINI_RATE_LIMIT_WINDOW_SECONDS = env.int(
-    "GEMINI_RATE_LIMIT_WINDOW_SECONDS", default=60
+ANTHROPIC_RATE_LIMIT_PER_USER = env.int("ANTHROPIC_RATE_LIMIT_PER_USER", default=10)
+ANTHROPIC_RATE_LIMIT_GLOBAL = env.int("ANTHROPIC_RATE_LIMIT_GLOBAL", default=12)
+ANTHROPIC_RATE_LIMIT_WINDOW_SECONDS = env.int(
+    "ANTHROPIC_RATE_LIMIT_WINDOW_SECONDS", default=60
 )
