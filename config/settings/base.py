@@ -268,4 +268,4 @@ MAPBOX_TOKEN = env("MAPBOX_TOKEN", default="")
 # when the key is missing, and the view falls back to a "please call
 # the office" message rather than crashing the page.
 GEMINI_API_KEY = env("GEMINI_API_KEY", default="")
-GEMINI_MODEL = env("GEMINI_MODEL", default="gemini-2.0-flash")
+GEMINI_MODEL = env("GEMINI_MODEL", default="gemini-flash-latest")

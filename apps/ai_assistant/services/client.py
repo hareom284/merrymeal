@@ -92,9 +92,17 @@ def generate(
         raise GeminiUnavailable("wrong key format (expected 'AIza...' or 'AQ....')")
 
     try:
+        # ``X-goog-api-key`` header works for both AI Studio ``AIza...``
+        # keys AND Google Cloud ``AQ....`` keys. The legacy ``?key=...``
+        # query-string form only accepts ``AIza...`` and silently 401s
+        # for ``AQ....`` — header auth is the format Google's current
+        # docs recommend, so we standardise on it.
         response = requests.post(
             url,
-            params={"key": api_key},
+            headers={
+                "Content-Type": "application/json",
+                "X-goog-api-key": api_key,
+            },
             json=payload,
             timeout=_TIMEOUT_SECONDS,
         )

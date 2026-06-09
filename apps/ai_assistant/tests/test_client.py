@@ -34,10 +34,13 @@ def test_generate_returns_text_from_first_candidate(mock_post):
         result = generate("system", "what is my meal?")
     assert result == "Today's meal is roast chicken."
 
-    # Confirm we hit the right endpoint with the key in the query string.
+    # Confirm we hit the right endpoint with the key in the header.
+    # Header auth is the form that works for both AIza* and AQ.* keys;
+    # the legacy ``?key=...`` query string silently 401s on AQ keys.
     call = mock_post.call_args
     assert "generateContent" in call.args[0]
-    assert call.kwargs["params"] == {"key": "AIzaTEST"}
+    assert call.kwargs["headers"]["X-goog-api-key"] == "AIzaTEST"
+    assert call.kwargs["headers"]["Content-Type"] == "application/json"
 
 
 @patch("apps.ai_assistant.services.client.requests.post")
