@@ -126,6 +126,12 @@ def test_view_404_for_unrelated_caregiver(client):
     assert resp.status_code == 404
 
 
+# Polling-fragment tests send ``HX-Request: true`` so the view returns
+# the partial. Direct browser visits redirect to ``/track/`` for the
+# full-page UX — a separate concern covered by ``test_member_track``.
+_HX = {"HTTP_HX_REQUEST": "true"}
+
+
 @pytest.mark.django_db
 def test_view_allows_linked_caregiver(client):
     owner = UserFactory(role="member")
@@ -134,7 +140,7 @@ def test_view_allows_linked_caregiver(client):
     d = DeliveryFactory(member=owner, status="pending")
 
     client.force_login(caregiver)
-    resp = client.get(reverse("delivery:tracking_status", args=[d.id]))
+    resp = client.get(reverse("delivery:tracking_status", args=[d.id]), **_HX)
     assert resp.status_code == 200
 
 
@@ -146,7 +152,7 @@ def test_view_renders_no_hx_trigger_when_terminal(client):
     )
 
     client.force_login(member)
-    resp = client.get(reverse("delivery:tracking_status", args=[d.id]))
+    resp = client.get(reverse("delivery:tracking_status", args=[d.id]), **_HX)
     assert resp.status_code == 200
     assert b"hx-trigger" not in resp.content
     assert b"Delivered" in resp.content
@@ -158,7 +164,7 @@ def test_view_renders_hx_trigger_when_pending(client):
     d = DeliveryFactory(member=member, status="pending")
 
     client.force_login(member)
-    resp = client.get(reverse("delivery:tracking_status", args=[d.id]))
+    resp = client.get(reverse("delivery:tracking_status", args=[d.id]), **_HX)
     assert resp.status_code == 200
     assert b"hx-trigger" in resp.content
     assert b"every 60s" in resp.content
@@ -171,7 +177,7 @@ def test_view_renders_volunteer_display_for_out_for_delivery(client):
     d = DeliveryFactory(member=member, volunteer=vol, status="out_for_delivery")
 
     client.force_login(member)
-    resp = client.get(reverse("delivery:tracking_status", args=[d.id]))
+    resp = client.get(reverse("delivery:tracking_status", args=[d.id]), **_HX)
     assert resp.status_code == 200
     assert b"Sarah K." in resp.content
     assert b"hx-trigger" in resp.content
@@ -183,8 +189,21 @@ def test_view_renders_failed_pill(client):
     d = DeliveryFactory(member=member, status="failed")
 
     client.force_login(member)
-    resp = client.get(reverse("delivery:tracking_status", args=[d.id]))
+    resp = client.get(reverse("delivery:tracking_status", args=[d.id]), **_HX)
     assert resp.status_code == 200
     assert b"hx-trigger" not in resp.content
     # "Couldn't deliver" copy lives in the partial.
     assert b"deliver" in resp.content.lower()
+
+
+@pytest.mark.django_db
+def test_view_redirects_direct_browser_visit_to_track_page(client):
+    """A logged-in member who hits the polling URL directly (no HTMX
+    header) gets the full ``/track/`` page rather than a bare partial
+    on a blank screen. Belt-and-braces for the ``HX-Request`` branch."""
+    member = UserFactory(role="member")
+    d = DeliveryFactory(member=member, status="pending")
+    client.force_login(member)
+    resp = client.get(reverse("delivery:tracking_status", args=[d.id]))
+    assert resp.status_code == 302
+    assert resp.url == "/track/"

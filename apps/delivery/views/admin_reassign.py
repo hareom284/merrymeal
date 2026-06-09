@@ -8,7 +8,6 @@ POST — runs ``reassign_delivery`` and returns the updated row partial,
 from __future__ import annotations
 
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_http_methods
 
