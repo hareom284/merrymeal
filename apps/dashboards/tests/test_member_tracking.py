@@ -4,7 +4,7 @@ Covers:
 * `apps.delivery.services.tracking.get_tracking_context` — status → label,
   volunteer display ("Sarah K."), `polling` flag toggling off for terminal
   states (`delivered`, `failed`).
-* `GET /volunteer/member/delivery/<id>/status/` — auth, 404 for non-owners,
+* `GET /member/delivery/<id>/status/` — auth, 404 for non-owners,
   partial body contents (`hx-trigger` present for live states, omitted for
   terminal states), green pill on delivered.
 

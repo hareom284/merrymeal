@@ -45,7 +45,7 @@ urlpatterns = [
     ),
     # --- Member-facing tracking poll (Story 4.12) ---------------------
     path(
-        "volunteer/member/delivery/<int:pk>/status/",
+        "member/delivery/<int:pk>/status/",
         tracking_status_view,
         name="tracking_status",
     ),

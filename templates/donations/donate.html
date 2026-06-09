@@ -17,7 +17,7 @@
 {% block content %}
 <section
   class="w-full"
-  x-data="{ amount: 5000, custom: '', recurring: false }"
+  x-data="{ amount: 5000, custom: '', recurring: false, mealCost: {{ meal_cost_cents }} }"
 >
   {% if cancelled %}
     {% comment %} Story 5.4's Stripe cancel return URL appends ``?cancelled=1``. Soft
@@ -116,12 +116,12 @@
           aria-label="Custom amount in dollars"
         >
       </div>
-      {% comment %} Placeholder copy — Story 5.6 fills the chip captions with the
-         real "≈ N meals" derived from the per-meal cost setting. Showing
-         a single line below the grid keeps the chips themselves uncluttered
-         on a 375 px viewport. {% endcomment %}
-      <p class="mt-2 text-xs text-warm-500">
-        Every donation funds meals for people in need.
+      {% comment %} Live "≈ N meals" caption — reads the Alpine ``amount`` and the
+         per-meal cost passed from the view. Keeping it below the grid (instead
+         of inside each button) keeps the chip layout uncluttered on a
+         375 px viewport while still reflecting the current selection. {% endcomment %}
+      <p class="mt-2 text-xs text-warm-500"
+         x-text="amount > 0 ? '≈ ' + Math.floor(amount / mealCost) + ' meals' : 'Every donation funds meals for people in need.'">
       </p>
       {% if form.amount_dollars.errors %}
         <p class="mt-1 text-sm text-red-600">{{ form.amount_dollars.errors.0 }}</p>
