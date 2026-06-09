@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Bad request · {{ org.name|default:"MerryMeal" }}{% endblock %}
+
+{% block content %}
+<section style="display:flex; flex-direction:column; align-items:center; text-align:center; gap:24px; padding:32px 16px;">
+  <div style="width:96px; height:96px; border-radius:24px; background:#fef2f2; display:flex; align-items:center; justify-content:center;">
+    <svg style="width:48px; height:48px; color:#b91c1c;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+      <circle cx="12" cy="12" r="10"/>
+      <path d="M12 8v4M12 16h.01" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+
+  <div style="display:flex; flex-direction:column; gap:8px; max-width:32rem;">
+    <p style="font-size:11px; letter-spacing:0.2em; text-transform:uppercase; color:#827b6f; margin:0;">Error 400</p>
+    <h1 class="font-display" style="font-size:30px; color:#1a1917; margin:0;">We couldn't process that request</h1>
+    <p style="color:#5d574e; margin:0; line-height:1.6;">
+      The data we received wasn't in the form we expected. This usually means the page was
+      open for too long, or a security token expired.
+    </p>
+  </div>
+
+  <div style="background:#faf9f8; border:1px solid #e8e6e1; border-radius:16px; padding:20px 24px; text-align:left; max-width:32rem; width:100%;">
+    <p style="margin:0 0 12px 0; font-size:11px; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; color:#5d574e;">
+      Here's what to try
+    </p>
+    <ul style="margin:0; padding-left:20px; color:#403c36; line-height:1.8;">
+      <li>Go back, refresh the page, and try again.</li>
+      <li>If you were filling in a long form, copy your answers somewhere safe before reloading.</li>
+      {% if org.phone %}<li>If it keeps happening, call {{ org.phone }} and we'll help right away.</li>{% endif %}
+    </ul>
+  </div>
+
+  <a href="{% url 'dashboards:landing' %}"
+     style="display:inline-flex; align-items:center; justify-content:center; border-radius:12px; background:#16a34a; color:white; padding:14px 24px; font-size:14px; font-weight:600; text-decoration:none;">
+    Back to home
+  </a>
+</section>
+{% endblock %}

@@ -34,11 +34,11 @@ from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 from django.core.signing import BadSignature, dumps, loads
 from django.db import transaction
-from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils import timezone
 
 from apps.donations.models import Donation, MagicLinkToken
+from apps.site_config.email_context import render_email as render_to_string
 
 # Salt namespaces the signed payload so a token issued for the donation
 # management flow cannot be replayed against a future signing surface.

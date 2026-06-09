@@ -1,67 +1,38 @@
-{% load donation_extras %}<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <title>MerryMeal donation receipt — {{ receipt_number }}</title>
-  </head>
-  <body style="margin:0;padding:0;background:#f7f5f1;font-family:Arial,Helvetica,sans-serif;color:#1f2937;">
-    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#f7f5f1;padding:24px 0;">
-      <tr>
-        <td align="center">
-          <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" style="max-width:600px;background:#ffffff;border-radius:8px;border:1px solid #e5e7eb;">
-            <tr>
-              <td style="padding:24px 28px 8px 28px;">
-                <p style="margin:0;font-size:14px;color:#6b7280;letter-spacing:0.08em;text-transform:uppercase;">MerryMeal</p>
-                <h1 style="margin:8px 0 0 0;font-size:24px;line-height:1.2;color:#111827;">Thank you for your donation.</h1>
-                <p style="margin:8px 0 0 0;font-size:14px;color:#4b5563;">
-                  Receipt for {{ donation.donor_email }}.
-                </p>
-              </td>
-            </tr>
-            <tr>
-              <td style="padding:8px 28px 0 28px;">
-                <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="border-collapse:collapse;font-size:14px;">
-                  <tr>
-                    <td style="padding:10px 0;border-top:1px solid #e5e7eb;color:#6b7280;">Receipt number</td>
-                    <td style="padding:10px 0;border-top:1px solid #e5e7eb;color:#111827;text-align:right;">{{ receipt_number }}</td>
-                  </tr>
-                  <tr>
-                    <td style="padding:10px 0;border-top:1px solid #e5e7eb;color:#6b7280;">Date</td>
-                    <td style="padding:10px 0;border-top:1px solid #e5e7eb;color:#111827;text-align:right;">{{ local_dt|date:"j F Y H:i" }} (Melbourne)</td>
-                  </tr>
-                  <tr>
-                    <td style="padding:10px 0;border-top:1px solid #e5e7eb;color:#6b7280;">Campaign</td>
-                    <td style="padding:10px 0;border-top:1px solid #e5e7eb;color:#111827;text-align:right;">{{ campaign.name }}</td>
-                  </tr>
-                  <tr>
-                    <td style="padding:10px 0;border-top:1px solid #e5e7eb;color:#6b7280;">Amount</td>
-                    <td style="padding:10px 0;border-top:1px solid #e5e7eb;color:#111827;text-align:right;font-weight:bold;">{{ donation.amount_cents|dollars }}</td>
-                  </tr>
-                  <tr>
-                    <td style="padding:10px 0;border-top:1px solid #e5e7eb;border-bottom:1px solid #e5e7eb;color:#6b7280;">Impact</td>
-                    <td style="padding:10px 0;border-top:1px solid #e5e7eb;border-bottom:1px solid #e5e7eb;color:#047857;text-align:right;">~{{ meals }} meal{{ meals|pluralize }} delivered</td>
-                  </tr>
-                </table>
-              </td>
-            </tr>
-            <tr>
-              <td style="padding:20px 28px;font-size:13px;color:#4b5563;line-height:1.5;">
-                <p style="margin:0 0 8px 0;">
-                  This receipt is for an income tax deductible gift.
-                  MerryMeal is a registered Australian charity.
-                </p>
-                <p style="margin:0 0 4px 0;">ABN {{ abn }}</p>
-                <p style="margin:0;white-space:pre-line;">{{ address }}</p>
-              </td>
-            </tr>
-            <tr>
-              <td style="padding:0 28px 24px 28px;font-size:12px;color:#9ca3af;">
-                You can print this email for your tax records.
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-    </table>
-  </body>
-</html>
+{% extends "emails/_base.html" %}
+{% load donation_extras %}
+
+{% block content %}
+<p style="margin:0 0 8px 0; font-size:16px; color:#1a1917; font-weight:600;">
+  Thank you for your donation.
+</p>
+<p style="margin:0 0 24px 0; font-size:14px; color:#5d574e; line-height:1.6;">
+  Receipt for {{ donation.donor_email }}.
+</p>
+
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="border-collapse:collapse;">
+  {% include "emails/_data_row.html" with label="Receipt number" value=receipt_number %}
+  {% include "emails/_data_row.html" with label="Date" value=local_dt|date:"j F Y H:i" %}
+  {% include "emails/_data_row.html" with label="Campaign" value=campaign.name %}
+  {% include "emails/_data_row.html" with label="Amount" value=donation.amount_cents|dollars bold=1 %}
+  <tr>
+    <td style="padding:12px 0; border-top:1px solid #e8e6e1; border-bottom:1px solid #e8e6e1; color:#5d574e; font-size:13px;">Impact</td>
+    <td style="padding:12px 0; border-top:1px solid #e8e6e1; border-bottom:1px solid #e8e6e1; color:#0f766e; font-size:13px; text-align:right; font-weight:600;">~{{ meals }} meal{{ meals|pluralize }} delivered</td>
+  </tr>
+</table>
+
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:24px 0 0 0; background:#ccfbf1; border-radius:12px;">
+  <tr>
+    <td style="padding:16px 18px;">
+      <p style="margin:0 0 6px 0; font-size:13px; color:#0f766e; line-height:1.6;">
+        This receipt is for an income tax deductible gift. {{ org.name|default:"MerryMeal" }} is a registered Australian charity.
+      </p>
+      <p style="margin:0 0 4px 0; font-size:12px; color:#1a1917;"><strong>ABN</strong> {{ abn }}</p>
+      <p style="margin:0; font-size:12px; color:#5d574e; white-space:pre-line;">{{ address }}</p>
+    </td>
+  </tr>
+</table>
+
+<p style="margin:20px 0 0 0; font-size:11px; color:#827b6f;">
+  You can print this email for your tax records.
+</p>
+{% endblock %}

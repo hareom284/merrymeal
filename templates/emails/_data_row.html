@@ -1,0 +1,10 @@
+{% comment %}
+  Label + value row used for receipts and confirmations.
+  Render with:
+    {% include "emails/_data_row.html" with label="Amount" value="$50.00" %}
+  Optional kwargs:
+    bold (default empty) — set to ``1`` to bold the value (e.g. totals).
+{% endcomment %}<tr>
+  <td style="padding:12px 0; border-top:1px solid #e8e6e1; color:#5d574e; font-size:13px;">{{ label }}</td>
+  <td style="padding:12px 0; border-top:1px solid #e8e6e1; color:#1a1917; font-size:13px; text-align:right; {% if bold %}font-weight:600;{% endif %}">{{ value }}</td>
+</tr>

@@ -125,8 +125,9 @@ def submit_application(
 
 def _send_confirmation_email(application: Application) -> None:
     from django.core.mail import EmailMultiAlternatives
-    from django.template.loader import render_to_string
     from django.utils import timezone
+
+    from apps.site_config.email_context import render_email as render_to_string
 
     ctx = {
         "application": application,
@@ -304,7 +305,8 @@ def _send_welcome_email(
 ) -> None:
     from django.conf import settings
     from django.core.mail import EmailMultiAlternatives
-    from django.template.loader import render_to_string
+
+    from apps.site_config.email_context import render_email as render_to_string
 
     base = getattr(settings, "SITE_URL", "http://localhost:8000").rstrip("/")
     setup_url = f"{base}/accounts/set-password/?token={token}"
@@ -416,7 +418,8 @@ def reject_application(application: Application, admin_user, *, reason: str) -> 
 
 def _send_rejection_email(*, application: Application, reason: str) -> None:
     from django.core.mail import EmailMultiAlternatives
-    from django.template.loader import render_to_string
+
+    from apps.site_config.email_context import render_email as render_to_string
 
     ctx = {
         "application": application,

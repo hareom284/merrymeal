@@ -50,6 +50,8 @@ urlpatterns = [
     path("admin/", include("apps.site_config.urls")),
 ]
 
-# Custom error handlers — branded 404 / 500 pages.
+# Custom error handlers — branded 400 / 403 / 404 / 500 pages.
+handler400 = "apps.site_config.views.errors.bad_request_view"
+handler403 = "apps.site_config.views.errors.permission_denied_view"
 handler404 = "apps.site_config.views.errors.not_found_view"
 handler500 = "apps.site_config.views.errors.server_error_view"

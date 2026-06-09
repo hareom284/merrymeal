@@ -34,10 +34,10 @@ from __future__ import annotations
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 from django.db import transaction
-from django.template.loader import render_to_string
 from django.utils import timezone
 
 from apps.donations.models import Donation
+from apps.site_config.email_context import render_email as render_to_string
 
 
 def assign_receipt_number(donation: Donation) -> str:

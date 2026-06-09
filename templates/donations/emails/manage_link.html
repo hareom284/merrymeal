@@ -1,51 +1,33 @@
-{% comment %} Story 5.7 — HTML body of the manage-link email.
+{% extends "emails/_base.html" %}
 
-   Inline styles only (a sizeable subset of email clients strip
-   ``<style>`` blocks and ``<link>`` stylesheets). The plain-text
-   alternative in ``manage_link.txt`` covers the rest.
-{% endcomment %}
-<!doctype html>
-<html lang="en">
-  <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #1f2937; line-height: 1.5;">
-    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width: 480px; margin: 0 auto; padding: 24px;">
-      <tr>
-        <td>
-          <h1 style="font-size: 20px; margin: 0 0 16px 0; color: #0f172a;">
-            Manage your MerryMeal donation
-          </h1>
+{% block content %}
+<p style="margin:0 0 16px 0; font-size:16px; color:#1a1917;">
+  Hi,
+</p>
+<p style="margin:0 0 16px 0; font-size:15px; color:#403c36; line-height:1.6;">
+  You requested a link to manage your recurring donation to {{ org.name|default:"MerryMeal" }}.
+  Tap the button below to view or cancel your subscription.
+</p>
 
-          <p style="margin: 0 0 16px 0;">
-            You requested a link to manage your recurring donation. Tap
-            the button below to view or cancel your subscription.
-          </p>
+{% include "emails/_button.html" with href=link label="Manage my donation" %}
 
-          <p style="margin: 24px 0; text-align: center;">
-            <a
-              href="{{ link }}"
-              style="display: inline-block; padding: 12px 24px; background-color: #16a34a; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 600;"
-            >
-              Manage my donation
-            </a>
-          </p>
+<p style="margin:8px 0 6px 0; font-size:12px; color:#5d574e;">
+  Or paste this URL into your browser:
+</p>
+<p style="margin:0 0 20px 0; font-size:12px; word-break:break-all;">
+  <a href="{{ link }}" style="color:#16a34a; text-decoration:none;">{{ link }}</a>
+</p>
 
-          <p style="margin: 0 0 8px 0; font-size: 13px; color: #6b7280;">
-            Or paste this URL into your browser:
-          </p>
-          <p style="margin: 0 0 24px 0; font-size: 13px; word-break: break-all;">
-            <a href="{{ link }}" style="color: #16a34a;">{{ link }}</a>
-          </p>
-
-          <p style="margin: 0 0 8px 0; font-size: 13px; color: #6b7280;">
-            The link can only be used once, and expires 30 minutes after
-            we sent it.
-          </p>
-
-          <p style="margin: 16px 0 0 0; font-size: 13px; color: #6b7280;">
-            If you didn't request this, please ignore this email — your
-            subscription is unchanged.
-          </p>
-        </td>
-      </tr>
-    </table>
-  </body>
-</html>
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:8px 0 0 0; background:#faf9f8; border-radius:12px;">
+  <tr>
+    <td style="padding:14px 16px;">
+      <p style="margin:0 0 6px 0; font-size:12px; color:#5d574e; line-height:1.5;">
+        🔒 The link can only be used once and expires 30 minutes after we sent it.
+      </p>
+      <p style="margin:0; font-size:12px; color:#5d574e; line-height:1.5;">
+        If you didn't request this, please ignore the email — your subscription is unchanged.
+      </p>
+    </td>
+  </tr>
+</table>
+{% endblock %}

@@ -4,32 +4,49 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Something went wrong · MerryMeal</title>
-    <link rel="stylesheet" href="{% static 'dist/output.css' %}" />
   </head>
-  {# A 500 may have fired because a context processor blew up, so we
-     intentionally don't extend base.html here — every dependency on
-     this page is inline so the error screen always renders. #}
-  <body style="margin: 0; padding: 0; min-height: 100vh; background: #faf9f8; font-family: -apple-system, BlinkMacSystemFont, sans-serif; display: flex; align-items: center; justify-content: center;">
-    <section style="max-width: 28rem; padding: 32px; text-align: center;">
-      <div style="width: 96px; height: 96px; border-radius: 24px; background: #fef2f2; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px;">
-        <svg style="width: 48px; height: 48px; color: #b91c1c;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+  {% comment %}
+    A 500 may have fired because a context processor blew up, so this
+    template intentionally doesn't extend base.html and uses ONLY
+    inline styles + no external dependencies. Every dependency is
+    self-contained so the error screen always renders, even when the
+    surrounding infrastructure is broken.
+  {% endcomment %}
+  <body style="margin:0; padding:0; min-height:100vh; background:#faf9f8; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; display:flex; align-items:center; justify-content:center;">
+    <section style="max-width:32rem; width:100%; padding:32px; text-align:center;">
+      <div style="width:96px; height:96px; border-radius:24px; background:#fef2f2; display:flex; align-items:center; justify-content:center; margin:0 auto 24px;">
+        <svg style="width:48px; height:48px; color:#b91c1c;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
           <path d="M12 9v3.5M12 16h.01M5.07 19h13.86c1.54 0 2.5-1.67 1.73-3L13.73 4a2 2 0 0 0-3.46 0L3.34 16c-.77 1.33.19 3 1.73 3z" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </div>
 
-      <p style="font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: #827b6f; margin: 0;">Error 500</p>
-      <h1 style="font-size: 28px; color: #1a1917; margin: 8px 0 12px; font-family: 'Playfair Display', Georgia, serif; font-weight: 600;">
+      <p style="font-size:12px; letter-spacing:0.2em; text-transform:uppercase; color:#827b6f; margin:0;">Error 500</p>
+      <h1 style="font-size:28px; color:#1a1917; margin:8px 0 12px; font-family:'Playfair Display', Georgia, serif; font-weight:600;">
         Something went wrong on our side
       </h1>
-      <p style="color: #5d574e; margin: 0 0 28px; line-height: 1.55;">
-        Our engineers have been notified. Please try again in a moment, or
-        call the office if you were in the middle of something important.
+      <p style="color:#5d574e; margin:0 0 20px; line-height:1.6;">
+        This isn't your fault. Our team has been notified automatically.
       </p>
 
+      <div style="background:white; border:1px solid #e8e6e1; border-radius:16px; padding:20px 24px; text-align:left; margin:0 0 20px;">
+        <p style="margin:0 0 12px 0; font-size:11px; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; color:#5d574e;">
+          Here's what you can do
+        </p>
+        <ul style="margin:0; padding-left:20px; color:#403c36; line-height:1.8;">
+          <li>Wait a minute or two and refresh — the issue is often temporary.</li>
+          <li>If you were saving something important, the change probably didn't go through.</li>
+          <li>Call the office if it's urgent — a real person can help right away.</li>
+        </ul>
+      </div>
+
       <a href="/"
-         style="display: inline-block; padding: 12px 24px; background: #16a34a; color: white; border-radius: 12px; text-decoration: none; font-weight: 600; font-size: 14px;">
+         style="display:inline-block; padding:14px 28px; background:#16a34a; color:white; border-radius:12px; text-decoration:none; font-weight:600; font-size:14px;">
         Back to home
       </a>
+
+      <p style="margin:20px 0 0 0; font-size:11px; color:#827b6f;">
+        Reference: <code style="background:#f5f4f1; padding:2px 6px; border-radius:4px; font-family:'Geist Mono', ui-monospace, monospace; font-size:11px;">{{ request.path }}</code>
+      </p>
     </section>
   </body>
 </html>

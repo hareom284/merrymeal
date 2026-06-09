@@ -8,8 +8,17 @@ number, even on an error screen.
 """
 from __future__ import annotations
 
+from django.http import HttpResponse
 from django.shortcuts import render
 from django.template import loader
+
+
+def bad_request_view(request, exception=None):
+    return render(request, "errors/400.html", status=400)
+
+
+def permission_denied_view(request, exception=None):
+    return render(request, "errors/403.html", status=403)
 
 
 def not_found_view(request, exception=None):
@@ -18,13 +27,12 @@ def not_found_view(request, exception=None):
 
 def server_error_view(request):
     """500 handler — runs outside the normal context-processor chain
-    when the error is severe enough that middleware fails. We
-    therefore render the template directly (no ``render()`` shortcut
-    that calls back into Django's response middleware) and pass the
-    minimal context manually so a broken context processor can't
-    cause a recursive 500."""
+    when the error is severe enough that middleware fails. We render
+    the template directly (rather than via the ``render()`` shortcut
+    which calls back into Django's response middleware) so a broken
+    context processor can't cause a recursive 500."""
     template = loader.get_template("errors/500.html")
-    return type(template.render(request=request))(
+    return HttpResponse(
         template.render(request=request),
         content_type="text/html",
         status=500,
