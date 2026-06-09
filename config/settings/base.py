@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     "apps.delivery",
     "apps.donations",
     "apps.ai_assistant",
+    "apps.site_config",
 ]
 
 MIDDLEWARE = [
@@ -61,6 +62,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "apps.dashboards.context_processors.navigation",
+                "apps.site_config.context_processors.org",
             ],
         },
     },

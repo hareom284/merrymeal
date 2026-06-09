@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Page not found · {{ org.name|default:"MerryMeal" }}{% endblock %}
+
+{% block content %}
+<section class="flex flex-col items-center text-center gap-6 py-10">
+  <div style="width: 96px; height: 96px; border-radius: 24px; background: #ccfbf1; display: flex; align-items: center; justify-content: center;">
+    <svg style="width: 48px; height: 48px; color: #0f766e;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+      <path d="M21 21l-4.35-4.35M10 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16z" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+
+  <div class="flex flex-col gap-2">
+    <p class="text-xs uppercase tracking-[0.2em] text-warm-500">Error 404</p>
+    <h1 class="font-display text-3xl text-warm-900">We couldn't find that page</h1>
+    <p class="text-warm-600">
+      The link may be old, or the page has moved. From here you can head back
+      to the {{ org.name|default:"MerryMeal" }} home page, or call us if you
+      were expecting something else.
+    </p>
+  </div>
+
+  <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+    <a href="{% url 'dashboards:landing' %}"
+       class="inline-flex items-center justify-center rounded-xl bg-brand-green text-white px-5 py-3 text-sm font-semibold hover:bg-brand-green-hover">
+      Back to home
+    </a>
+    {% if org.phone %}
+      <a href="tel:{{ org.phone }}"
+         class="inline-flex items-center justify-center rounded-xl border border-warm-300 bg-white px-5 py-3 text-sm font-semibold text-warm-900 hover:border-brand-green">
+        Call {{ org.phone }}
+      </a>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

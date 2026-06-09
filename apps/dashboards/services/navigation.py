@@ -52,14 +52,18 @@ _ADMIN_NAV = [
     NavItem("applications", "Applications", "dashboards:admin_applications", "users"),
     NavItem("kitchens", "Kitchens", "dashboards:admin_kitchens", "kitchen"),
     NavItem("audit", "Audit", "dashboards:audit_viewer", "shield"),
+    NavItem("settings", "Settings", "site_config:edit", "shield"),
+    NavItem("profile", "Profile", "dashboards:admin_profile", "profile"),
 ]
 
 _VOLUNTEER_NAV = [
     NavItem("today", "Today", "delivery:volunteer_today", "truck"),
+    NavItem("availability", "When", "volunteers:availability", "history"),
 ]
 
 _KITCHEN_STAFF_NAV = [
-    NavItem("receive", "Receive stock", "kitchens:stock_receive", "kitchen"),
+    NavItem("receive", "Receive", "kitchens:stock_receive", "kitchen"),
+    NavItem("safety", "Safety", "food_safety:safety-check", "shield"),
 ]
 
 NAV_ITEMS_BY_ROLE: dict[str, list[NavItem]] = {

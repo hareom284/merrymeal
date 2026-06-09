@@ -1,0 +1,127 @@
+{% extends "app_base.html" %}
+{% load static %}
+{% block title %}Organisation settings · MerryMeal{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto flex flex-col gap-6">
+  <header class="flex flex-col gap-1 px-1">
+    <h1 class="font-display text-2xl text-warm-900">Organisation settings</h1>
+    <p class="text-warm-500 text-sm">
+      These details show up across the site — receipts, the help page, error
+      screens, transactional emails, and the AI assistant.
+    </p>
+  </header>
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="rounded-2xl border p-3 text-sm
+                  {% if message.tags == 'success' %}border-green-200 bg-green-50 text-green-800
+                  {% else %}border-warm-200 bg-warm-50 text-warm-700{% endif %}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <form method="post" enctype="multipart/form-data" class="flex flex-col gap-5">
+    {% csrf_token %}
+
+    <section class="rounded-2xl border border-warm-200 bg-white p-5 flex flex-col gap-4">
+      <h2 class="font-display text-lg text-warm-900">Identity</h2>
+
+      <div>
+        <label for="{{ form.name.id_for_label }}" class="block text-sm font-medium text-warm-800 mb-1">Charity name</label>
+        {{ form.name }}
+        {% if form.name.errors %}<p class="text-sm text-red-600 mt-1">{{ form.name.errors.0 }}</p>{% endif %}
+      </div>
+
+      <div>
+        <label for="{{ form.tagline.id_for_label }}" class="block text-sm font-medium text-warm-800 mb-1">Tagline</label>
+        {{ form.tagline }}
+        <p class="text-xs text-warm-500 mt-1">{{ form.tagline.help_text }}</p>
+        {% if form.tagline.errors %}<p class="text-sm text-red-600 mt-1">{{ form.tagline.errors.0 }}</p>{% endif %}
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-warm-800 mb-1">Logo</label>
+        <div class="flex items-center gap-4">
+          <img src="{{ org.logo_url }}" alt="Current logo"
+               class="w-16 h-16 rounded-xl object-contain bg-warm-50 border border-warm-200 shrink-0">
+          <div class="flex-1">
+            {{ form.logo }}
+            <p class="text-xs text-warm-500 mt-1">{{ form.logo.help_text }}</p>
+            {% if form.logo.errors %}<p class="text-sm text-red-600 mt-1">{{ form.logo.errors.0 }}</p>{% endif %}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="rounded-2xl border border-warm-200 bg-white p-5 flex flex-col gap-4">
+      <h2 class="font-display text-lg text-warm-900">Contact</h2>
+
+      <div>
+        <label for="{{ form.address.id_for_label }}" class="block text-sm font-medium text-warm-800 mb-1">Address</label>
+        {{ form.address }}
+        <p class="text-xs text-warm-500 mt-1">{{ form.address.help_text }}</p>
+        {% if form.address.errors %}<p class="text-sm text-red-600 mt-1">{{ form.address.errors.0 }}</p>{% endif %}
+      </div>
+
+      <div class="grid sm:grid-cols-2 gap-4">
+        <div>
+          <label for="{{ form.phone.id_for_label }}" class="block text-sm font-medium text-warm-800 mb-1">Phone</label>
+          {{ form.phone }}
+          {% if form.phone.errors %}<p class="text-sm text-red-600 mt-1">{{ form.phone.errors.0 }}</p>{% endif %}
+        </div>
+        <div>
+          <label for="{{ form.contact_email.id_for_label }}" class="block text-sm font-medium text-warm-800 mb-1">Public email</label>
+          {{ form.contact_email }}
+          {% if form.contact_email.errors %}<p class="text-sm text-red-600 mt-1">{{ form.contact_email.errors.0 }}</p>{% endif %}
+        </div>
+      </div>
+
+      <div>
+        <label for="{{ form.office_email.id_for_label }}" class="block text-sm font-medium text-warm-800 mb-1">Office email</label>
+        {{ form.office_email }}
+        <p class="text-xs text-warm-500 mt-1">{{ form.office_email.help_text }}</p>
+        {% if form.office_email.errors %}<p class="text-sm text-red-600 mt-1">{{ form.office_email.errors.0 }}</p>{% endif %}
+      </div>
+    </section>
+
+    <div class="flex items-center justify-between gap-3">
+      <p class="text-xs text-warm-500">
+        Last saved {{ org.updated_at|date:"D d M Y · H:i" }}
+      </p>
+      <button type="submit"
+              class="inline-flex items-center justify-center rounded-xl bg-brand-green text-white px-5 py-2.5 text-sm font-semibold hover:bg-brand-green-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green focus-visible:ring-offset-2">
+        Save changes
+      </button>
+    </div>
+  </form>
+</div>
+
+<style>
+  /* Style the auto-rendered form widgets so they match the site theme
+     without forcing a Tailwind purge dependency. */
+  form input[type="text"],
+  form input[type="email"],
+  form input[type="file"],
+  form textarea {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #e8e6e1;
+    border-radius: 10px;
+    background: white;
+    color: #1a1917;
+    font-size: 14px;
+    font-family: inherit;
+  }
+  form input[type="text"]:focus,
+  form input[type="email"]:focus,
+  form textarea:focus {
+    outline: 2px solid #16a34a;
+    outline-offset: 1px;
+    border-color: #16a34a;
+  }
+  form input[type="file"] { padding: 6px; }
+  form textarea { resize: vertical; min-height: 70px; font-family: inherit; }
+</style>
+{% endblock %}

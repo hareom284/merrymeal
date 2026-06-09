@@ -45,4 +45,11 @@ urlpatterns = [
     path("", include("apps.donations.urls")),
     # AI assistant — Gemini-backed chat widget endpoint.
     path("", include("apps.ai_assistant.urls")),
+    # Site config — admin-editable charity name/address/phone/logo
+    # at /admin/settings/.
+    path("admin/", include("apps.site_config.urls")),
 ]
+
+# Custom error handlers — branded 404 / 500 pages.
+handler404 = "apps.site_config.views.errors.not_found_view"
+handler500 = "apps.site_config.views.errors.server_error_view"

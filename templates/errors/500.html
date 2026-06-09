@@ -1,0 +1,35 @@
+{% load static %}<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Something went wrong · MerryMeal</title>
+    <link rel="stylesheet" href="{% static 'dist/output.css' %}" />
+  </head>
+  {# A 500 may have fired because a context processor blew up, so we
+     intentionally don't extend base.html here — every dependency on
+     this page is inline so the error screen always renders. #}
+  <body style="margin: 0; padding: 0; min-height: 100vh; background: #faf9f8; font-family: -apple-system, BlinkMacSystemFont, sans-serif; display: flex; align-items: center; justify-content: center;">
+    <section style="max-width: 28rem; padding: 32px; text-align: center;">
+      <div style="width: 96px; height: 96px; border-radius: 24px; background: #fef2f2; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px;">
+        <svg style="width: 48px; height: 48px; color: #b91c1c;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M12 9v3.5M12 16h.01M5.07 19h13.86c1.54 0 2.5-1.67 1.73-3L13.73 4a2 2 0 0 0-3.46 0L3.34 16c-.77 1.33.19 3 1.73 3z" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+
+      <p style="font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: #827b6f; margin: 0;">Error 500</p>
+      <h1 style="font-size: 28px; color: #1a1917; margin: 8px 0 12px; font-family: 'Playfair Display', Georgia, serif; font-weight: 600;">
+        Something went wrong on our side
+      </h1>
+      <p style="color: #5d574e; margin: 0 0 28px; line-height: 1.55;">
+        Our engineers have been notified. Please try again in a moment, or
+        call the office if you were in the middle of something important.
+      </p>
+
+      <a href="/"
+         style="display: inline-block; padding: 12px 24px; background: #16a34a; color: white; border-radius: 12px; text-decoration: none; font-weight: 600; font-size: 14px;">
+        Back to home
+      </a>
+    </section>
+  </body>
+</html>
