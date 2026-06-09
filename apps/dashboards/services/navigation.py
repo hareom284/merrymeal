@@ -32,9 +32,7 @@ class NavItem:
 
 _MEMBER_NAV = [
     NavItem("dashboard", "Home", "dashboards:member", "home"),
-    # ``menu`` tab currently lands on the dashboard's week-menu section.
-    # Story 12.5 will repoint this to a standalone /menu/ page.
-    NavItem("menu", "Menu", "dashboards:member", "menu"),
+    NavItem("menu", "Menu", "dashboards:weekly_menu", "menu"),
     NavItem("profile", "Profile", "dashboards:member_profile", "profile"),
     NavItem("help", "Help", "dashboards:member_help", "help"),
 ]

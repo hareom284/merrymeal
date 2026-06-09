@@ -1,0 +1,70 @@
+{% extends "app_base.html" %}
+{% block title %}This week's menu · MerryMeal{% endblock %}
+
+{% block content %}
+<div class="flex flex-col gap-5 max-w-3xl mx-auto">
+
+  <header class="flex items-center justify-between">
+    <div>
+      <p class="text-xs uppercase tracking-widest text-warm-500">This week</p>
+      <h1 class="font-display text-2xl text-warm-900">Your menu</h1>
+    </div>
+    <p class="text-sm text-warm-500 tabular-nums">{{ today|date:"j M Y" }}</p>
+  </header>
+
+  <ul class="flex flex-col gap-3">
+    {% for day in days %}
+      <li>
+        <article class="rounded-2xl border p-4 sm:p-5
+                        {% if day.state == 'today' %}border-brand-green bg-brand-green/5
+                        {% elif day.state == 'done' %}border-warm-200 bg-warm-50
+                        {% else %}border-warm-200 bg-white{% endif %}">
+          <header class="flex items-center justify-between gap-3 mb-2">
+            <div class="flex items-center gap-3 min-w-0">
+              <span class="w-12 h-12 rounded-xl flex flex-col items-center justify-center shrink-0
+                           {% if day.state == 'today' %}bg-brand-green text-white
+                           {% elif day.state == 'done' %}bg-warm-200 text-warm-600
+                           {% else %}bg-warm-100 text-warm-700{% endif %}">
+                <span class="text-[10px] font-semibold tracking-wider leading-none">{{ day.weekday }}</span>
+                <span class="text-base font-bold leading-none mt-0.5 tabular-nums">{{ day.date|date:"j" }}</span>
+              </span>
+              <div class="min-w-0">
+                <p class="font-semibold text-warm-900 truncate">{{ day.meal_name }}</p>
+                {% if day.kitchen_name %}
+                  <p class="text-xs text-warm-500 truncate">from {{ day.kitchen_name }}</p>
+                {% endif %}
+              </div>
+            </div>
+            <div class="shrink-0">
+              {% if day.state == 'today' %}
+                <span class="inline-flex items-center rounded-full bg-sky-100 text-sky-700 text-xs font-medium px-2.5 py-0.5">Today</span>
+              {% elif day.state == 'done' %}
+                <svg class="w-5 h-5 text-brand-green" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><polyline points="20 6 9 17 4 12" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              {% endif %}
+            </div>
+          </header>
+
+          {% if day.ingredient_names %}
+            <p class="text-sm text-warm-600 leading-relaxed mt-2">
+              {{ day.ingredient_names|join:", " }}
+            </p>
+          {% endif %}
+
+          {% if day.allergens %}
+            <ul class="mt-3 flex flex-wrap gap-2">
+              {% for a in day.allergens %}
+                <li>
+                  <span class="inline-flex items-center gap-1.5 rounded-full bg-red-100 text-red-800 text-xs font-medium px-2.5 py-1">
+                    <span aria-hidden="true">&#9888;</span>
+                    Contains {{ a.name }}
+                  </span>
+                </li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </article>
+      </li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}
