@@ -42,11 +42,34 @@ def test_volunteer_card_uses_mailto_link(client):
 
 
 @pytest.mark.django_db
-def test_landing_title_includes_brand_and_heading(client):
+def test_landing_title_includes_brand_and_new_headline(client):
+    """Story 12.2 — landing copy shifted from a role-picker
+    (\"How would you like to help?\") to a member-first marketing
+    headline. The new design leads with the value prop, then offers
+    Apply for meals + Donate as primary actions."""
     response = client.get("/")
-    assert b"MerryMeal" in response.content
-    assert b"How would you like to help?" in response.content
-    assert b"Join the community" in response.content
+    body = response.content
+    assert b"MerryMeal" in body
+    assert b"friendly smile" in body
+    assert b"5,000+ MEALS DAILY" in body
+
+
+@pytest.mark.django_db
+def test_landing_has_how_it_works_section(client):
+    response = client.get("/")
+    body = response.content
+    assert b"How it works" in body or b"HOW IT WORKS" in body
+    assert b"Three caring steps" in body
+    assert b"01" in body
+
+
+@pytest.mark.django_db
+def test_landing_donate_cta_present(client):
+    """Donate is now a top-level CTA on landing, not a tiny footer link."""
+    response = client.get("/")
+    body = response.content
+    assert b"Donate" in body
+    assert b"/donate/" in body
 
 
 @pytest.mark.django_db

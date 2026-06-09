@@ -1,0 +1,66 @@
+{% extends "app_base.html" %}
+{% block title %}Notifications · MerryMeal admin{% endblock %}
+
+{% block content %}
+<section class="mx-auto flex w-full max-w-3xl flex-col gap-6">
+
+  <header class="flex items-center justify-between gap-3">
+    <div>
+      <h1 class="font-display text-2xl text-warm-900">Notifications</h1>
+      <p class="text-warm-500 text-sm mt-0.5">
+        {% if notifications %}{{ notifications|length }} attention area{{ notifications|length|pluralize }}{% else %}You're all caught up.{% endif %}
+      </p>
+    </div>
+    {% if notifications %}
+      <form method="post" action="{% url 'dashboards:admin_notifications' %}" class="m-0">
+        {% csrf_token %}
+        <button type="submit"
+                class="text-sm font-medium text-brand-green hover:text-brand-green-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green focus-visible:ring-offset-2 rounded">
+          Mark all read
+        </button>
+      </form>
+    {% endif %}
+  </header>
+
+  {% if notifications %}
+    <ul class="flex flex-col gap-3">
+      {% for n in notifications %}
+        <li>
+          <a href="{{ n.url }}"
+             class="flex items-start gap-4 rounded-2xl bg-white border p-4 hover:border-brand-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green
+                    {% if n.severity == 'red' %}border-red-200
+                    {% elif n.severity == 'yellow' %}border-amber-200
+                    {% else %}border-warm-200{% endif %}">
+            <span aria-hidden="true"
+                  class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0
+                  {% if n.severity == 'red' %}bg-red-100 text-red-700
+                  {% elif n.severity == 'yellow' %}bg-amber-100 text-amber-700
+                  {% else %}bg-warm-100 text-warm-700{% endif %}">
+              {% include "_partials/nav_icon.html" with name=n.icon class="w-5 h-5" %}
+            </span>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center justify-between gap-2">
+                <p class="font-semibold text-warm-900">{{ n.title }}</p>
+                <span class="inline-flex items-center rounded-full text-xs font-semibold px-2.5 py-0.5
+                             {% if n.severity == 'red' %}bg-red-100 text-red-800
+                             {% elif n.severity == 'yellow' %}bg-amber-100 text-amber-800
+                             {% else %}bg-warm-100 text-warm-700{% endif %}">{{ n.count }}</span>
+              </div>
+              <p class="text-sm text-warm-600 leading-relaxed mt-0.5">{{ n.body }}</p>
+            </div>
+            <svg class="w-4 h-4 text-warm-400 mt-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m9 18 6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <div class="rounded-2xl border border-dashed border-warm-300 bg-warm-50 p-8 text-center">
+      <p class="font-display text-xl text-warm-900">Nothing to action right now.</p>
+      <p class="mt-2 text-sm text-warm-600">
+        When applications come in or deliveries fail, they'll appear here.
+      </p>
+    </div>
+  {% endif %}
+
+</section>
+{% endblock %}

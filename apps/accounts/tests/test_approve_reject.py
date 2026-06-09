@@ -109,6 +109,40 @@ def test_approve_reuses_existing_caregiver():
     assert link.relationship == "friend"
 
 
+# ---------- approve: atomicity ----------
+
+def test_approve_rolls_back_on_inner_failure(monkeypatch):
+    """A failure inside the atomic block reverts every write and skips email.
+
+    Patches ``issue_password_setup_token`` (the last call inside the
+    ``transaction.atomic()`` block) to raise. After the exception:
+      * no member ``User`` row was committed
+      * the application stays ``STATUS_SUBMITTED``
+      * no welcome email is sent (``on_commit`` callback never fires)
+    """
+    import apps.accounts.services.tokens as tokens
+
+    def _boom(_member):
+        raise RuntimeError("token issuance failed")
+
+    # The service imports ``issue_password_setup_token`` lazily inside
+    # the function body, so we patch the source module — the next call
+    # picks up the patched attribute.
+    monkeypatch.setattr(tokens, "issue_password_setup_token", _boom)
+
+    app = _submitted_app()
+    admin = _admin()
+
+    with pytest.raises(RuntimeError, match="token issuance failed"):
+        approve_application(app, admin)
+
+    assert not User.objects.filter(email="margaret@example.com").exists()
+    app.refresh_from_db()
+    assert app.status == Application.STATUS_SUBMITTED
+    assert app.approved_by is None
+    assert mail.outbox == []
+
+
 # ---------- reject ----------
 
 def test_reject_marks_application_rejected():

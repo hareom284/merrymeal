@@ -1,8 +1,8 @@
-{% extends "base.html" %}
+{% extends "app_base.html" %}
 {% block title %}Application — {{ application.full_name }} · MerryMeal{% endblock %}
 
 {% block content %}
-<section class="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-8">
+<section class="mx-auto flex w-full max-w-3xl flex-col gap-6">
   <nav class="text-sm text-warm-500">
     <a href="{% url 'dashboards:admin_applications' %}" class="hover:underline">← Back to queue</a>
   </nav>

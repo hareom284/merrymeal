@@ -1,0 +1,120 @@
+{% extends "app_base.html" %}
+{% block title %}Food safety · MerryMeal admin{% endblock %}
+
+{% block content %}
+<section class="mx-auto flex w-full max-w-6xl flex-col gap-5">
+
+  <header class="flex flex-wrap items-end justify-between gap-3">
+    <div>
+      <h1 class="font-display text-2xl text-warm-900">Food safety</h1>
+      <p class="text-warm-500 text-sm mt-0.5">{{ total }} check{{ total|pluralize }}</p>
+    </div>
+    <a href="{% url 'dashboards:admin_fs_create' %}"
+       class="inline-flex items-center gap-2 rounded-xl bg-brand-green px-4 py-2 text-sm font-semibold text-white hover:bg-brand-green-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green focus-visible:ring-offset-2">
+      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg>
+      Add check
+    </a>
+  </header>
+
+  <form method="get" class="grid grid-cols-1 sm:grid-cols-4 gap-2">
+    <div>
+      <label for="kitchen" class="sr-only">Kitchen</label>
+      <select id="kitchen" name="kitchen"
+              class="w-full rounded-xl border border-warm-300 bg-white px-4 py-2.5 text-sm focus:outline-none focus:border-brand-green focus:ring-2 focus:ring-brand-green/30">
+        <option value="">All kitchens</option>
+        {% for k in kitchens %}
+          <option value="{{ k.id }}" {% if filters.kitchen_id == k.id %}selected{% endif %}>{{ k.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label for="result" class="sr-only">Result</label>
+      <select id="result" name="result"
+              class="w-full rounded-xl border border-warm-300 bg-white px-4 py-2.5 text-sm focus:outline-none focus:border-brand-green focus:ring-2 focus:ring-brand-green/30">
+        <option value="" {% if not filters.result %}selected{% endif %}>All results</option>
+        <option value="pass" {% if filters.result == "pass" %}selected{% endif %}>Pass</option>
+        <option value="fail" {% if filters.result == "fail" %}selected{% endif %}>Fail</option>
+      </select>
+    </div>
+    <div>
+      <label for="from" class="sr-only">From</label>
+      <input id="from" type="date" name="from" value="{{ filters.date_from|date:'Y-m-d' }}"
+             class="w-full rounded-xl border border-warm-300 bg-white px-4 py-2.5 text-sm focus:outline-none focus:border-brand-green focus:ring-2 focus:ring-brand-green/30">
+    </div>
+    <div class="flex gap-2">
+      <input id="to" type="date" name="to" value="{{ filters.date_to|date:'Y-m-d' }}"
+             aria-label="To"
+             class="flex-1 rounded-xl border border-warm-300 bg-white px-4 py-2.5 text-sm focus:outline-none focus:border-brand-green focus:ring-2 focus:ring-brand-green/30">
+      <button type="submit"
+              class="rounded-xl bg-brand-green px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-green-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green focus-visible:ring-offset-2">
+        Filter
+      </button>
+    </div>
+  </form>
+
+  {% if page.object_list %}
+    <div class="rounded-2xl border border-warm-200 bg-white overflow-hidden">
+      <table class="min-w-full text-sm">
+        <thead class="bg-warm-50 text-warm-600 text-left text-xs uppercase tracking-wider">
+          <tr>
+            <th class="px-4 py-3 font-semibold">When</th>
+            <th class="px-4 py-3 font-semibold">Kitchen</th>
+            <th class="px-4 py-3 font-semibold hidden sm:table-cell">Type</th>
+            <th class="px-4 py-3 font-semibold hidden md:table-cell">Temp °C</th>
+            <th class="px-4 py-3 font-semibold">Result</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-warm-200">
+          {% for c in page.object_list %}
+            <tr class="hover:bg-warm-50">
+              <td class="px-4 py-3">
+                <a href="{% url 'dashboards:admin_fs_detail' c.id %}"
+                   class="text-warm-900 hover:text-brand-green font-medium tabular-nums">
+                  {{ c.checked_at|date:"j M · g:i A" }}
+                </a>
+              </td>
+              <td class="px-4 py-3 text-warm-700">{{ c.kitchen.name }}</td>
+              <td class="px-4 py-3 text-warm-700 hidden sm:table-cell">{{ c.get_check_type_display }}</td>
+              <td class="px-4 py-3 text-warm-700 hidden md:table-cell tabular-nums">
+                {% if c.temperature_celsius is not None %}{{ c.temperature_celsius }}{% else %}—{% endif %}
+              </td>
+              <td class="px-4 py-3">
+                {% if c.result == "pass" %}
+                  <span class="inline-flex items-center rounded-full bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5">Pass</span>
+                {% else %}
+                  <span class="inline-flex items-center rounded-full bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5">Fail</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    {% if page.has_other_pages %}
+      <nav class="flex items-center justify-between text-sm" aria-label="Pagination">
+        <span class="text-warm-500">
+          Page {{ page.number }} of {{ page.paginator.num_pages }}
+        </span>
+        <div class="flex gap-2">
+          {% if page.has_previous %}
+            <a href="?{% if base_querystring %}{{ base_querystring }}&amp;{% endif %}page={{ page.previous_page_number }}"
+               class="rounded-xl border border-warm-300 px-3 py-1.5 text-warm-700 hover:border-brand-green">Previous</a>
+          {% endif %}
+          {% if page.has_next %}
+            <a href="?{% if base_querystring %}{{ base_querystring }}&amp;{% endif %}page={{ page.next_page_number }}"
+               class="rounded-xl border border-warm-300 px-3 py-1.5 text-warm-700 hover:border-brand-green">Next</a>
+          {% endif %}
+        </div>
+      </nav>
+    {% endif %}
+
+  {% else %}
+    <div class="rounded-2xl border border-dashed border-warm-300 bg-warm-50 p-8 text-center">
+      <p class="font-display text-xl text-warm-900">No checks match.</p>
+      <p class="mt-2 text-sm text-warm-600">Try clearing the filters or add the first check.</p>
+    </div>
+  {% endif %}
+
+</section>
+{% endblock %}

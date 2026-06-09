@@ -39,6 +39,17 @@ def fy_period(fy: int) -> tuple[date, date]:
     return date(fy - 1, 7, 1), date(fy, 6, 30)
 
 
+def fy_for_date(d: date) -> int:
+    """Return the FY ending year for ``d``.
+
+    ``fy_for_date(date(2025, 8, 1)) == 2026`` — an August date sits in
+    the FY that ends the following June. Used by the donor history
+    page to render a per-row "Tax receipt" link pointing at the
+    correct FY receipt.
+    """
+    return d.year if d.month <= 6 else d.year + 1
+
+
 def _current_fy() -> int:
     """The FY that includes ``today`` (Melbourne time).
 

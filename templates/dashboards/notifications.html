@@ -1,0 +1,62 @@
+{% extends "app_base.html" %}
+{% block title %}Notifications &middot; MerryMeal{% endblock %}
+
+{% block content %}
+<div class="flex flex-col gap-6 max-w-2xl mx-auto">
+
+  <header class="flex items-center justify-between gap-3 px-1">
+    <div>
+      <h1 class="font-display text-2xl text-warm-900">Notifications</h1>
+      <p class="text-warm-500 text-sm mt-0.5">
+        {% if notifications %}{{ notifications|length }} new today{% else %}You're all caught up.{% endif %}
+      </p>
+    </div>
+    {% if notifications %}
+      {% comment %} "Mark all read" is a no-op POST (the list is synthesised
+         from live data, so nothing persists). Returns 204 — the page
+         reloads via the form's redirect to keep the UX simple. {% endcomment %}
+      <form method="post" action="{% url 'dashboards:notifications' %}" class="m-0">
+        {% csrf_token %}
+        <button type="submit"
+                class="text-sm font-medium text-brand-green hover:text-brand-green-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green focus-visible:ring-offset-2 rounded">
+          Mark all read
+        </button>
+      </form>
+    {% endif %}
+  </header>
+
+  {% if notifications %}
+    <ul class="flex flex-col gap-3" data-testid="notifications-list">
+      {% for n in notifications %}
+        <li>
+          <a href="{{ n.url }}"
+             class="flex items-start gap-4 rounded-2xl bg-white border border-warm-200 p-4 hover:border-brand-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green"
+             data-testid="notification-{{ n.kind }}">
+            <span aria-hidden="true"
+                  class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0
+                  {% if n.kind == 'delivery' %}bg-brand-green/10 text-brand-green
+                  {% elif n.kind == 'feedback' %}bg-amber-100 text-amber-700
+                  {% else %}bg-warm-100 text-warm-700{% endif %}">
+              {% include "_partials/nav_icon.html" with name=n.icon class="w-5 h-5" %}
+            </span>
+            <div class="min-w-0 flex-1">
+              <p class="font-semibold text-warm-900">{{ n.title }}</p>
+              <p class="text-sm text-warm-600 leading-relaxed mt-0.5">{{ n.body }}</p>
+              <p class="text-xs uppercase tracking-wider text-warm-500 mt-2">{{ n.when }}</p>
+            </div>
+            <svg class="w-4 h-4 text-warm-400 mt-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m9 18 6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <div class="rounded-2xl border border-dashed border-warm-300 bg-warm-50 p-8 text-center">
+      <p class="font-display text-xl text-warm-900">Nothing new right now.</p>
+      <p class="mt-2 text-sm text-warm-600">
+        We'll let you know when there's a meal on the way or feedback to give.
+      </p>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

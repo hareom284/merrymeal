@@ -1,28 +1,39 @@
-<!doctype html>
-<html><body style="font-family: Arial, sans-serif; color:#1a1917;">
-  <p>Hi team,</p>
-  <p>The following batches at <strong>{{ kitchen.name }}</strong>
-     expire on or before <strong>{{ cutoff|date:"D j M Y" }}</strong>
-     (cutoff: 3 days from {{ today|date:"D j M Y" }}).</p>
+{% extends "emails/_base.html" %}
 
-  {% for ingredient, batches in ingredient_groups %}
-    <h3 style="margin:16px 0 4px;">{{ ingredient.name }} ({{ ingredient.unit }})</h3>
-    <table cellpadding="6" cellspacing="0" border="1"
-           style="border-collapse:collapse; border-color:#e8e6e1;">
-      <thead style="background:#faf9f8;">
-        <tr><th>Lot</th><th>Quantity</th><th>Expires</th></tr>
-      </thead>
-      <tbody>
-        {% for b in batches %}
-          <tr>
-            <td>{{ b.lot_number|default:"—" }}</td>
-            <td>{{ b.quantity }} {{ ingredient.unit }}</td>
-            <td>{{ b.expiration_date|date:"D j M Y" }}</td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  {% endfor %}
+{% block content %}
+<p style="margin:0 0 16px 0; font-size:16px; color:#1a1917;">
+  Hi team,
+</p>
+<p style="margin:0 0 20px 0; font-size:15px; color:#403c36; line-height:1.6;">
+  The following batches at <strong>{{ kitchen.name }}</strong> expire on or before
+  <strong>{{ cutoff|date:"D j M Y" }}</strong> — three days from {{ today|date:"D j M Y" }}.
+</p>
 
-  <p style="margin-top:24px; color:#827b6f; font-size:12px;">— MerryMeal automation</p>
-</body></html>
+{% for ingredient, batches in ingredient_groups %}
+  <p style="margin:24px 0 8px 0; font-size:13px; font-weight:600; color:#1a1917; letter-spacing:0.02em;">
+    {{ ingredient.name }} <span style="color:#5d574e; font-weight:400;">({{ ingredient.unit }})</span>
+  </p>
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="border-collapse:collapse; background:#faf9f8; border-radius:12px; overflow:hidden;">
+    <thead>
+      <tr style="background:#f5f4f1;">
+        <th align="left" style="padding:10px 14px; font-size:11px; font-weight:600; color:#5d574e; text-transform:uppercase; letter-spacing:0.06em;">Lot</th>
+        <th align="left" style="padding:10px 14px; font-size:11px; font-weight:600; color:#5d574e; text-transform:uppercase; letter-spacing:0.06em;">Quantity</th>
+        <th align="left" style="padding:10px 14px; font-size:11px; font-weight:600; color:#5d574e; text-transform:uppercase; letter-spacing:0.06em;">Expires</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for b in batches %}
+        <tr>
+          <td style="padding:10px 14px; border-top:1px solid #e8e6e1; font-size:13px; color:#1a1917;">{{ b.lot_number|default:"—" }}</td>
+          <td style="padding:10px 14px; border-top:1px solid #e8e6e1; font-size:13px; color:#1a1917;">{{ b.quantity }} {{ ingredient.unit }}</td>
+          <td style="padding:10px 14px; border-top:1px solid #e8e6e1; font-size:13px; color:#b91c1c; font-weight:600;">{{ b.expiration_date|date:"D j M Y" }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endfor %}
+
+<p style="margin:32px 0 0 0; font-size:12px; color:#5d574e;">
+  — {{ org.name|default:"MerryMeal" }} automation
+</p>
+{% endblock %}

@@ -1,0 +1,117 @@
+{% extends "app_base.html" %}
+{% block title %}Ingredient batches · MerryMeal admin{% endblock %}
+
+{% block content %}
+<section class="mx-auto flex w-full max-w-6xl flex-col gap-5">
+
+  <header class="flex flex-wrap items-end justify-between gap-3">
+    <div>
+      <h1 class="font-display text-2xl text-warm-900">Ingredient batches</h1>
+      <p class="text-warm-500 text-sm mt-0.5">{{ total }} batch{{ total|pluralize:"es" }}</p>
+    </div>
+    <a href="{% url 'dashboards:admin_batch_create' %}"
+       class="inline-flex items-center gap-2 rounded-xl bg-brand-green px-4 py-2 text-sm font-semibold text-white hover:bg-brand-green-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green focus-visible:ring-offset-2">
+      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg>
+      Add batch
+    </a>
+  </header>
+
+  <form method="get" class="grid grid-cols-1 sm:grid-cols-4 gap-2">
+    <div>
+      <label for="kitchen" class="sr-only">Kitchen</label>
+      <select id="kitchen" name="kitchen"
+              class="w-full rounded-xl border border-warm-300 bg-white px-4 py-2.5 text-sm focus:outline-none focus:border-brand-green focus:ring-2 focus:ring-brand-green/30">
+        <option value="">All kitchens</option>
+        {% for k in kitchens %}
+          <option value="{{ k.id }}" {% if filters.kitchen_id == k.id %}selected{% endif %}>{{ k.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label for="ingredient" class="sr-only">Ingredient</label>
+      <select id="ingredient" name="ingredient"
+              class="w-full rounded-xl border border-warm-300 bg-white px-4 py-2.5 text-sm focus:outline-none focus:border-brand-green focus:ring-2 focus:ring-brand-green/30">
+        <option value="">All ingredients</option>
+        {% for i in ingredients %}
+          <option value="{{ i.id }}" {% if filters.ingredient_id == i.id %}selected{% endif %}>{{ i.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label for="expiring" class="sr-only">Expiring</label>
+      <select id="expiring" name="expiring"
+              class="w-full rounded-xl border border-warm-300 bg-white px-4 py-2.5 text-sm focus:outline-none focus:border-brand-green focus:ring-2 focus:ring-brand-green/30">
+        <option value="">Any expiration</option>
+        <option value="expired" {% if expiring_param == "expired" %}selected{% endif %}>Already expired</option>
+        <option value="3" {% if expiring_param == "3" %}selected{% endif %}>Expiring in 3 days</option>
+        <option value="7" {% if expiring_param == "7" %}selected{% endif %}>Expiring in 7 days</option>
+        <option value="14" {% if expiring_param == "14" %}selected{% endif %}>Expiring in 14 days</option>
+      </select>
+    </div>
+    <button type="submit"
+            class="rounded-xl bg-brand-green px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-green-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green focus-visible:ring-offset-2">
+      Filter
+    </button>
+  </form>
+
+  {% if page.object_list %}
+    <div class="rounded-2xl border border-warm-200 bg-white overflow-hidden">
+      <table class="min-w-full text-sm">
+        <thead class="bg-warm-50 text-warm-600 text-left text-xs uppercase tracking-wider">
+          <tr>
+            <th class="px-4 py-3 font-semibold">Expires</th>
+            <th class="px-4 py-3 font-semibold">Ingredient</th>
+            <th class="px-4 py-3 font-semibold hidden sm:table-cell">Kitchen</th>
+            <th class="px-4 py-3 font-semibold hidden md:table-cell">Qty</th>
+            <th class="px-4 py-3 font-semibold hidden lg:table-cell">Lot</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-warm-200">
+          {% for b in page.object_list %}
+            <tr class="hover:bg-warm-50">
+              <td class="px-4 py-3">
+                <a href="{% url 'dashboards:admin_batch_detail' b.id %}"
+                   class="font-medium text-warm-900 hover:text-brand-green tabular-nums">
+                  {{ b.expiration_date|date:"j M Y" }}
+                </a>
+                {% if b.expiration_date < today %}
+                  <span class="ml-1 inline-flex items-center rounded-full bg-red-100 text-red-800 text-[10px] font-semibold px-2 py-0.5">Expired</span>
+                {% endif %}
+              </td>
+              <td class="px-4 py-3 text-warm-700">{{ b.ingredient.name }}</td>
+              <td class="px-4 py-3 text-warm-700 hidden sm:table-cell">{{ b.kitchen.name }}</td>
+              <td class="px-4 py-3 text-warm-700 hidden md:table-cell tabular-nums">{{ b.quantity }} {{ b.ingredient.unit }}</td>
+              <td class="px-4 py-3 text-warm-500 hidden lg:table-cell">{{ b.lot_number|default:"—" }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    {% if page.has_other_pages %}
+      <nav class="flex items-center justify-between text-sm" aria-label="Pagination">
+        <span class="text-warm-500">Page {{ page.number }} of {{ page.paginator.num_pages }}</span>
+        <div class="flex gap-2">
+          {% if page.has_previous %}
+            <a href="?{% if base_querystring %}{{ base_querystring }}&amp;{% endif %}page={{ page.previous_page_number }}"
+               class="rounded-xl border border-warm-300 px-3 py-1.5 text-warm-700 hover:border-brand-green">Previous</a>
+          {% endif %}
+          {% if page.has_next %}
+            <a href="?{% if base_querystring %}{{ base_querystring }}&amp;{% endif %}page={{ page.next_page_number }}"
+               class="rounded-xl border border-warm-300 px-3 py-1.5 text-warm-700 hover:border-brand-green">Next</a>
+          {% endif %}
+        </div>
+      </nav>
+    {% endif %}
+
+  {% else %}
+    <div class="rounded-2xl border border-dashed border-warm-300 bg-warm-50 p-8 text-center">
+      <p class="font-display text-xl text-warm-900">No batches match.</p>
+      <p class="mt-2 text-sm text-warm-600">Try clearing the filters or
+        <a href="{% url 'dashboards:admin_batch_create' %}" class="text-brand-green underline">log the first batch</a>.
+      </p>
+    </div>
+  {% endif %}
+
+</section>
+{% endblock %}

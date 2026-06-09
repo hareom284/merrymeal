@@ -4,12 +4,12 @@ from datetime import timedelta
 
 from django.core.mail import EmailMultiAlternatives
 from django.db import IntegrityError, transaction
-from django.template.loader import render_to_string
 from django.utils import timezone
 
 from apps.accounts.models import User
 from apps.kitchens.models import ExpiryAlertLog, Kitchen
 from apps.kitchens.services.expiry import find_expiring_batches
+from apps.site_config.email_context import render_email as render_to_string
 
 logger = logging.getLogger(__name__)
 

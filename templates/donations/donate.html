@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load donation_extras %}
 
-{# Story 5.3 — public donate page (mobile-first, 375 x 667 px iPhone SE).
+{% comment %} Story 5.3 — public donate page (mobile-first, 375 x 667 px iPhone SE).
    Extends ``base.html`` (the public/anonymous template) rather than
    ``app_base.html`` so we don't drag in the auth-only sidebar — strangers
    should not see member navigation while donating.
@@ -10,18 +10,18 @@
    * ``amount`` — integer cents reflected on the chips (5000 default = $50)
    * ``custom`` — the free-form custom-input string
    * ``recurring`` — checkbox state, bound to the hidden recurring input
-#}
+{% endcomment %}
 
 {% block title %}Donate · MerryMeal{% endblock %}
 
 {% block content %}
 <section
   class="w-full"
-  x-data="{ amount: 5000, custom: '', recurring: false }"
+  x-data="{ amount: 5000, custom: '', recurring: false, mealCost: {{ meal_cost_cents }} }"
 >
   {% if cancelled %}
-    {# Story 5.4's Stripe cancel return URL appends ``?cancelled=1``. Soft
-       toast above the form so the user can re-try without confusion. #}
+    {% comment %} Story 5.4's Stripe cancel return URL appends ``?cancelled=1``. Soft
+       toast above the form so the user can re-try without confusion. {% endcomment %}
     <div
       role="status"
       class="mb-4 rounded-md bg-amber-50 p-3 text-sm text-amber-900 ring-1 ring-amber-200"
@@ -36,10 +36,10 @@
     </h1>
     {% if campaign and campaign.goal_cents %}
       <div class="mt-3 h-2 w-full overflow-hidden rounded bg-warm-100">
-        {# ``widthratio`` returns an integer 0..100; CSS clamps to 100% if
+        {% comment %} ``widthratio`` returns an integer 0..100; CSS clamps to 100% if
            pledges overshoot the goal. ``raised_cents_for`` only sums
            ``status=completed`` donations so a fresh pending row does NOT
-           bump the bar — by design. #}
+           bump the bar — by design. {% endcomment %}
         <div
           class="h-2 rounded bg-brand-green"
           style="width: {% widthratio raised_cents campaign.goal_cents 100 %}%; max-width: 100%;"
@@ -60,22 +60,22 @@
     @submit="submitting = true"
   >
     {% csrf_token %}
-    {# ``campaign_slug`` is hidden; set by the GET-side view from
+    {% comment %} ``campaign_slug`` is hidden; set by the GET-side view from
        ``?campaign=`` and round-tripped through the form so the slug
-       survives a validation-error re-render. #}
+       survives a validation-error re-render. {% endcomment %}
     <input
       type="hidden"
       name="campaign_slug"
       value="{{ form.campaign_slug.value|default_if_none:'' }}"
     >
 
-    {# Amount chips + custom input.
+    {% comment %} Amount chips + custom input.
        Three preset chips ($20 / $50 / $100) plus a free-form input. The
        chips push integer cents into Alpine's ``amount`` AND write the
        dollar value into ``id_amount_dollars`` (the actual form field)
        so server-side validation receives the same value the user picked.
        The ``split`` template filter doesn't exist by default and isn't
-       worth a custom filter for three values — chips are hand-unrolled. #}
+       worth a custom filter for three values — chips are hand-unrolled. {% endcomment %}
     <div>
       <p class="mb-2 text-sm text-warm-700">Choose an amount</p>
       <div class="grid grid-cols-4 gap-2">
@@ -116,12 +116,12 @@
           aria-label="Custom amount in dollars"
         >
       </div>
-      {# Placeholder copy — Story 5.6 fills the chip captions with the
-         real "≈ N meals" derived from the per-meal cost setting. Showing
-         a single line below the grid keeps the chips themselves uncluttered
-         on a 375 px viewport. #}
-      <p class="mt-2 text-xs text-warm-500">
-        Every donation funds meals for people in need.
+      {% comment %} Live "≈ N meals" caption — reads the Alpine ``amount`` and the
+         per-meal cost passed from the view. Keeping it below the grid (instead
+         of inside each button) keeps the chip layout uncluttered on a
+         375 px viewport while still reflecting the current selection. {% endcomment %}
+      <p class="mt-2 text-xs text-warm-500"
+         x-text="amount > 0 ? '≈ ' + Math.floor(amount / mealCost) + ' meals' : 'Every donation funds meals for people in need.'">
       </p>
       {% if form.amount_dollars.errors %}
         <p class="mt-1 text-sm text-red-600">{{ form.amount_dollars.errors.0 }}</p>
@@ -156,8 +156,8 @@
       {% endif %}
     </div>
 
-    {# CTA — full-width on mobile, minimum 48 px tall (touch target).
-       Playwright asserts ``boundingBox.height >= 48`` at 375 px. #}
+    {% comment %} CTA — full-width on mobile, minimum 48 px tall (touch target).
+       Playwright asserts ``boundingBox.height >= 48`` at 375 px. {% endcomment %}
     <button
       type="submit"
       class="btn-primary min-h-[48px] w-full"

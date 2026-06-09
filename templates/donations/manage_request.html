@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{# Story 5.7 — public manage-donation entry form.
+{% comment %} Story 5.7 — public manage-donation entry form.
 
    Anonymous donors land here from a footer link or the receipt email.
    The page accepts an email and POSTs to the same URL; the server
@@ -10,7 +10,7 @@
    Extends ``base.html`` (not ``app_base.html``) because a recurring
    donor does NOT have a logged-in MerryMeal account — the magic link
    is the only auth surface.
-#}
+{% endcomment %}
 
 {% block title %}Manage your donation · MerryMeal{% endblock %}
 
@@ -37,8 +37,8 @@
       {% endif %}
     </div>
 
-    {# Mobile-first CTA — minimum 48 px touch target (project convention,
-       same as the donate page primary button). #}
+    {% comment %} Mobile-first CTA — minimum 48 px touch target (project convention,
+       same as the donate page primary button). {% endcomment %}
     <button type="submit" class="btn-primary min-h-[48px] w-full"
             :disabled="submitting"
             :class="{ 'opacity-70 cursor-not-allowed': submitting }">

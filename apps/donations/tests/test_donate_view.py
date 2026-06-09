@@ -6,16 +6,41 @@ Covers:
 * GET ``/donate/?campaign=<slug>`` renders the named campaign.
 * GET ``/donate/?cancelled=1`` renders the soft toast.
 * POST ``/donate/start/`` with valid data creates one pending Donation and
-  redirects to the (stubbed) Stripe Checkout URL.
+  redirects to the Stripe Checkout URL.
 * POST with invalid data re-renders the form and creates no Donation.
 * POST with ``is_recurring=on`` flips the model flag.
+
+The Stripe Checkout call is patched at the donate service's use site
+(``apps.donations.services.donate.create_checkout_session``) — patch where
+it's used, not where it's defined — so the real ``stripe_checkout`` module
+stays out of the test network path.
 """
+
+from unittest.mock import patch
 
 import pytest
 from django.urls import reverse
 
 from apps.donations.models import Donation
 from apps.donations.tests.factories import CampaignFactory
+
+FAKE_CHECKOUT_URL = "https://checkout.stripe.com/c/pay/cs_test_fake"
+
+
+@pytest.fixture
+def patched_checkout():
+    """Replace the Stripe session helper used by ``start_donation``.
+
+    The donate service imports ``create_checkout_session`` at module load,
+    so the patch target is the donate module's binding (not
+    ``stripe_checkout``'s). Returns the mock so individual tests can
+    inspect call args if they need to.
+    """
+    with patch(
+        "apps.donations.services.donate.create_checkout_session",
+        return_value=FAKE_CHECKOUT_URL,
+    ) as mock:
+        yield mock
 
 
 @pytest.mark.django_db
@@ -56,7 +81,9 @@ def test_donate_page_get_unknown_campaign_falls_back_to_general_fund(client):
 
 
 @pytest.mark.django_db
-def test_donate_start_creates_pending_donation_and_redirects(client):
+def test_donate_start_creates_pending_donation_and_redirects(
+    client, patched_checkout
+):
     CampaignFactory(slug="general-fund", name="General fund")
     resp = client.post(
         reverse("donations:donate_start"),
@@ -68,7 +95,7 @@ def test_donate_start_creates_pending_donation_and_redirects(client):
         },
     )
     assert resp.status_code == 302
-    assert resp["Location"].startswith("https://stripe.test/")
+    assert resp["Location"] == FAKE_CHECKOUT_URL
     d = Donation.objects.get()
     assert d.amount_cents == 5000
     assert d.status == "pending"
@@ -76,10 +103,13 @@ def test_donate_start_creates_pending_donation_and_redirects(client):
     assert d.donor_email == "donor@example.com"
     assert d.campaign.slug == "general-fund"
     assert d.payment_type == "card"
+    patched_checkout.assert_called_once_with(d.id, recurring=False)
 
 
 @pytest.mark.django_db
-def test_donate_start_with_recurring_flag_creates_recurring_donation(client):
+def test_donate_start_with_recurring_flag_creates_recurring_donation(
+    client, patched_checkout
+):
     CampaignFactory(slug="general-fund", name="General fund")
     resp = client.post(
         reverse("donations:donate_start"),
@@ -93,10 +123,11 @@ def test_donate_start_with_recurring_flag_creates_recurring_donation(client):
     assert resp.status_code == 302
     d = Donation.objects.get()
     assert d.is_recurring is True
+    patched_checkout.assert_called_once_with(d.id, recurring=True)
 
 
 @pytest.mark.django_db
-def test_donate_start_resolves_named_campaign(client):
+def test_donate_start_resolves_named_campaign(client, patched_checkout):
     CampaignFactory(slug="general-fund", name="General fund")
     winter = CampaignFactory(slug="winter-appeal", name="Winter appeal 2026")
     resp = client.post(
@@ -114,7 +145,9 @@ def test_donate_start_resolves_named_campaign(client):
 
 
 @pytest.mark.django_db
-def test_donate_start_unknown_slug_falls_back_to_general_fund(client):
+def test_donate_start_unknown_slug_falls_back_to_general_fund(
+    client, patched_checkout
+):
     general = CampaignFactory(slug="general-fund", name="General fund")
     resp = client.post(
         reverse("donations:donate_start"),
@@ -131,7 +164,7 @@ def test_donate_start_unknown_slug_falls_back_to_general_fund(client):
 
 
 @pytest.mark.django_db
-def test_donate_start_invalid_form_rerenders_with_errors(client):
+def test_donate_start_invalid_form_rerenders_with_errors(client, patched_checkout):
     CampaignFactory(slug="general-fund", name="General fund")
     resp = client.post(
         reverse("donations:donate_start"),
@@ -143,6 +176,8 @@ def test_donate_start_invalid_form_rerenders_with_errors(client):
     )
     assert resp.status_code == 200  # form re-render
     assert Donation.objects.count() == 0
+    # Invalid form must short-circuit before any Stripe interaction.
+    patched_checkout.assert_not_called()
 
 
 @pytest.mark.django_db

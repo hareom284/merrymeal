@@ -1,0 +1,129 @@
+{% load static %}
+{% comment %}
+  Render contract:
+    * assistant_post_url  — chat endpoint URL (member or admin variant)
+    * assistant_title     — header headline (e.g. "Ask MerryMeal")
+    * assistant_subtitle  — header tagline
+    * assistant_placeholder — input placeholder
+    * assistant_intro     — first bubble in the log (greeting)
+{% endcomment %}
+<div
+  x-data="{
+    open: false,
+    scrollBottom() {
+      const log = document.getElementById('assistant-chat-log');
+      if (log) log.scrollTop = log.scrollHeight;
+    },
+    resetLog() {
+      const log = document.getElementById('assistant-chat-log');
+      if (!log) return;
+      while (log.children.length > 1) log.removeChild(log.lastChild);
+    }
+  }"
+  style="position: fixed; right: 16px; bottom: 96px; z-index: 40;"
+  class="md:!bottom-6"
+>
+  <button
+    type="button"
+    @click="open = !open; $nextTick(() => scrollBottom())"
+    style="width: 56px; height: 56px; border-radius: 9999px; background-color: #16a34a; color: white; box-shadow: 0 10px 25px rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center; border: 0; cursor: pointer;"
+    class="hover:bg-brand-green-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green focus-visible:ring-offset-2"
+    aria-label="Open MerryMeal assistant"
+  >
+    <svg x-show="!open" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <svg x-show="open" x-cloak class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+      <path d="M18 6 6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+
+  <div
+    x-show="open"
+    x-cloak
+    x-transition.opacity
+    style="position: absolute; bottom: 72px; right: 0; width: 320px; max-width: calc(100vw - 32px); height: 480px; max-height: calc(100vh - 160px); background: white; border-radius: 16px; box-shadow: 0 20px 50px rgba(0,0,0,0.25); border: 1px solid #e8e6e1; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; overflow: hidden;"
+  >
+    <header style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-bottom: 1px solid #e8e6e1; background: #faf9f8;" class="flex items-center gap-2 px-3 py-2 border-b border-warm-200 bg-warm-50">
+      <img src="{% static 'img/logo.png' %}" alt="" aria-hidden="true"
+           class="w-8 h-8 rounded-lg object-contain shrink-0">
+      <div class="min-w-0 flex-1">
+        <p class="font-display text-sm text-warm-900 leading-tight">{{ assistant_title }}</p>
+        <p class="text-[11px] text-warm-500 leading-tight">{{ assistant_subtitle }}</p>
+      </div>
+      <form
+        onsubmit="return false"
+        hx-post="{% url 'ai_assistant:clear' %}"
+        hx-swap="none"
+        hx-on:htmx:after-request="resetLog()"
+        class="m-0"
+      >
+        {% csrf_token %}
+        <button
+          type="submit"
+          class="text-[11px] font-medium text-warm-500 hover:text-brand-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green focus-visible:ring-offset-2 rounded px-2 py-1"
+          aria-label="Clear conversation"
+        >Clear</button>
+      </form>
+    </header>
+
+    <div
+      id="assistant-chat-log"
+      style="min-height: 0; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; scroll-behavior: smooth; padding: 12px; display: flex; flex-direction: column; gap: 12px;"
+      class="text-sm"
+    >
+      <div style="display: flex; justify-content: flex-start; align-items: flex-end; gap: 8px; flex-shrink: 0;">
+        <img src="{% static 'img/logo.png' %}" alt="" aria-hidden="true"
+             style="width: 28px; height: 28px; border-radius: 8px; object-fit: contain; flex-shrink: 0;">
+        <div style="background: #f5f4f1; color: #1a1917; border-radius: 16px; border-bottom-left-radius: 4px; padding: 8px 12px; font-size: 14px; max-width: 75%;">
+          {{ assistant_intro }}
+        </div>
+      </div>
+    </div>
+
+    {% comment %}
+      ``onsubmit="return false"`` is the no-JS guard: it stops the
+      browser's default GET-to-current-URL submit if HTMX hasn't
+      loaded yet. With HTMX present, ``hx-post`` takes over and the
+      AJAX POST runs as normal. We intentionally do NOT set ``action``
+      — older HTMX versions can race against the native submit when
+      both are present, leaking a GET to ``/assistant/chat/`` before
+      HTMX's preventDefault fires.
+    {% endcomment %}
+    <form
+      onsubmit="return false"
+      hx-post="{{ assistant_post_url }}"
+      hx-target="#assistant-chat-log"
+      hx-swap="beforeend"
+      hx-on:htmx:after-request="this.reset(); document.getElementById('assistant-chat-log').scrollTop = document.getElementById('assistant-chat-log').scrollHeight;"
+      hx-indicator="#assistant-typing"
+      style="display: flex; align-items: center; gap: 8px; padding: 8px; border-top: 1px solid #e8e6e1; background: white;"
+      class="border-t border-warm-200 p-2 flex items-center gap-2"
+    >
+      {% csrf_token %}
+      <input
+        type="text"
+        name="message"
+        placeholder="{{ assistant_placeholder }}"
+        required
+        maxlength="600"
+        autocomplete="off"
+        class="flex-1 min-w-0 rounded-lg border border-warm-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-green"
+      />
+      <button
+        type="submit"
+        class="rounded-lg bg-brand-green text-white px-3 py-2 text-sm font-medium hover:bg-brand-green-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green focus-visible:ring-offset-2"
+        aria-label="Send"
+      >
+        Send
+      </button>
+    </form>
+
+    <p
+      id="assistant-typing"
+      class="htmx-indicator px-3 py-1 text-[11px] text-warm-500 border-t border-warm-200 bg-warm-50"
+    >
+      MerryMeal is thinking...
+    </p>
+  </div>
+</div>

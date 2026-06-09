@@ -1,0 +1,176 @@
+{% extends "app_base.html" %}
+{% block title %}{{ member.full_name }} · MerryMeal admin{% endblock %}
+
+{% block content %}
+<section class="mx-auto flex w-full max-w-3xl flex-col gap-5">
+
+  <nav class="text-sm">
+    <a href="{% url 'dashboards:admin_members' %}"
+       class="inline-flex items-center gap-1 text-brand-green hover:text-brand-green-hover">
+      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m15 18-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Back to members
+    </a>
+  </nav>
+
+  {% if messages %}
+    {% for m in messages %}
+      <div class="rounded-xl border px-4 py-3 text-sm
+                  {% if m.tags == 'success' %}border-green-200 bg-green-50 text-green-900
+                  {% elif m.tags == 'error' %}border-red-200 bg-red-50 text-red-900
+                  {% else %}border-warm-200 bg-warm-50 text-warm-900{% endif %}">
+        {{ m }}
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <header class="flex flex-wrap items-center gap-4 justify-between">
+    <div class="flex items-center gap-4 min-w-0">
+      <span class="w-14 h-14 rounded-full bg-warm-200 text-warm-700 flex items-center justify-center text-lg font-semibold shrink-0">
+        {{ member.full_name|slice:":2"|upper }}
+      </span>
+      <div class="min-w-0">
+        <p class="font-display text-2xl text-warm-900 truncate">{{ member.full_name }}</p>
+        <p class="text-sm text-warm-500 truncate">{{ member.email }}</p>
+        <div class="mt-1 flex flex-wrap gap-2">
+          {% if member.is_active %}
+            <span class="inline-flex items-center rounded-full bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5">Active</span>
+          {% else %}
+            <span class="inline-flex items-center rounded-full bg-warm-200 text-warm-700 text-xs font-medium px-2.5 py-0.5">Inactive</span>
+          {% endif %}
+          {% if member.partner %}
+            <span class="inline-flex items-center rounded-full bg-amber-100 text-amber-800 text-xs font-medium px-2.5 py-0.5">via {{ member.partner.legal_name }}</span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    {% if member.is_active %}
+      <form method="post" action="{% url 'dashboards:admin_member_deactivate' member.id %}" class="m-0">
+        {% csrf_token %}
+        <button type="submit"
+                onclick="return confirm('Deactivate {{ member.full_name|escapejs }}?');"
+                class="rounded-xl border border-red-300 bg-white px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500">
+          Deactivate
+        </button>
+      </form>
+    {% else %}
+      <form method="post" action="{% url 'dashboards:admin_member_reactivate' member.id %}" class="m-0">
+        {% csrf_token %}
+        <button type="submit"
+                class="rounded-xl border border-green-300 bg-white px-4 py-2 text-sm font-semibold text-green-700 hover:bg-green-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500">
+          Reactivate
+        </button>
+      </form>
+    {% endif %}
+  </header>
+
+  <section class="rounded-2xl bg-white border border-warm-200 p-5">
+    <p class="text-xs uppercase tracking-wider text-warm-500 mb-3">Account</p>
+    <dl class="grid grid-cols-3 gap-y-3 text-sm">
+      <dt class="text-warm-500">Email</dt>
+      <dd class="col-span-2 text-warm-900 font-medium break-words">{{ member.email }}</dd>
+
+      {% if member.dob %}
+        <dt class="text-warm-500">DOB</dt>
+        <dd class="col-span-2 text-warm-900 font-medium">{{ member.dob|date:"j M Y" }}</dd>
+      {% endif %}
+
+      <dt class="text-warm-500">Joined</dt>
+      <dd class="col-span-2 text-warm-900 font-medium">{{ member.created_at|date:"j M Y" }}</dd>
+
+      <dt class="text-warm-500">Last sign-in</dt>
+      <dd class="col-span-2 text-warm-900 font-medium">
+        {% if member.last_login %}{{ member.last_login|date:"j M Y · g:i A" }}{% else %}Never{% endif %}
+      </dd>
+    </dl>
+  </section>
+
+  <section class="rounded-2xl bg-white border border-warm-200 p-5">
+    <p class="text-xs uppercase tracking-wider text-warm-500 mb-3">Address{{ addresses|length|pluralize }}</p>
+    {% if addresses %}
+      <ul class="flex flex-col gap-2">
+        {% for a in addresses %}
+          <li class="text-sm text-warm-800">
+            <span class="font-medium">{{ a.label|default:"Home" }}</span>
+            {% if a.postal_code %} · {{ a.postal_code }}{% endif %}
+            {% if a.city %} · {{ a.city.name }}{% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="text-sm text-warm-500">No address on file.</p>
+    {% endif %}
+  </section>
+
+  <section class="rounded-2xl bg-white border border-warm-200 p-5">
+    <p class="text-xs uppercase tracking-wider text-warm-500 mb-3">Diet</p>
+    {% if diet_preferences %}
+      <div class="flex flex-wrap gap-2">
+        {% for p in diet_preferences %}
+          <span class="inline-flex items-center rounded-full bg-brand-green/10 text-brand-green text-sm font-medium px-3 py-1">{{ p.name }}</span>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="text-sm text-warm-500">No diet preferences.</p>
+    {% endif %}
+
+    <p class="text-xs uppercase tracking-wider text-warm-500 mt-5 mb-3">Allergies</p>
+    {% if allergies %}
+      <div class="flex flex-wrap gap-2">
+        {% for a in allergies %}
+          <span class="inline-flex items-center rounded-full bg-red-100 text-red-800 text-sm font-medium px-3 py-1">{{ a.name }}</span>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="text-sm text-warm-500">No allergies on file.</p>
+    {% endif %}
+  </section>
+
+  {% if caregiver_links %}
+    <section class="rounded-2xl bg-white border border-warm-200 p-5">
+      <p class="text-xs uppercase tracking-wider text-warm-500 mb-3">Caregivers</p>
+      <ul class="flex flex-col gap-3">
+        {% for link in caregiver_links %}
+          <li class="flex items-center gap-3">
+            <span class="w-10 h-10 rounded-full bg-warm-200 text-warm-700 flex items-center justify-center text-sm font-semibold">
+              {{ link.caregiver.full_name|slice:":2"|upper }}
+            </span>
+            <div class="min-w-0">
+              <p class="font-semibold text-warm-900 truncate">{{ link.caregiver.full_name }}</p>
+              <p class="text-sm text-warm-500">{{ link.get_relationship_display }} · {{ link.caregiver.email }}</p>
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+    </section>
+  {% endif %}
+
+  <section class="rounded-2xl bg-white border border-warm-200 p-5">
+    <p class="text-xs uppercase tracking-wider text-warm-500 mb-3">Recent deliveries</p>
+    {% if recent_deliveries %}
+      <ul class="flex flex-col gap-2 text-sm">
+        {% for d in recent_deliveries %}
+          <li class="flex items-center justify-between gap-3 py-1.5 border-b border-warm-100 last:border-0">
+            <div class="min-w-0">
+              <p class="font-medium text-warm-900 truncate">
+                {{ d.meal_plan.meal.name|default:"—" }}
+              </p>
+              <p class="text-xs text-warm-500">{{ d.scheduled_date|date:"D j M Y" }}</p>
+            </div>
+            <span class="inline-flex items-center rounded-full text-xs font-medium px-2.5 py-0.5
+                         {% if d.status == 'delivered' %}bg-green-100 text-green-800
+                         {% elif d.status == 'failed' %}bg-red-100 text-red-800
+                         {% elif d.status == 'out_for_delivery' %}bg-sky-100 text-sky-800
+                         {% else %}bg-warm-100 text-warm-700{% endif %}">
+              {{ d.get_status_display }}
+            </span>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="text-sm text-warm-500">No deliveries on file.</p>
+    {% endif %}
+  </section>
+
+</section>
+{% endblock %}

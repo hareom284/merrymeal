@@ -1,0 +1,53 @@
+{% extends "app_base.html" %}
+{% block title %}New food-safety check · MerryMeal admin{% endblock %}
+
+{% block content %}
+<section class="mx-auto flex w-full max-w-xl flex-col gap-5">
+
+  <nav class="text-sm">
+    <a href="{% url 'dashboards:admin_fs_list' %}"
+       class="inline-flex items-center gap-1 text-brand-green hover:text-brand-green-hover">
+      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m15 18-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Back to food safety
+    </a>
+  </nav>
+
+  <header>
+    <h1 class="font-display text-2xl text-warm-900">New food-safety check</h1>
+    <p class="text-sm text-warm-500 mt-0.5">Temperature checks auto-derive pass/fail.</p>
+  </header>
+
+  <form method="post" class="rounded-2xl bg-white border border-warm-200 p-5 flex flex-col gap-4">
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+      <div class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900">
+        {{ form.non_field_errors }}
+      </div>
+    {% endif %}
+
+    {% for field in form %}
+      <div>
+        <label for="{{ field.id_for_label }}"
+               class="block text-sm font-medium text-warm-800 mb-1">{{ field.label }}</label>
+        {{ field }}
+        {% if field.errors %}
+          <p class="mt-1 text-xs text-red-700">{{ field.errors|striptags }}</p>
+        {% endif %}
+      </div>
+    {% endfor %}
+
+    <div class="flex gap-3 mt-2">
+      <a href="{% url 'dashboards:admin_fs_list' %}"
+         class="flex-1 inline-flex items-center justify-center rounded-xl border border-warm-300 bg-white px-4 py-2.5 text-sm font-medium text-warm-800 hover:border-brand-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green">
+        Cancel
+      </a>
+      <button type="submit"
+              class="flex-1 inline-flex items-center justify-center rounded-xl bg-brand-green px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-green-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green focus-visible:ring-offset-2">
+        Save check
+      </button>
+    </div>
+  </form>
+
+</section>
+{% endblock %}

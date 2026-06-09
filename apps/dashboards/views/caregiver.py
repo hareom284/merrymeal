@@ -34,6 +34,8 @@ def caregiver_list_view(request):
     return render(request, "dashboards/caregiver/list.html", {
         "summaries": summaries,
         "greeting_name": _greeting_name(request.user),
+        "active": "dashboard",
+        "page_title": "My members",
     })
 
 
@@ -51,4 +53,6 @@ def caregiver_member_detail_view(request, pk: int):
     return render(request, "dashboards/caregiver/member_detail.html", {
         "member": member,
         "card": card,
+        "active": "dashboard",
+        "page_title": member.full_name,
     })

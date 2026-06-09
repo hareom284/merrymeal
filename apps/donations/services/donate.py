@@ -3,8 +3,7 @@
 Per MerryMeal conventions all side effects (DB writes, Stripe calls, email)
 live in services — views stay thin. ``start_donation`` is the single entry
 point for the public donate page: it writes the pending ``Donation`` row and
-hands off to the Stripe Checkout stub (Story 5.4 swaps the stub for the
-real API call).
+hands off to the Stripe Checkout helper (Story 5.4 ``stripe_checkout``).
 
 Money is integer cents the whole way through; the form
 (``DonateForm.clean_amount_dollars``) is the only place a user-typed dollar
@@ -15,7 +14,7 @@ mis-wired caller blows up loudly instead of silently storing 0.
 from __future__ import annotations
 
 from apps.donations.models import Campaign, Donation
-from apps.donations.services.stripe import create_checkout_session
+from apps.donations.services.stripe_checkout import create_checkout_session
 
 # Sentinel slug for the catch-all "no campaign chosen" bucket. The general
 # fund row itself is seeded by the Admin/Ops track in this sprint; the

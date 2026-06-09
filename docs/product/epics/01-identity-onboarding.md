@@ -36,7 +36,7 @@ unsafe meals).
 ## Stories
 
 ### Story 1.1 — `City` model + admin
-**STATUS: backlog**
+**STATUS: done (sprint-02/03)**
 
 **As an** admin
 **I want** a list of cities to choose from when creating addresses
@@ -61,7 +61,7 @@ unsafe meals).
 ---
 
 ### Story 1.2 — `Address` model with lat/lng
-**STATUS: backlog**
+**STATUS: done (sprint-02/03)**
 
 **As a** member
 **I want** to register one or more delivery addresses
@@ -88,7 +88,7 @@ unsafe meals).
 ---
 
 ### Story 1.3 — `CaregiverLink` model
-**STATUS: backlog**
+**STATUS: done (sprint-02/03)**
 
 **As a** caregiver
 **I want** to be linked to the members I look after, with a recorded relationship type
@@ -113,7 +113,7 @@ unsafe meals).
 ---
 
 ### Story 1.4 — `partners` app: `Partner` model + admin CRUD
-**STATUS: backlog**
+**STATUS: done (sprint-02/03)**
 
 **As an** admin
 **I want** to manage charities, restaurants, suppliers, and corporate partners
@@ -137,7 +137,7 @@ unsafe meals).
 ---
 
 ### Story 1.5 — `dietary` app: `DietPreference` and `Allergy` (M2M scaffolding)
-**STATUS: backlog**
+**STATUS: done (sprint-02/03)**
 
 **As an** admin
 **I want** a controlled list of diet preferences and allergies
@@ -162,7 +162,7 @@ unsafe meals).
 ---
 
 ### Story 1.6 — Public landing page
-**STATUS: backlog**
+**STATUS: done (sprint-02/03)**
 
 **As a** visitor (member or caregiver)
 **I want** a clear landing page with one "Apply" button
@@ -190,7 +190,7 @@ unsafe meals).
 ---
 
 ### Story 1.7 — Member application — step 1 (contact)
-**STATUS: backlog**
+**STATUS: done (sprint-02/03)**
 
 **As a** prospective member
 **I want** to start an application by giving my contact details
@@ -224,7 +224,7 @@ unsafe meals).
 ---
 
 ### Story 1.8 — Member application — step 2 (address)
-**STATUS: backlog**
+**STATUS: done (sprint-02/03)**
 
 **As a** prospective member
 **I want** to enter my delivery address with city + postcode
@@ -253,7 +253,7 @@ unsafe meals).
 ---
 
 ### Story 1.9 — Member application — step 3 (dietary + allergies)
-**STATUS: backlog**
+**STATUS: done (sprint-02/03)**
 
 **As a** prospective member
 **I want** to declare my diet preferences and allergies up-front
@@ -287,7 +287,7 @@ asserted via `django.core.mail.outbox`.
 ---
 
 ### Story 1.10 — Caregiver-on-behalf application
-**STATUS: backlog**
+**STATUS: done (sprint-02/03)**
 
 **As a** caregiver
 **I want** to apply on behalf of someone I look after, declaring the relationship
@@ -319,7 +319,7 @@ asserted via `django.core.mail.outbox`.
 ---
 
 ### Story 1.11 — Admin approval queue list view
-**STATUS: backlog**
+**STATUS: done (sprint-02/03)**
 
 **As an** admin
 **I want** to see a list of submitted applications, newest first
@@ -346,7 +346,7 @@ asserted via `django.core.mail.outbox`.
 ---
 
 ### Story 1.12 — Admin approve / reject action
-**STATUS: backlog**
+**STATUS: done (sprint-02/03)**
 
 **As an** admin
 **I want** to approve or reject an application with one click

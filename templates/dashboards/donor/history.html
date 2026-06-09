@@ -1,9 +1,9 @@
-{% extends "base.html" %}
+{% extends "app_base.html" %}
 {% load donation_extras %}
 
 {% block title %}My donations — MerryMeal{% endblock %}
 
-{# Story 6.3 — Donor history page.
+{% comment %} Story 6.3 — Donor history page.
 
    Mobile-first: the outer ``main`` in base.html already constrains
    width to ``max-w-md`` on small screens, so this template lays out as
@@ -18,7 +18,7 @@
    * ``failed`` / ``cancelled`` — red; donor may need to retry. We
      surface these (rather than hide them per the original spec) so
      donors are never left wondering why a charge "disappeared".
-#}
+{% endcomment %}
 {% block content %}
 <section class="flex w-full flex-col gap-6">
   <header class="flex flex-col gap-2">
@@ -53,13 +53,13 @@
               {{ d.get_status_display }}
             </span>
 
-            {# TODO(story 6.4): point at ``dashboards:donor_receipt`` once
-               the receipt-detail view exists. Until then, ``#`` keeps
-               the link visible (so the design is correct) without a
-               NoReverseMatch crash. Only completed/refunded donations
-               can be receipted; the rest hide the link entirely. #}
+            {% comment %} Links to the per-FY tax receipt page (Story 6.4). The
+               view annotates each donation with ``.fy`` (the FY ending
+               year) so the URL reverses correctly per row. Only
+               completed / refunded donations can be receipted; the rest
+               hide the link entirely. {% endcomment %}
             {% if d.status == 'completed' or d.status == 'refunded' %}
-              <a href="#"
+              <a href="{% url 'dashboards:donor_fy_receipt' d.fy %}"
                  class="inline-flex min-h-[44px] items-center text-sm font-medium text-brand-green underline">
                 Tax receipt &rarr;
               </a>

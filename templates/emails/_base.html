@@ -1,0 +1,85 @@
+{% comment %}
+  Shared email shell — every transactional email extends this so the
+  brand chrome, footer, and dynamic ``{{ org }}`` data stay in one
+  place. Outlook + Gmail safe: table layout, inline CSS, no flexbox,
+  no @media print, no web fonts.
+
+  Render contract:
+    * subject_line   — short title shown in the email header band
+    * preheader      — single-line inbox preview (hidden in the body)
+    * Block ``content`` is the body copy; templates extending this
+      render their own rows + CTA buttons inside it.
+
+  Available helpers (drop them in the ``content`` block):
+    * ``{% include "emails/_button.html" with href="…" label="…" %}``
+      — rounded brand-green CTA button, bullet-proof across clients.
+    * ``{% include "emails/_card.html" with title="…" %}…{% endinclude %}``
+      — soft card surface for quoted data (uses a wrapper table).
+{% endcomment %}{% load static %}<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% firstof subject_line org.name "MerryMeal" %}</title>
+  </head>
+  <body style="margin:0; padding:0; background-color:#e7e3d8; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; color:#1a1917; -webkit-font-smoothing: antialiased;">
+    {# Preheader — hidden line that appears as the inbox preview. #}
+    <div style="display:none; max-height:0; overflow:hidden; mso-hide:all; font-size:1px; line-height:1px; color:#e7e3d8;">{% firstof preheader subject_line "" %}</div>
+
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color:#e7e3d8;">
+      <tr>
+        <td align="center" style="padding:32px 16px;">
+          <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" style="max-width:600px; width:100%; background:#ffffff; border-radius:20px; overflow:hidden; box-shadow: 0 8px 24px rgba(26, 25, 23, 0.08);">
+
+            {# --- Brand band (soft gradient via two stacked rows) --- #}
+            <tr>
+              <td style="background-color:#16a34a; padding:24px 32px;">
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                  <tr>
+                    <td style="vertical-align:middle;">
+                      <p style="margin:0; color:rgba(255,255,255,0.78); font-size:11px; font-weight:600; letter-spacing:0.18em; text-transform:uppercase;">
+                        {{ org.name|default:"MerryMeal" }}
+                      </p>
+                      <p style="margin:6px 0 0 0; color:#ffffff; font-size:22px; font-weight:600; line-height:1.2;">
+                        {% firstof subject_line "A note from the team" %}
+                      </p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            {# --- Body --- #}
+            <tr>
+              <td style="padding:32px;">
+                {% block content %}{% endblock %}
+              </td>
+            </tr>
+
+            {# --- Footer (dynamic org contact) --- #}
+            <tr>
+              <td style="background-color:#faf9f8; padding:24px 32px; border-top:1px solid #e8e6e1;">
+                <p style="margin:0 0 8px 0; font-size:13px; color:#1a1917; font-weight:600;">
+                  {{ org.name|default:"MerryMeal" }}{% if org.tagline %} · <span style="font-weight:400; color:#5d574e;">{{ org.tagline }}</span>{% endif %}
+                </p>
+                {% if org.address %}
+                  <p style="margin:0 0 6px 0; font-size:12px; color:#5d574e; line-height:1.5; white-space:pre-line;">{{ org.address }}</p>
+                {% endif %}
+                <p style="margin:0; font-size:12px; color:#5d574e;">
+                  {% if org.phone %}<a href="tel:{{ org.phone }}" style="color:#16a34a; text-decoration:none;">{{ org.phone }}</a>{% endif %}
+                  {% if org.phone and org.contact_email %} &nbsp;·&nbsp; {% endif %}
+                  {% if org.contact_email %}<a href="mailto:{{ org.contact_email }}" style="color:#16a34a; text-decoration:none;">{{ org.contact_email }}</a>{% endif %}
+                </p>
+              </td>
+            </tr>
+          </table>
+
+          <p style="margin:16px 0 0 0; font-size:11px; color:#5d574e; text-align:center;">
+            You're receiving this because of your account with {{ org.name|default:"MerryMeal" }}.
+          </p>
+
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

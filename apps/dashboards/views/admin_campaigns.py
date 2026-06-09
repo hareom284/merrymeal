@@ -48,7 +48,10 @@ def index(request):
     return render(
         request,
         "dashboards/admin/campaigns.html",
-        {"campaigns": list_active_campaigns()},
+        {
+            "campaigns": list_active_campaigns(),
+            "page_title": "Campaigns",
+        },
     )
 
 
@@ -77,6 +80,7 @@ def detail(request, slug: str):
             "page": page,
             "status_filter": status_filter,
             "filter_statuses": DETAIL_FILTER_STATUSES,
+            "page_title": snap.campaign.name if hasattr(snap, "campaign") else "Campaign",
         },
     )
 

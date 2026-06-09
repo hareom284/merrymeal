@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load donation_extras %}
 
-{# Story 5.5 — post-Stripe-redirect thank-you page.
+{% comment %} Story 5.5 — post-Stripe-redirect thank-you page.
 
    Extends ``base.html`` (the public/anonymous shell) rather than
    ``app_base.html`` so an anonymous donor never sees the member
@@ -18,7 +18,7 @@
    * ``donation`` falsy — webhook race lost or unknown session id.
      Show a soft "processing" state with a refresh hint instead of
      404ing on the donor.
-#}
+{% endcomment %}
 
 {% block title %}Thank you · MerryMeal{% endblock %}
 

@@ -1,5 +1,7 @@
 from django.urls import include, path
 
+from apps.core.views import manifest, service_worker
+
 # Django's built-in admin is intentionally NOT mounted.
 # All operational/admin UIs are built as custom views under /
 # (e.g. /admin/applications/, /admin/kitchens/) using the brand design.
@@ -7,6 +9,11 @@ from django.urls import include, path
 # custom management commands.
 
 urlpatterns = [
+    # PWA — service worker MUST be served from the site root so its
+    # scope covers every URL. Manifest matches for symmetry; see
+    # apps/core/views/pwa.py for the rationale.
+    path("sw.js", service_worker, name="service_worker"),
+    path("manifest.webmanifest", manifest, name="manifest"),
     path("", include("apps.accounts.urls")),
     # Story 5.8 — admin campaign-progress card lives at /admin/campaigns/.
     # Included *before* the generic dashboards URLs so the namespace
@@ -36,4 +43,15 @@ urlpatterns = [
     # carry their own ``donate/`` and ``donations/`` prefixes inside the
     # module so the namespace stays single-rooted under ``donations:``.
     path("", include("apps.donations.urls")),
+    # AI assistant — Gemini-backed chat widget endpoint.
+    path("", include("apps.ai_assistant.urls")),
+    # Site config — admin-editable charity name/address/phone/logo
+    # at /admin/settings/.
+    path("admin/", include("apps.site_config.urls")),
 ]
+
+# Custom error handlers — branded 400 / 403 / 404 / 500 pages.
+handler400 = "apps.site_config.views.errors.bad_request_view"
+handler403 = "apps.site_config.views.errors.permission_denied_view"
+handler404 = "apps.site_config.views.errors.not_found_view"
+handler500 = "apps.site_config.views.errors.server_error_view"

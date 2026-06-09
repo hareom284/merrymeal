@@ -12,5 +12,10 @@ def admin_kitchens(request):
     return render(
         request,
         "dashboards/admin/kitchens.html",
-        {"cards": cards, "has_kitchens": bool(kitchens)},
+        {
+            "cards": cards,
+            "has_kitchens": bool(kitchens),
+            "active": "kitchens",
+            "page_title": "Kitchens",
+        },
     )

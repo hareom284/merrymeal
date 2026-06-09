@@ -1,0 +1,65 @@
+{% extends "app_base.html" %}
+{% block title %}My profile · MerryMeal admin{% endblock %}
+
+{% block content %}
+<section class="mx-auto flex w-full max-w-2xl flex-col gap-5">
+
+  <header class="flex items-center gap-4">
+    <span class="w-16 h-16 rounded-full bg-warm-200 text-warm-700 flex items-center justify-center text-xl font-semibold shrink-0">
+      {{ admin.full_name|slice:":2"|upper }}
+    </span>
+    <div class="flex-1 min-w-0">
+      <p class="font-display text-2xl text-warm-900 truncate">{{ admin.full_name }}</p>
+      <p class="text-sm text-warm-500">{{ admin.email }}</p>
+      <div class="mt-1 flex flex-wrap gap-2">
+        <span class="inline-flex items-center rounded-full bg-brand-green/10 text-brand-green text-xs font-semibold px-2.5 py-0.5 uppercase tracking-wider">
+          {{ admin.get_role_display }}
+        </span>
+        {% if admin.is_staff %}
+          <span class="inline-flex items-center rounded-full bg-warm-100 text-warm-700 text-xs font-medium px-2.5 py-0.5">Staff</span>
+        {% endif %}
+        {% if admin.is_superuser %}
+          <span class="inline-flex items-center rounded-full bg-amber-100 text-amber-800 text-xs font-medium px-2.5 py-0.5">Superuser</span>
+        {% endif %}
+      </div>
+    </div>
+  </header>
+
+  <section class="rounded-2xl bg-white border border-warm-200 p-5">
+    <p class="text-xs uppercase tracking-wider text-warm-500 mb-3">Account</p>
+    <dl class="grid grid-cols-3 gap-y-3 text-sm">
+      <dt class="text-warm-500">Email</dt>
+      <dd class="col-span-2 text-warm-900 font-medium break-words">{{ admin.email }}</dd>
+
+      <dt class="text-warm-500">Role</dt>
+      <dd class="col-span-2 text-warm-900 font-medium">{{ admin.get_role_display }}</dd>
+
+      <dt class="text-warm-500">Member since</dt>
+      <dd class="col-span-2 text-warm-900 font-medium">{{ admin.created_at|date:"j M Y" }}</dd>
+
+      <dt class="text-warm-500">Last sign-in</dt>
+      <dd class="col-span-2 text-warm-900 font-medium">
+        {% if admin.last_login %}{{ admin.last_login|date:"j M Y · g:i A" }}{% else %}—{% endif %}
+      </dd>
+    </dl>
+  </section>
+
+  <section class="rounded-2xl border border-warm-200 bg-warm-50 p-5">
+    <p class="text-xs uppercase tracking-wider text-warm-500 mb-2">Managing your account</p>
+    <p class="text-sm text-warm-700 leading-relaxed">
+      Profile editing for admins isn't in the UI yet — to change your
+      name, password, or permissions ask another admin or update the
+      record via <code class="text-xs bg-white border border-warm-200 rounded px-1 py-0.5">manage.py shell</code>.
+    </p>
+  </section>
+
+  <form method="post" action="{% url 'accounts:logout' %}" class="m-0">
+    {% csrf_token %}
+    <button type="submit"
+            class="w-full rounded-2xl border border-warm-300 bg-white py-3 text-sm font-medium text-warm-800 hover:border-brand-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green flex items-center justify-center gap-2">
+      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Sign out
+    </button>
+  </form>
+</section>
+{% endblock %}

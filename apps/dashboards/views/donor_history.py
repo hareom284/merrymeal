@@ -18,6 +18,7 @@ from __future__ import annotations
 from django.conf import settings
 from django.http import Http404, JsonResponse
 from django.shortcuts import render
+from django.utils import timezone
 
 from apps.core.decorators import role_required
 from apps.dashboards.services import fy as fy_service
@@ -27,10 +28,20 @@ from apps.dashboards.services.donor_history import donor_history, list_for_fy
 @role_required("donor")
 def donor_history_view(request):
     donations = donor_history(request.user)
+    # Annotate each row with its FY ending year so the template can
+    # link directly at the existing ``dashboards:donor_fy_receipt`` page
+    # (Story 6.4). Computed in the view rather than the service so the
+    # service stays a pure list-of-Donation query.
+    for donation in donations:
+        donation.fy = fy_service.fy_for_date(timezone.localtime(donation.created_at).date())
     return render(
         request,
         "dashboards/donor/history.html",
-        {"donations": donations},
+        {
+            "donations": donations,
+            "active": "history",
+            "page_title": "My donations",
+        },
     )
 
 

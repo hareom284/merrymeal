@@ -4,8 +4,8 @@
 <div class="p-6" x-data="{modal: null}">
   <h1 class="font-display text-2xl mb-4">Today — {{ today|date:"D j M" }}</h1>
 
-  {# Desktop ≥ md: table layout. Below md the table is hidden and the
-     mobile fallback (stacked cards) is shown instead. #}
+  {% comment %} Desktop ≥ md: table layout. Below md the table is hidden and the
+     mobile fallback (stacked cards) is shown instead. {% endcomment %}
   <div class="hidden md:block">
     <table class="w-full text-[16px]">
       <thead class="text-left text-warm-500 border-b border-warm-200">

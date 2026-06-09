@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 
-{# Story 5.7 — 410 Gone page for expired / used / tampered tokens.
+{% comment %} Story 5.7 — 410 Gone page for expired / used / tampered tokens.
 
    Rendered when ``verify_token`` raises ``BadSignature`` or
    ``SignatureExpired``. The HTTP status is 410 (not 404) because the
    resource genuinely existed and was intentionally retired — that's
    the semantically correct code for a burned magic link.
-#}
+{% endcomment %}
 
 {% block title %}Link expired · MerryMeal{% endblock %}
 

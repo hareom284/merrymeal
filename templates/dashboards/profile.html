@@ -1,0 +1,102 @@
+{% extends "app_base.html" %}
+{% block title %}My profile · MerryMeal{% endblock %}
+
+{% block content %}
+<div class="flex flex-col gap-5 max-w-2xl mx-auto">
+
+  <header class="flex items-center gap-4">
+    <span class="w-16 h-16 rounded-full bg-warm-200 text-warm-700 flex items-center justify-center text-xl font-semibold shrink-0">
+      {{ member.full_name|slice:":2"|upper }}
+    </span>
+    <div class="flex-1 min-w-0">
+      <p class="font-display text-2xl text-warm-900 truncate">{{ member.full_name }}</p>
+      <p class="text-sm text-warm-500">Member since {{ member.created_at|date:"M Y" }}</p>
+      <div class="mt-1 flex flex-wrap gap-2">
+        {% if member.is_active %}
+          <span class="inline-flex items-center rounded-full bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5">Active</span>
+        {% else %}
+          <span class="inline-flex items-center rounded-full bg-warm-200 text-warm-700 text-xs font-medium px-2.5 py-0.5">Inactive</span>
+        {% endif %}
+        {% if member.dob %}
+          <span class="inline-flex items-center rounded-full bg-warm-100 text-warm-700 text-xs font-medium px-2.5 py-0.5">DOB {{ member.dob|date:"j M Y" }}</span>
+        {% endif %}
+      </div>
+    </div>
+  </header>
+
+  <section class="rounded-2xl bg-white border border-warm-200 p-5">
+    <p class="text-xs uppercase tracking-wider text-warm-500 mb-3">Personal</p>
+    <dl class="grid grid-cols-3 gap-y-3 text-sm">
+      <dt class="text-warm-500">Email</dt>
+      <dd class="col-span-2 text-warm-900 font-medium break-words">{{ member.email }}</dd>
+
+      {% if address %}
+        <dt class="text-warm-500">Address</dt>
+        <dd class="col-span-2 text-warm-900 font-medium">
+          {{ address.label|default:"Home" }}{% if address.postal_code %} · {{ address.postal_code }}{% endif %}{% if address.city %} · {{ address.city.name }}{% endif %}
+        </dd>
+      {% endif %}
+
+      {% if member.dob %}
+        <dt class="text-warm-500">DOB</dt>
+        <dd class="col-span-2 text-warm-900 font-medium">{{ member.dob|date:"j M Y" }}</dd>
+      {% endif %}
+    </dl>
+  </section>
+
+  <section class="rounded-2xl bg-white border border-warm-200 p-5">
+    <p class="text-xs uppercase tracking-wider text-warm-500 mb-3">Diet</p>
+    {% if diet_preferences %}
+      <div class="flex flex-wrap gap-2">
+        {% for pref in diet_preferences %}
+          <span class="inline-flex items-center rounded-full bg-brand-green/10 text-brand-green text-sm font-medium px-3 py-1">{{ pref.name }}</span>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="text-sm text-warm-500">No diet preferences on file.</p>
+    {% endif %}
+
+    <p class="text-xs uppercase tracking-wider text-warm-500 mt-5 mb-3">Allergies</p>
+    {% if allergies %}
+      <div class="flex flex-wrap gap-2">
+        {% for a in allergies %}
+          <span class="inline-flex items-center rounded-full bg-red-100 text-red-800 text-sm font-medium px-3 py-1">{{ a.name }}</span>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="text-sm text-warm-500">No allergies on file.</p>
+    {% endif %}
+  </section>
+
+  <section class="rounded-2xl bg-white border border-warm-200 p-5">
+    <p class="text-xs uppercase tracking-wider text-warm-500 mb-3">Emergency contact</p>
+    {% if caregiver_link %}
+      <div class="flex items-center gap-3">
+        <span class="w-11 h-11 rounded-full bg-warm-200 text-warm-700 flex items-center justify-center text-sm font-semibold">
+          {{ caregiver_link.caregiver.full_name|slice:":2"|upper }}
+        </span>
+        <div class="flex-1 min-w-0">
+          <p class="font-semibold text-warm-900 truncate">{{ caregiver_link.caregiver.full_name }}</p>
+          <p class="text-sm text-warm-500">{{ caregiver_link.get_relationship_display }}</p>
+        </div>
+        <a href="mailto:{{ caregiver_link.caregiver.email }}"
+           class="w-10 h-10 rounded-xl border border-warm-200 hover:border-brand-green flex items-center justify-center text-warm-700"
+           aria-label="Email caregiver">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </div>
+    {% else %}
+      <p class="text-sm text-warm-500">No emergency contact on file. Ask the team to link a caregiver.</p>
+    {% endif %}
+  </section>
+
+  <form method="post" action="{% url 'accounts:logout' %}" class="m-0">
+    {% csrf_token %}
+    <button type="submit"
+            class="w-full rounded-2xl border border-warm-300 bg-white py-3 text-sm font-medium text-warm-800 hover:border-brand-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green flex items-center justify-center gap-2">
+      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Sign out
+    </button>
+  </form>
+</div>
+{% endblock %}

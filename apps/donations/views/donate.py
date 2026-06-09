@@ -14,6 +14,7 @@ service (per MerryMeal conventions).
 
 from __future__ import annotations
 
+from django.conf import settings
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_GET, require_POST
 
@@ -53,6 +54,7 @@ def _render_donate(request, form: DonateForm, campaign: Campaign | None):
             # context list (instead of hard-coding the loop variable in the
             # template) makes them easy to A/B test later.
             "amount_chips": [20, 50, 100],
+            "meal_cost_cents": int(getattr(settings, "MEAL_COST_CENTS", 300)),
         },
     )
 

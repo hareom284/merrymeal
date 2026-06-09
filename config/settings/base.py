@@ -33,6 +33,8 @@ INSTALLED_APPS = [
     "apps.volunteers",
     "apps.delivery",
     "apps.donations",
+    "apps.ai_assistant",
+    "apps.site_config",
 ]
 
 MIDDLEWARE = [
@@ -59,6 +61,8 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "apps.dashboards.context_processors.navigation",
+                "apps.site_config.context_processors.org",
             ],
         },
     },
@@ -229,4 +233,60 @@ MERRYMEAL_ABN = env(
 MERRYMEAL_ADDRESS = env(
     "MERRYMEAL_ADDRESS",
     default=DONATIONS_CHARITY_ADDRESS,
+)
+
+
+# Django-Q2 cluster. We only set the knobs needed to silence the
+# ``Retry and timeout are misconfigured`` warning emitted on every
+# ``manage.py`` call when the defaults disagree — ``retry`` MUST be
+# strictly greater than ``timeout`` or the cluster requeues the same
+# task before its first run finishes. The dispatch jobs (Story 4.5
+# generate, 4.6 routes) finish in <30s on a real DB; 60s timeout +
+# 90s retry gives a comfortable margin without keeping a failed task
+# in flight too long. Test settings override to ``sync=True`` and
+# never reach this code path.
+Q_CLUSTER = {
+    "name": "merrymeal",
+    "orm": "default",
+    "timeout": 60,
+    "retry": 90,
+    "workers": 2,
+    "recycle": 500,
+    "save_limit": 250,
+    "queue_limit": 50,
+    "label": "Django Q",
+}
+
+# Mapbox Static Images API token (Story 12.7 — the member track-delivery
+# page renders an <img> against this token). Leave unset in dev/test so
+# ``static_map_url`` returns ``None`` and the template falls back to a
+# stylised placeholder block — no broken images, no failing tests.
+MAPBOX_TOKEN = env("MAPBOX_TOKEN", default="")
+
+# AI assistant (Gemini). Member-facing chat widget. Free tier of Gemini
+# 2.0 Flash is generous (1500 req/day) — plenty for a demo and the
+# early pilot. Leave the key blank to disable the widget gracefully:
+# ``apps.ai_assistant.services.client.generate`` raises GeminiUnavailable
+# when the key is missing, and the view falls back to a "please call
+# the office" message rather than crashing the page.
+GEMINI_API_KEY = env("GEMINI_API_KEY", default="")
+GEMINI_MODEL = env("GEMINI_MODEL", default="gemini-flash-latest")
+# Rate limits for the AI assistant. Both caps are enforced by
+# ``apps.ai_assistant.services.rate_limit.check`` and protect the
+# Gemini free tier's 15 req/min ceiling.
+#
+# * ``GEMINI_RATE_LIMIT_PER_USER`` — how many chat sends one user can
+#   make per window. 10 is generous for a real conversation and far
+#   enough below the global cap that one chatty user can't lock the
+#   whole charity out.
+# * ``GEMINI_RATE_LIMIT_GLOBAL`` — total across all users per window.
+#   12 leaves a 3 req/min cushion under Gemini's 15 req/min free-tier
+#   limit so a brief burst doesn't 429 at the upstream.
+# * ``GEMINI_RATE_LIMIT_WINDOW_SECONDS`` — bucket size. The window
+#   slides over the wall clock (not per-user), so the moment the
+#   second hits the boundary, all counters reset.
+GEMINI_RATE_LIMIT_PER_USER = env.int("GEMINI_RATE_LIMIT_PER_USER", default=10)
+GEMINI_RATE_LIMIT_GLOBAL = env.int("GEMINI_RATE_LIMIT_GLOBAL", default=12)
+GEMINI_RATE_LIMIT_WINDOW_SECONDS = env.int(
+    "GEMINI_RATE_LIMIT_WINDOW_SECONDS", default=60
 )
