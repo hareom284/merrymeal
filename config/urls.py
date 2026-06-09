@@ -43,4 +43,6 @@ urlpatterns = [
     # carry their own ``donate/`` and ``donations/`` prefixes inside the
     # module so the namespace stays single-rooted under ``donations:``.
     path("", include("apps.donations.urls")),
+    # AI assistant — Gemini-backed chat widget endpoint.
+    path("", include("apps.ai_assistant.urls")),
 ]

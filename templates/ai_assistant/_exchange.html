@@ -1,0 +1,16 @@
+{% comment %}
+  One question/answer turn — appended to ``#chat-log`` by HTMX
+  (``hx-swap="beforeend"``). The user bubble sits right-aligned in
+  brand green; the assistant bubble sits left-aligned on a warm
+  background. ``whitespace-pre-wrap`` preserves Gemini's line breaks
+  without rendering markdown — the page is a charity chat for seniors,
+  not a code editor; richer formatting can come later if asked.
+{% endcomment %}
+<div class="flex justify-end" data-testid="assistant-user-bubble">
+  <div class="bg-brand-green text-white rounded-2xl rounded-br-sm px-3 py-2 text-sm max-w-[80%] break-words">
+    {{ message }}
+  </div>
+</div>
+<div class="flex justify-start" data-testid="assistant-reply-bubble">
+  <div class="bg-warm-100 text-warm-900 rounded-2xl rounded-bl-sm px-3 py-2 text-sm max-w-[80%] whitespace-pre-wrap break-words">{{ reply }}</div>
+</div>

@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     "apps.volunteers",
     "apps.delivery",
     "apps.donations",
+    "apps.ai_assistant",
 ]
 
 MIDDLEWARE = [
@@ -259,3 +260,12 @@ Q_CLUSTER = {
 # ``static_map_url`` returns ``None`` and the template falls back to a
 # stylised placeholder block — no broken images, no failing tests.
 MAPBOX_TOKEN = env("MAPBOX_TOKEN", default="")
+
+# AI assistant (Gemini). Member-facing chat widget. Free tier of Gemini
+# 2.0 Flash is generous (1500 req/day) — plenty for a demo and the
+# early pilot. Leave the key blank to disable the widget gracefully:
+# ``apps.ai_assistant.services.client.generate`` raises GeminiUnavailable
+# when the key is missing, and the view falls back to a "please call
+# the office" message rather than crashing the page.
+GEMINI_API_KEY = env("GEMINI_API_KEY", default="")
+GEMINI_MODEL = env("GEMINI_MODEL", default="gemini-2.0-flash")
