@@ -269,3 +269,22 @@ MAPBOX_TOKEN = env("MAPBOX_TOKEN", default="")
 # the office" message rather than crashing the page.
 GEMINI_API_KEY = env("GEMINI_API_KEY", default="")
 GEMINI_MODEL = env("GEMINI_MODEL", default="gemini-flash-latest")
+# Rate limits for the AI assistant. Both caps are enforced by
+# ``apps.ai_assistant.services.rate_limit.check`` and protect the
+# Gemini free tier's 15 req/min ceiling.
+#
+# * ``GEMINI_RATE_LIMIT_PER_USER`` — how many chat sends one user can
+#   make per window. 10 is generous for a real conversation and far
+#   enough below the global cap that one chatty user can't lock the
+#   whole charity out.
+# * ``GEMINI_RATE_LIMIT_GLOBAL`` — total across all users per window.
+#   12 leaves a 3 req/min cushion under Gemini's 15 req/min free-tier
+#   limit so a brief burst doesn't 429 at the upstream.
+# * ``GEMINI_RATE_LIMIT_WINDOW_SECONDS`` — bucket size. The window
+#   slides over the wall clock (not per-user), so the moment the
+#   second hits the boundary, all counters reset.
+GEMINI_RATE_LIMIT_PER_USER = env.int("GEMINI_RATE_LIMIT_PER_USER", default=10)
+GEMINI_RATE_LIMIT_GLOBAL = env.int("GEMINI_RATE_LIMIT_GLOBAL", default=12)
+GEMINI_RATE_LIMIT_WINDOW_SECONDS = env.int(
+    "GEMINI_RATE_LIMIT_WINDOW_SECONDS", default=60
+)
