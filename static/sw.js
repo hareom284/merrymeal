@@ -11,7 +11,7 @@
  * file referenced from base.html / app_base.html so installed clients
  * pick up the new shell on their next page view.
  */
-const CACHE_VERSION = "v2";
+const CACHE_VERSION = "v3";
 const SHELL_CACHE = `merrymeal-shell-${CACHE_VERSION}`;
 const PRECACHE_URLS = [
   "/",

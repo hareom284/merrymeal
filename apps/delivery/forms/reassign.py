@@ -21,3 +21,14 @@ class ReassignForm(forms.Form):
         queryset=User.objects.filter(role="volunteer", is_active=True),
         required=True,
     )
+
+    def __init__(self, *args, exclude_volunteer_id: int | None = None, **kwargs):
+        """``exclude_volunteer_id`` removes the currently-assigned volunteer
+        from the dropdown so the admin can't pick a same-volunteer dead-end
+        that the reassign service rejects with HTTP 400. Pass the
+        delivery's current ``volunteer_id`` when rendering the modal."""
+        super().__init__(*args, **kwargs)
+        if exclude_volunteer_id is not None:
+            self.fields["volunteer"].queryset = (
+                self.fields["volunteer"].queryset.exclude(pk=exclude_volunteer_id)
+            )

@@ -1,14 +1,18 @@
 {% comment %}
   Story 4.12 — member tracking partial.
 
-  Lives as both:
-    1. The initial render embedded in the member home today card.
-    2. The body HTMX swaps in on each `every 60s` poll.
+  Two render paths:
+    1. Embedded inside the member home today card (initial render).
+    2. The HTMX swap target on each `every 60s` poll.
 
   Because (2) replaces the whole element (outerHTML), the partial owns
   its own `hx-trigger`. When `polling` is False (status delivered or
   failed), the trigger is OMITTED on purpose — HTMX has nothing left
   to fire and polling stops naturally. Do NOT add JS to "stop" it.
+
+  Visiting ``/member/delivery/<pk>/status/`` directly redirects to the
+  full ``/track/`` page (see ``tracking_status_view``), so this partial
+  never appears as a bare page in a browser.
 
   Context (see `apps.delivery.services.tracking.get_tracking_context`):
     delivery          Delivery
@@ -18,38 +22,82 @@
     delivered_at      datetime | None
     polling           bool  False once status in {delivered, failed}
 {% endcomment %}
-<div id="tracking-card-{{ delivery.id }}"
-     class="rounded-2xl border border-warm-200 bg-white p-4 text-[18px] flex items-center justify-between gap-3 min-h-[44px]"
-     data-testid="tracking-card"
-     {% if polling %}hx-get="{% url 'delivery:tracking_status' delivery.id %}" hx-trigger="every 60s" hx-swap="outerHTML"{% endif %}>
-  {% if status == "delivered" %}
-    <span class="inline-flex items-center bg-brand-green text-white px-4 py-2 rounded-full font-semibold min-h-[44px]"
-          data-testid="status-pill">
-      Delivered ✓{% if delivered_at %} at {{ delivered_at|time:"H:i" }}{% endif %}
-    </span>
-  {% elif status == "failed" %}
-    <span class="inline-flex items-center bg-brand-orange text-white px-4 py-2 rounded-full font-semibold min-h-[44px]"
-          data-testid="status-pill">
-      Couldn't deliver — we'll call you
-    </span>
-  {% elif status == "out_for_delivery" %}
-    <p class="text-warm-900 min-h-[44px] flex items-center" data-testid="status-pill">
-      On the way with <strong class="ml-1">{{ volunteer_display }}</strong>
-    </p>
-  {% else %}
-    {# pending (and any unexpected status — render the label safely). #}
-    <p class="text-warm-500 min-h-[44px] flex items-center" data-testid="status-pill">
-      {{ label }}
-    </p>
-  {% endif %}
+<a id="tracking-card-{{ delivery.id }}"
+   href="{% url 'delivery:member_track' %}"
+   data-testid="tracking-card"
+   {% if polling %}
+     hx-get="{% url 'delivery:tracking_status' delivery.id %}"
+     hx-trigger="every 60s"
+     hx-swap="outerHTML"
+   {% endif %}
+   class="group block rounded-2xl border bg-white p-4 hover:border-brand-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green focus-visible:ring-offset-2 transition
+     {% if status == 'delivered' %}border-brand-green/40
+     {% elif status == 'out_for_delivery' %}border-sky-300
+     {% elif status == 'failed' %}border-orange-300
+     {% else %}border-warm-200{% endif %}"
+   aria-label="Open full delivery tracking">
+  <div class="flex items-center gap-3">
 
-  {% if polling %}
-    <a href="{% url 'delivery:member_track' %}"
-       class="shrink-0 inline-flex items-center gap-1 text-sm font-medium text-brand-green hover:underline min-h-[44px] px-2"
-       data-testid="tracking-map-link"
-       aria-label="Open the live tracking map">
-      Track on map
-      <span aria-hidden="true">→</span>
-    </a>
-  {% endif %}
-</div>
+    {# Status icon — colour matches the state #}
+    <span aria-hidden="true"
+          class="shrink-0 w-11 h-11 rounded-full flex items-center justify-center
+            {% if status == 'delivered' %}bg-brand-green text-white
+            {% elif status == 'out_for_delivery' %}bg-sky-500 text-white
+            {% elif status == 'failed' %}bg-orange-500 text-white
+            {% else %}bg-warm-100 text-warm-700{% endif %}">
+      {% if status == 'delivered' %}
+        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="m5 12 5 5L20 7" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      {% elif status == 'out_for_delivery' %}
+        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 17h2l1-9h9v9h2m-7 0h-1m9-9 3 3v6h-2m-4 0h-2" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="7.5" cy="18" r="1.5" fill="currentColor"/>
+          <circle cx="16.5" cy="18" r="1.5" fill="currentColor"/>
+        </svg>
+      {% elif status == 'failed' %}
+        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 9v4m0 4h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      {% else %}
+        {# Pending — chef's hat. #}
+        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M6 13a4 4 0 1 1 1.6-7.66 4 4 0 0 1 8.8 0A4 4 0 1 1 18 13v6a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2v-6Z" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M9 17h6" stroke-linecap="round"/>
+        </svg>
+      {% endif %}
+    </span>
+
+    {# Status text — single source of truth, no duplicate pill #}
+    <div class="flex-1 min-w-0">
+      <p class="text-xs uppercase tracking-widest text-warm-500">Today's delivery</p>
+      <p class="text-[17px] sm:text-lg font-semibold text-warm-900 leading-snug truncate"
+         data-testid="status-pill">
+        {% if status == 'delivered' %}
+          Delivered{% if delivered_at %} at {{ delivered_at|time:"g:i a" }}{% endif %}
+        {% elif status == 'out_for_delivery' %}
+          {% if volunteer_display %}{{ volunteer_display }} is on the way{% else %}On the way to you{% endif %}
+        {% elif status == 'failed' %}
+          Couldn't deliver — we'll call you
+        {% else %}
+          We're cooking your meal
+        {% endif %}
+      </p>
+    </div>
+
+    {% comment %}
+      Open-chevron CTA — replaces the old "Track on map →" link. The
+      whole card is now the link, but the chevron makes that visually
+      obvious without competing for tap space.
+    {% endcomment %}
+    {% if polling %}
+      <span class="shrink-0 inline-flex items-center justify-center w-9 h-9 rounded-full bg-warm-100 text-warm-700 group-hover:bg-brand-green group-hover:text-white transition"
+            data-testid="tracking-map-link"
+            aria-hidden="true">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="m9 18 6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+    {% endif %}
+  </div>
+</a>

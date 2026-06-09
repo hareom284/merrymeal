@@ -56,12 +56,20 @@ diet-coverage badge (Story 3.6). When the plan's
         </div>
         {% endwith %}
       {% endif %}
-      <button type="button"
-              class="self-start text-xs font-medium text-brand-green hover:underline"
-              hx-get="{% url 'planning:cell-edit' %}?kitchen={{ kitchen.id }}&amp;date={{ date|date:'Y-m-d' }}"
-              hx-target="#modal" hx-swap="innerHTML">
-        Edit
-      </button>
+      <div class="flex items-center gap-3">
+        <button type="button"
+                class="text-xs font-medium text-brand-green hover:underline"
+                hx-get="{% url 'planning:cell-edit' %}?kitchen={{ kitchen.id }}&amp;date={{ date|date:'Y-m-d' }}"
+                hx-target="#modal" hx-swap="innerHTML">
+          Edit
+        </button>
+        <button type="button"
+                class="text-xs font-medium text-warm-600 hover:text-brand-green hover:underline"
+                hx-get="{% url 'planning:cell-members' %}?plan={{ plan.id }}"
+                hx-target="#modal" hx-swap="innerHTML">
+          View members
+        </button>
+      </div>
     </div>
   {% else %}
     <button type="button"

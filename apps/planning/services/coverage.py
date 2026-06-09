@@ -41,6 +41,30 @@ def _candidate_members(meal_plan):
             yield member
 
 
+def members_for_plan(meal_plan) -> list[dict]:
+    """Return the active members eating fresh from this plan's kitchen on
+    this date, each annotated with their dietary preferences and allergy
+    tags. Used by the planner cell modal so an admin can see *who* a meal
+    choice will reach before saving.
+
+    Ordered by member name for stable rendering. Returns a list (not a
+    queryset) because each row is enriched with a per-member diet name
+    list — that's awkward to do in pure ORM.
+    """
+    rows: list[dict] = []
+    for member in _candidate_members(meal_plan):
+        rows.append(
+            {
+                "member": member,
+                "diet_names": sorted(
+                    d.name for d in member.diet_preferences.all()
+                ),
+            }
+        )
+    rows.sort(key=lambda r: r["member"].full_name.lower())
+    return rows
+
+
 def diet_warnings(meal_plan) -> dict:
     """Return ``{DietPreference: count}`` for diets the meal does not cover.
 

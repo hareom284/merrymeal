@@ -16,40 +16,21 @@
     </p>
   </header>
 
-  <main class="flex-1 space-y-3 pb-28" data-testid="stop-list">
-    {% if not stops %}
-      <div class="card p-6 text-center text-warm-500" data-testid="empty-state">
-        <p class="font-display text-xl text-warm-900">All done</p>
-        <p class="mt-2">Nothing scheduled for today.</p>
-      </div>
-    {% endif %}
-    {% for stop in stops %}
-      {% include "delivery/volunteer/_stop_card.html" with stop=stop %}
-    {% endfor %}
-  </main>
-
   {% comment %}
-    Bottom-anchored CTA. Spec calls for ``position: sticky; bottom: 0``
-    inside the scroll container (NOT ``fixed`` — fixed jumps when iOS
-    Safari's URL bar shows/hides). The CTA only renders when there is
-    a current stop (first ``pending`` / ``out_for_delivery``). The form
-    action is a placeholder ``#`` — Story 4.9 introduces the
-    ``mark_delivered`` endpoint and will wire it up at that point.
+    Route fragment wrapper — owns ``id="route-fragment"`` which is the
+    HTMX swap target for both ``mark_delivered`` and ``mark_failed``.
+    Without this include the forms post fine but HTMX can't find
+    ``#route-fragment`` to swap into, so the UI silently does nothing
+    even though the DB transitioned. The previous static ``<main>`` +
+    placeholder ``action="#"`` sticky CTA was the source of both the
+    "Mark delivered does nothing" and "Submit on couldn't-deliver does
+    nothing" bugs.
+
+    The Mark-delivered + Couldn't-deliver buttons live inside each
+    current stop card (see ``_stop_card.html``) — keep them there to
+    avoid the duplicate broken button that was rendering at the bottom
+    of the page.
   {% endcomment %}
-  {% for stop in stops %}
-    {% if stop.is_current %}
-      <div class="sticky bottom-0 left-0 right-0 -mx-4 border-t border-warm-200 bg-warm-50 px-4 py-3"
-           data-testid="cta-bar">
-        <form method="post" action="#">
-          {% csrf_token %}
-          <button type="submit"
-                  class="btn-primary w-full min-h-[44px] py-3 text-[18px]"
-                  data-testid="mark-delivered-cta">
-            Mark {{ stop.member_display }} delivered
-          </button>
-        </form>
-      </div>
-    {% endif %}
-  {% endfor %}
+  {% include "delivery/volunteer/_route_fragment.html" %}
 </div>
 {% endblock %}

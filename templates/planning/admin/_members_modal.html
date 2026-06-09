@@ -1,0 +1,96 @@
+{% comment %}
+  Planner cell modal — lists every active member eating "fresh" from
+  this plan's kitchen on the plan's date, with their dietary tags. HTMX
+  swaps this into ``#modal`` from the cell's "View members" link.
+
+  Closes via ``@click.outside`` and the X button. The wrapper sets
+  ``@keydown.escape.window`` so Esc also closes — accessibility default
+  expected for any modal.
+{% endcomment %}
+<div
+  x-data="{ open: true }"
+  x-init="$nextTick(() => open = true)"
+  x-show="open"
+  @keydown.escape.window="open = false; setTimeout(() => $el.remove(), 150)"
+  class="fixed inset-0 z-50 flex items-center justify-center px-4"
+>
+  {# Backdrop #}
+  <div
+    @click="open = false; setTimeout(() => $el.parentElement.remove(), 150)"
+    class="absolute inset-0 bg-warm-900/40"
+  ></div>
+
+  {# Panel #}
+  <div
+    x-show="open"
+    x-transition.opacity
+    class="relative z-10 w-full max-w-lg rounded-2xl bg-white shadow-xl border border-warm-200"
+  >
+    <header class="flex items-start justify-between gap-3 border-b border-warm-200 px-5 py-3">
+      <div class="flex flex-col gap-0.5">
+        <h2 class="font-display text-lg font-semibold text-warm-900">
+          Members eating this meal
+        </h2>
+        <p class="text-sm text-warm-600">
+          {{ plan.kitchen.name }} · {{ plan.service_date|date:"D j M Y" }} ·
+          {{ plan.meal.name }}
+        </p>
+      </div>
+      <button
+        type="button"
+        @click="open = false; setTimeout(() => $el.closest('[x-data]').parentElement.remove(), 150)"
+        class="rounded-full p-1 text-warm-500 hover:bg-warm-100 hover:text-warm-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green"
+        aria-label="Close"
+      >
+        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M18 6 6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </header>
+
+    <div class="max-h-[60vh] overflow-y-auto px-5 py-3">
+      {% if members %}
+        <p class="text-sm text-warm-600 mb-2">
+          {{ members|length }} member{{ members|length|pluralize }} will receive this fresh meal.
+        </p>
+        <ul class="divide-y divide-warm-100">
+          {% for row in members %}
+            <li class="flex items-start justify-between gap-3 py-2">
+              <div class="flex flex-col gap-0.5 min-w-0">
+                <span class="font-medium text-warm-900 truncate">
+                  {{ row.member.full_name }}
+                </span>
+                <span class="text-xs text-warm-500 truncate">
+                  {{ row.member.email }}
+                </span>
+              </div>
+              <div class="flex flex-wrap items-center gap-1 justify-end shrink-0 max-w-[55%]">
+                {% for diet in row.diet_names %}
+                  <span class="inline-flex items-center rounded-full bg-warm-100 px-2 py-0.5 text-xs text-warm-700">
+                    {{ diet }}
+                  </span>
+                {% empty %}
+                  <span class="text-xs text-warm-400">no dietary tags</span>
+                {% endfor %}
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="py-6 text-center text-sm text-warm-500">
+          No active members are within range of this kitchen on this date.
+        </p>
+      {% endif %}
+    </div>
+
+    <footer class="border-t border-warm-200 px-5 py-3 flex justify-end">
+      <button
+        type="button"
+        @click="open = false; setTimeout(() => $el.closest('[x-data]').parentElement.remove(), 150)"
+        class="btn-secondary text-sm"
+      >
+        Close
+      </button>
+    </footer>
+  </div>
+</div>

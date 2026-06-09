@@ -9,6 +9,7 @@ from django.urls import path
 from apps.planning.views.admin_planner import (
     cell_acknowledge_view,
     cell_edit_view,
+    cell_members_view,
     planner_view,
 )
 
@@ -18,4 +19,5 @@ urlpatterns = [
     path("", planner_view, name="planner"),
     path("cell/", cell_edit_view, name="cell-edit"),
     path("cell/acknowledge/", cell_acknowledge_view, name="cell-acknowledge"),
+    path("cell/members/", cell_members_view, name="cell-members"),
 ]

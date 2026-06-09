@@ -1,12 +1,12 @@
-{% extends "base.html" %}
+{% extends "app_base.html" %}
 {% block title %}Weekly planner · MerryMeal{% endblock %}
 
 {% block content %}
-<section class="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-8">
+<section class="mx-auto flex w-full max-w-6xl flex-col gap-6">
   <header class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-    <div>
+    <div class="flex flex-col gap-1">
       <h1 class="font-display text-3xl font-semibold text-warm-900">Weekly planner</h1>
-      <p class="text-warm-600 text-sm">
+      <p class="text-warm-600">
         Week of <span class="font-medium">{{ monday|date:"D j M Y" }}</span>
         (Mon–Sun). Drop a meal in each cell.
       </p>

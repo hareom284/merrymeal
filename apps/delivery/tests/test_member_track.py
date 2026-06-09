@@ -71,8 +71,12 @@ def test_track_page_renders_today_delivery(client):
 
 
 @pytest.mark.django_db
-def test_track_page_falls_back_to_placeholder_without_token(client):
-    """No token + no GPS → "Map preview unavailable" placeholder."""
+def test_track_page_hides_map_section_without_token(client):
+    """No token (or non-out-for-delivery status) → the map section is
+    omitted entirely rather than rendering an empty grey "Map preview
+    unavailable" rectangle. Keeping the page free of dead UI was the
+    motivation for the Story 12.7 refresh — an empty box was confusing
+    seniors who thought the map had failed to load."""
     member = UserFactory(role="member")
     client.force_login(member)
     DeliveryFactory(
@@ -83,8 +87,9 @@ def test_track_page_falls_back_to_placeholder_without_token(client):
     with override_settings(MAPBOX_TOKEN=""):
         response = client.get("/track/")
     assert response.status_code == 200
-    assert b"Map preview unavailable" in response.content
+    # No map image, no Mapbox call, no empty placeholder copy.
     assert b"api.mapbox.com" not in response.content
+    assert b"Map preview unavailable" not in response.content
 
 
 @pytest.mark.django_db

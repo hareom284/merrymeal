@@ -1,30 +1,61 @@
 {% comment %}
-  Service worker registration + Android install hint.
+  Service worker registration + install hints.
 
-  The script no-ops on browsers without ``navigator.serviceWorker`` so
-  legacy desktop browsers don't see a console error. ``catch`` swallows
-  registration failures (e.g. localhost with self-signed certs over
-  HTTPS) — the site still works without the SW, the user just doesn't
-  get offline support or the install prompt.
+  Two install paths because the two mobile platforms behave differently:
 
-  Android Chrome fires ``beforeinstallprompt`` once the PWA install
-  criteria are met (manifest + SW + icon + start_url reachable). We
-  stash the event and expose an "Install app" button via a small
-  Alpine snippet, because Chrome no longer shows the URL-bar install
-  icon automatically on mobile.
+  * **Android / desktop Chrome / Edge.** Fires ``beforeinstallprompt``
+    once the PWA install criteria are met (manifest + SW + icon +
+    start_url reachable). We stash the event and expose an "Install
+    app" pill — Chrome no longer auto-shows the URL-bar install icon
+    on mobile, so without this pill the install flow is invisible.
+
+  * **iOS Safari / WebKit.** Does NOT fire ``beforeinstallprompt`` and
+    has no programmatic install API. The only path is the user
+    tapping Share → Add to Home Screen themselves. We detect iOS, hide
+    the hint once installed (``navigator.standalone === true``), and
+    let the user dismiss the hint to localStorage so it doesn't pester
+    them every visit.
+
+  Both hints are bottom-anchored, single-row, and respect
+  ``safe-area-inset-bottom`` so they don't sit under the iOS gesture
+  bar or the Android nav bar. ``pointer-events-none`` on the wrapper
+  with ``pointer-events-auto`` on the children means the pill is
+  tappable but doesn't block clicks on the rest of the page.
 {% endcomment %}
 <div
-  x-data="{ canInstall: false, deferred: null }"
+  x-data="{
+    canInstall: false,
+    deferred: null,
+    iosHint: false,
+    isIos() {
+      const ua = window.navigator.userAgent || '';
+      return /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+    },
+    isStandalone() {
+      return window.navigator.standalone === true
+        || window.matchMedia('(display-mode: standalone)').matches;
+    },
+    dismissIos() {
+      this.iosHint = false;
+      try { localStorage.setItem('mm-ios-install-dismissed', '1'); } catch (e) {}
+    },
+  }"
   x-init="
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferred = e;
       canInstall = true;
     });
-    window.addEventListener('appinstalled', () => { canInstall = false; deferred = null; });
+    window.addEventListener('appinstalled', () => { canInstall = false; deferred = null; iosHint = false; });
+    if (isIos() && !isStandalone()) {
+      let dismissed = false;
+      try { dismissed = localStorage.getItem('mm-ios-install-dismissed') === '1'; } catch (e) {}
+      iosHint = !dismissed;
+    }
   "
-  class="fixed inset-x-0 bottom-0 z-50 flex justify-center pointer-events-none pb-[max(env(safe-area-inset-bottom),1rem)]"
+  class="fixed inset-x-0 bottom-0 z-50 flex justify-center pointer-events-none pb-[max(env(safe-area-inset-bottom),1rem)] px-3"
 >
+  {# Android / desktop Chrome — programmatic install via beforeinstallprompt. #}
   <button
     type="button"
     x-show="canInstall"
@@ -37,6 +68,39 @@
     </svg>
     Install app
   </button>
+
+  {# iOS Safari — manual hint, no programmatic install possible. #}
+  <div
+    x-show="iosHint"
+    x-cloak
+    role="dialog"
+    aria-label="Install MerryMeal on iPhone"
+    class="pointer-events-auto inline-flex max-w-[min(420px,100%)] items-center gap-2 rounded-2xl bg-warm-900 px-3 py-2 text-sm text-white shadow-lg"
+  >
+    <svg class="w-5 h-5 shrink-0 text-brand-green" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+      {# Apple share glyph: square with up-arrow. #}
+      <path d="M12 16V4m0 0-4 4m4-4 4 4M6 12v6a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-6" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <p class="flex-1 leading-tight">
+      Install MerryMeal: tap
+      <span class="inline-flex items-center gap-0.5 align-middle">
+        <svg class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M12 16V4m0 0-4 4m4-4 4 4M6 12v6a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+      then <strong>Add to Home Screen</strong>.
+    </p>
+    <button
+      type="button"
+      @click="dismissIos()"
+      class="shrink-0 rounded-full p-1 text-warm-300 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green"
+      aria-label="Dismiss install hint"
+    >
+      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M18 6 6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </div>
 </div>
 
 <script>

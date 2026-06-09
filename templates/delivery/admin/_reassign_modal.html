@@ -1,5 +1,13 @@
-{# Reassign modal — loaded into #modal-slot via HTMX GET, removed by
-   the closeModal listener after a successful POST. #}
+{% comment %}
+  Reassign modal — loaded into #modal-slot via HTMX GET, removed by
+  the closeModal listener after a successful POST.
+
+  When the POST fails (no eligible volunteers, route at cap, etc.) the
+  server re-renders this same partial with ``form.non_field_errors``
+  populated and an ``HX-Retarget`` header pointing back at
+  #modal-slot, so the admin sees *why* save did nothing instead of a
+  silent fail.
+{% endcomment %}
 <div class="fixed inset-0 z-50 bg-black/40 flex items-center justify-center"
      id="reassign-modal"
      data-testid="reassign-modal"
@@ -8,18 +16,41 @@
     <h2 class="font-display text-xl mb-3">
       Reassign {{ delivery.member.full_name }}
     </h2>
+
+    {% if form.non_field_errors %}
+      <div class="mb-3 rounded-lg border border-orange-300 bg-orange-50 px-3 py-2 text-sm text-orange-900"
+           data-testid="reassign-error"
+           role="alert">
+        {% for err in form.non_field_errors %}{{ err }}{% if not forloop.last %} {% endif %}{% endfor %}
+      </div>
+    {% endif %}
+
+    {% if not form.fields.volunteer.queryset.exists %}
+      <p class="mb-3 rounded-lg border border-warm-300 bg-warm-100 px-3 py-2 text-sm text-warm-700">
+        No other volunteers are available to take this stop. Add a
+        second volunteer (or activate one) and reopen this dialog.
+      </p>
+    {% endif %}
+
     <form hx-post="{% url 'delivery:admin_reassign' delivery.id %}"
           hx-target="#delivery-row-{{ delivery.id }}"
           hx-swap="outerHTML">
       {% csrf_token %}
       <label class="label" for="id_volunteer">Volunteer</label>
       {{ form.volunteer }}
+      {% if form.volunteer.errors %}
+        <p class="mt-1 text-sm text-orange-700">
+          {{ form.volunteer.errors|join:" " }}
+        </p>
+      {% endif %}
       <div class="flex justify-end gap-2 mt-4">
         <button type="button" class="btn-secondary"
                 onclick="document.getElementById('modal-slot').innerHTML=''">
           Cancel
         </button>
-        <button type="submit" class="btn-primary" data-testid="reassign-save">
+        <button type="submit" class="btn-primary"
+                data-testid="reassign-save"
+                {% if not form.fields.volunteer.queryset.exists %}disabled{% endif %}>
           Save
         </button>
       </div>

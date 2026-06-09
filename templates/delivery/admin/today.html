@@ -1,12 +1,21 @@
-{% extends "base.html" %}
-{% block title %}Today's deliveries — admin{% endblock %}
+{% extends "app_base.html" %}
+{% block title %}Today's deliveries · MerryMeal{% endblock %}
+
 {% block content %}
-<div class="p-6" x-data="{modal: null}">
-  <h1 class="font-display text-2xl mb-4">Today — {{ today|date:"D j M" }}</h1>
+<section class="mx-auto flex w-full max-w-6xl flex-col gap-6" x-data="{modal: null}">
+  <header class="flex flex-col gap-1">
+    <h1 class="font-display text-3xl font-semibold text-warm-900">
+      Today — {{ today|date:"D j M" }}
+    </h1>
+    <p class="text-warm-600">
+      Every scheduled delivery for today, grouped by route. Tap Reassign to
+      move a stop to a different volunteer.
+    </p>
+  </header>
 
   {% comment %} Desktop ≥ md: table layout. Below md the table is hidden and the
      mobile fallback (stacked cards) is shown instead. {% endcomment %}
-  <div class="hidden md:block">
+  <div class="hidden md:block rounded-2xl border border-warm-200 bg-white p-4">
     <table class="w-full text-[16px]">
       <thead class="text-left text-warm-500 border-b border-warm-200">
         <tr>
@@ -34,7 +43,8 @@
   {# Mobile (< md) fallback — stacked cards. Tap target ≥ 44 px. #}
   <div class="md:hidden space-y-2">
     {% for delivery in deliveries %}
-      <div class="card p-3 text-[16px]" data-testid="delivery-card">
+      <div class="rounded-2xl border border-warm-200 bg-white p-3 text-[16px]"
+           data-testid="delivery-card">
         <strong>{{ delivery.member.full_name }}</strong>
         <p class="text-warm-500">
           {{ delivery.volunteer.full_name }} — {{ delivery.get_status_display }}
@@ -46,10 +56,12 @@
         </button>
       </div>
     {% empty %}
-      <p class="text-warm-500">No deliveries today.</p>
+      <p class="rounded-2xl border border-dashed border-warm-200 px-4 py-8 text-center text-warm-500">
+        No deliveries today.
+      </p>
     {% endfor %}
   </div>
 
   <div id="modal-slot"></div>
-</div>
+</section>
 {% endblock %}

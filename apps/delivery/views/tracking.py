@@ -21,7 +21,8 @@ Hiding behind 404 (rather than 403) keeps delivery IDs unenumerable.
 from __future__ import annotations
 
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 
 from apps.delivery.models import Delivery
 from apps.delivery.services.tracking import get_tracking_context
@@ -41,5 +42,13 @@ def tracking_status_view(request, pk: int):
         qs = qs.none()
 
     delivery = get_object_or_404(qs)
+
+    # Direct browser visit (no ``HX-Request`` header) → redirect to the
+    # full ``/track/`` page so the user sees the app shell + map +
+    # progress timeline instead of a bare partial on a blank screen.
+    # HTMX polls still get the partial they expect.
+    if request.headers.get("HX-Request") != "true":
+        return redirect(reverse("delivery:member_track"))
+
     context = get_tracking_context(delivery, user)
     return render(request, "delivery/member/_tracking_card.html", context)

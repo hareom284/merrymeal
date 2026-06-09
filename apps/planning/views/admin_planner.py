@@ -12,7 +12,11 @@ from apps.core.decorators import role_required
 from apps.kitchens.models import Kitchen
 from apps.planning.forms.planner import MealPlanCellForm
 from apps.planning.models import MealPlan
-from apps.planning.services.coverage import acknowledge, diet_warnings
+from apps.planning.services.coverage import (
+    acknowledge,
+    diet_warnings,
+    members_for_plan,
+)
 from apps.planning.services.planner import upsert_cell
 
 
@@ -166,5 +170,33 @@ def cell_acknowledge_view(request):
                 "plan": plan,
                 "warnings": diet_warnings(plan),
             },
+        },
+    )
+
+
+@role_required("admin")
+def cell_members_view(request):
+    """HTMX endpoint — return the modal listing members eating fresh from
+    this plan's kitchen on the plan's date, with their dietary tags.
+
+    The cell template links here so an admin can see who a meal choice
+    actually reaches before committing.
+    """
+    raw_plan = request.GET.get("plan")
+    try:
+        plan_id = int(raw_plan)
+    except (TypeError, ValueError):
+        return HttpResponseBadRequest("bad plan id")
+
+    plan = get_object_or_404(
+        MealPlan.objects.select_related("kitchen", "meal"),
+        pk=plan_id,
+    )
+    return render(
+        request,
+        "planning/admin/_members_modal.html",
+        {
+            "plan": plan,
+            "members": members_for_plan(plan),
         },
     )
