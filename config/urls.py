@@ -1,5 +1,7 @@
 from django.urls import include, path
 
+from apps.core.views import manifest, service_worker
+
 # Django's built-in admin is intentionally NOT mounted.
 # All operational/admin UIs are built as custom views under /
 # (e.g. /admin/applications/, /admin/kitchens/) using the brand design.
@@ -7,6 +9,11 @@ from django.urls import include, path
 # custom management commands.
 
 urlpatterns = [
+    # PWA — service worker MUST be served from the site root so its
+    # scope covers every URL. Manifest matches for symmetry; see
+    # apps/core/views/pwa.py for the rationale.
+    path("sw.js", service_worker, name="service_worker"),
+    path("manifest.webmanifest", manifest, name="manifest"),
     path("", include("apps.accounts.urls")),
     # Story 5.8 — admin campaign-progress card lives at /admin/campaigns/.
     # Included *before* the generic dashboards URLs so the namespace
