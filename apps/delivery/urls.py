@@ -26,6 +26,7 @@ from apps.delivery.views import (
     member_track_view,
     rate_meal_view,
     reassign_view,
+    start_route_view,
     today_view,
     tracking_status_view,
 )
@@ -35,6 +36,15 @@ app_name = "delivery"
 urlpatterns = [
     # --- Volunteer-facing (Story 4.8) ---------------------------------
     path("volunteer/today/", today_view, name="volunteer_today"),
+    # --- Start-of-route "I'm on my way" CTA ---------------------------
+    # Flips Route.status planned → in_progress and bulk-promotes
+    # pending deliveries to ``out_for_delivery``, which is what the
+    # member-facing tracking page gates the live map block on.
+    path(
+        "volunteer/route/start/",
+        start_route_view,
+        name="start_route",
+    ),
     # --- POD upload + status flip (Story 4.9) -------------------------
     path(
         "volunteer/delivery/<int:pk>/mark-delivered/",

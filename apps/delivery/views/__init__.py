@@ -7,6 +7,7 @@ from apps.delivery.views.tracking import tracking_status_view
 from apps.delivery.views.volunteer_today import (
     mark_delivered_view,
     mark_failed_view,
+    start_route_view,
     today_view,
 )
 
@@ -18,6 +19,7 @@ __all__ = [
     "member_track_view",
     "rate_meal_view",
     "reassign_view",
+    "start_route_view",
     "today_view",
     "tracking_status_view",
 ]

@@ -38,11 +38,8 @@ def issue_password_setup_token(user: User) -> str:
     return token
 
 
-def consume_password_setup_token(token: str) -> User:
-    """Returns the User the token belongs to. Marks it used. Single-use.
-
-    Raises InvalidTokenError / ExpiredTokenError / ConsumedTokenError.
-    """
+def _decode_payload(token: str) -> int:
+    """Verify signature + extract ``uid``. Raises Invalid/Expired errors."""
     try:
         payload = loads(token, salt=TOKEN_SALT, max_age=TOKEN_TTL.total_seconds())
     except SignatureExpired as exc:
@@ -53,7 +50,41 @@ def consume_password_setup_token(token: str) -> User:
     uid = payload.get("uid")
     if not isinstance(uid, int):
         raise InvalidTokenError("payload missing uid")
+    return uid
 
+
+def verify_password_setup_token(token: str) -> User:
+    """Read-only token check. Returns the User the token belongs to.
+
+    Use on GET handlers that need to know whether to show the
+    set-password form or a friendly error. Does **not** mark the token
+    used — the actual single-use consume happens in
+    ``consume_password_setup_token`` on POST.
+
+    Raises InvalidTokenError / ExpiredTokenError / ConsumedTokenError.
+    """
+    uid = _decode_payload(token)
+    token_hash = _hash(token)
+    row = (
+        PasswordSetupToken.objects
+        .filter(user_id=uid, token_hash=token_hash)
+        .first()
+    )
+    if row is None:
+        raise InvalidTokenError("token not found")
+    if row.used_at is not None:
+        raise ConsumedTokenError("token already used")
+    if row.expires_at <= timezone.now():
+        raise ExpiredTokenError("token expired (db row)")
+    return User.objects.get(pk=uid)
+
+
+def consume_password_setup_token(token: str) -> User:
+    """Returns the User the token belongs to. Marks it used. Single-use.
+
+    Raises InvalidTokenError / ExpiredTokenError / ConsumedTokenError.
+    """
+    uid = _decode_payload(token)
     token_hash = _hash(token)
     with transaction.atomic():
         row = (

@@ -14,6 +14,7 @@ from .tokens import (
     InvalidTokenError,
     consume_password_setup_token,
     issue_password_setup_token,
+    verify_password_setup_token,
 )
 from .users import create_user, delete_user
 
@@ -31,6 +32,7 @@ __all__ = [
     "reject_application",
     "issue_password_setup_token",
     "consume_password_setup_token",
+    "verify_password_setup_token",
     "InvalidTokenError",
     "ExpiredTokenError",
     "ConsumedTokenError",

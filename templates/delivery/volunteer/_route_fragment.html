@@ -8,8 +8,34 @@
   The actual ``<form>`` + ``<input type=file>`` live inside
   ``_stop_card.html`` (current-stop branch). This wrapper only owns
   the swap target id and the empty-state copy.
+
+  "I'm on my way" CTA
+  -------------------
+  Rendered ONLY while the volunteer's route is still ``planned`` (i.e.
+  they haven't left the kitchen yet). POSTs to ``delivery:start_route``,
+  which flips the route to ``in_progress`` and bulk-promotes pending
+  deliveries to ``out_for_delivery`` — that's the trigger the
+  member-side tracking page watches to switch to live "On the way"
+  copy + show the map block. After the swap, ``route.status`` is no
+  longer ``planned`` and the button disappears.
 {% endcomment %}
 <div id="route-fragment">
+  {% if route and route.status == 'planned' and stops %}
+    <form method="post"
+          action="{% url 'delivery:start_route' %}"
+          hx-post="{% url 'delivery:start_route' %}"
+          hx-target="#route-fragment"
+          hx-swap="outerHTML"
+          class="mb-3"
+          data-testid="start-route-form">
+      {% csrf_token %}
+      <button type="submit"
+              class="btn-primary w-full min-h-[48px] py-3 text-[18px]"
+              data-testid="start-route-cta">
+        I'm on my way
+      </button>
+    </form>
+  {% endif %}
   <main class="flex-1 space-y-3 pb-28" data-testid="stop-list">
     {% if not stops %}
       <div class="card p-6 text-center text-warm-500" data-testid="empty-state">

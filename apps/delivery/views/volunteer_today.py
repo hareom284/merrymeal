@@ -25,6 +25,7 @@ from apps.delivery.models import Delivery
 from apps.delivery.services.mark_delivered import mark_delivered
 from apps.delivery.services.mark_failed import mark_failed
 from apps.delivery.services.photo import upload_pod_photo
+from apps.delivery.services.start_route import start_route
 from apps.delivery.services.volunteer_today import get_today_route
 
 logger = logging.getLogger("merrymeal.pod")
@@ -77,6 +78,36 @@ def mark_delivered_view(request, pk: int):
     logger.info(
         "pod.delivered delivery=%s volunteer=%s",
         delivery.id,
+        request.user.id,
+    )
+
+    context = get_today_route(request.user)
+    return render(
+        request, "delivery/volunteer/_route_fragment.html", context
+    )
+
+
+@login_required
+@role_required("volunteer")
+@require_POST
+def start_route_view(request):
+    """HTMX endpoint: volunteer taps "I'm on my way" at the top of the
+    route fragment after collecting meals from the kitchen.
+
+    Flips the volunteer's planned ``Route`` to ``in_progress`` and
+    bulk-promotes pending ``Delivery`` rows to ``out_for_delivery`` —
+    which is what unlocks the live "On the way" copy + map block on
+    the member's tracking page. Returns the re-rendered route fragment
+    so the CTA disappears from the UI without a full page reload.
+
+    Idempotent — see ``services/start_route.py``. A volunteer with no
+    route for today still gets a 200 + empty-state render rather than a
+    404, because the button is only shown when a planned route exists.
+    """
+    start_route(request.user)
+
+    logger.info(
+        "route.started volunteer=%s",
         request.user.id,
     )
 
