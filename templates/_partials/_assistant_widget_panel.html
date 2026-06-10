@@ -10,6 +10,7 @@
 <div
   x-data="{
     open: false,
+    isMobile() { return window.matchMedia('(max-width: 767px)').matches; },
     scrollBottom() {
       const log = document.getElementById('assistant-chat-log');
       if (log) log.scrollTop = log.scrollHeight;
@@ -18,17 +19,24 @@
       const log = document.getElementById('assistant-chat-log');
       if (!log) return;
       while (log.children.length > 1) log.removeChild(log.lastChild);
+    },
+    focusInput() {
+      const el = this.$el.querySelector('input[name=\'message\']');
+      if (el) el.focus();
     }
   }"
+  x-effect="document.body.style.overflow = (open && isMobile()) ? 'hidden' : ''"
+  @keydown.escape.window="open = false"
   style="position: fixed; right: 16px; bottom: 96px; z-index: 40;"
   class="md:!bottom-6"
 >
   <button
     type="button"
-    @click="open = !open; $nextTick(() => scrollBottom())"
-    style="width: 56px; height: 56px; border-radius: 9999px; background-color: #16a34a; color: white; box-shadow: 0 10px 25px rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center; border: 0; cursor: pointer;"
-    class="hover:bg-brand-green-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green focus-visible:ring-offset-2"
-    aria-label="Open MerryMeal assistant"
+    @click="open = !open; $nextTick(() => { scrollBottom(); if (open) focusInput(); })"
+    style="width: 56px; height: 56px; border-radius: 9999px; background-color: #16a34a; color: white; box-shadow: 0 10px 25px rgba(0,0,0,0.2); align-items: center; justify-content: center; border: 0; cursor: pointer;"
+    class="flex hover:bg-brand-green-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green focus-visible:ring-offset-2"
+    :class="{ 'hidden md:flex': open }"
+    :aria-label="open ? 'Close MerryMeal assistant' : 'Open MerryMeal assistant'"
   >
     <svg x-show="!open" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
       <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke-linecap="round" stroke-linejoin="round"/>
@@ -42,7 +50,16 @@
     x-show="open"
     x-cloak
     x-transition.opacity
-    style="position: absolute; bottom: 72px; right: 0; width: 320px; max-width: calc(100vw - 32px); height: 480px; max-height: calc(100dvh - 192px); background: white; border-radius: 16px; box-shadow: 0 20px 50px rgba(0,0,0,0.25); border: 1px solid #e8e6e1; display: grid; grid-template-rows: auto minmax(0, 1fr) auto auto; overflow: hidden;"
+    role="dialog"
+    aria-modal="true"
+    :aria-label="'{{ assistant_title|escapejs }}'"
+    class="
+      fixed inset-0 w-screen h-[100dvh] rounded-none border-0
+      md:absolute md:inset-auto md:bottom-[72px] md:right-0
+      md:w-[400px] md:max-w-[calc(100vw-32px)] md:h-[600px] md:max-h-[calc(100dvh-192px)]
+      md:rounded-2xl md:border md:border-warm-200
+    "
+    style="background: white; box-shadow: 0 20px 50px rgba(0,0,0,0.25); display: grid; grid-template-rows: auto minmax(0, 1fr) auto auto; overflow: hidden; padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); z-index: 50;"
   >
     <header style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-bottom: 1px solid #e8e6e1; background: #faf9f8;" class="flex items-center gap-2 px-3 py-2 border-b border-warm-200 bg-warm-50">
       <img src="{% static 'img/logo.png' %}" alt="" aria-hidden="true"
@@ -65,6 +82,16 @@
           aria-label="Clear conversation"
         >Clear</button>
       </form>
+      <button
+        type="button"
+        @click="open = false"
+        class="ml-1 inline-flex items-center justify-center w-8 h-8 rounded-full text-warm-500 hover:text-warm-900 hover:bg-warm-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green focus-visible:ring-offset-2"
+        aria-label="Close assistant"
+      >
+        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M18 6 6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
     </header>
 
     <div
